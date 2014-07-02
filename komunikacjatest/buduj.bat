@@ -1,0 +1,1 @@
+g++ oscpkt_demo.cc -o oscpkt_demo -lwsock32 -lWs2_32
