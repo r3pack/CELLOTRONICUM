@@ -12,7 +12,7 @@ using std::cerr;
 
 using namespace oscpkt;
 
-const int PORT_NUM = 6449;
+const int PORT_NUM = 57120;
 
 void runServer() {
   UdpSocket sock;
@@ -50,11 +50,11 @@ void runClient() {
     cerr << "Error connection to port " << PORT_NUM << ": " << sock.errorMessage() << "\n";
   } else {
     cout << "Client started, will send packets to port " << PORT_NUM << std::endl;
-    int iping = 1;
+    int iping = 2500;
     while (sock.isOk()) {
       Message msg("/ping"); msg.pushInt32(iping);
       PacketWriter pw;
-      pw.startBundle().startBundle().addMessage(msg).endBundle().endBundle();
+      pw.startBundle().addMessage(msg).endBundle();
       bool ok = sock.sendPacket(pw.packetData(), pw.packetSize());
       cout << "Client: sent /ping " << iping++ << ", ok=" << ok << "\n";
       // wait for a reply ?
