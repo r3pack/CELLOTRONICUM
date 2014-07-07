@@ -1,4 +1,4 @@
-(
+
 OSCdef.new(
 	\toggle,
 	{
@@ -8,7 +8,26 @@ OSCdef.new(
 	},
 	'/ping',
 );
-)
+
+Server
+
+OSCdef.new(
+	\toggle,
+	{
+		arg msg, time, addr, recvPort;
+		var re = NetAddr.new(addr, recvPort);
+		[msg, time, addr, recvPort].postln;
+		//~x.set(\freq, msg[1]);
+		s.boot(recover:true); //onFailure:func_onFailure report sender!
+		//zamiast tego:
+		//s.waitForBoot(func_główna_pętla, inf, func_onFailure)
+		re.sendMsg('\status', s.status);
+		re.sendMsg('\status', [s.status, s.sampleRate, s.numSynths]);
+		//re.sendMsg(
+	},
+	'/start',
+);
+
 
 NetAddr.langPort; //odbierający
 
