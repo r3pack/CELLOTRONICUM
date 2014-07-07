@@ -1,0 +1,1 @@
+g++ main.cpp -o main -lwsock32 -lWs2_32 -std=c++11
