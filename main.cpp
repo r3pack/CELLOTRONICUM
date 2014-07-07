@@ -77,6 +77,50 @@ bool quitServer()
 }
 
 
+bool getEffects()
+{
+	const int MAX_EFFECTS=1000;
+
+	if(!sendSimpleMessage("/app_list_effects")) return false;
+
+	int effectCount=MAX_EFFECTS;
+	int effectReceived=0;
+
+	
+	while (sock.isOk() && effectReceived < effectCount)
+	{
+		if (sock.receiveNextPacket(30)) 
+		{
+			PacketReader pr(sock.packetData(), sock.packetSize());
+			Message *incomingMsg;
+			while (pr.isOk() && (incomingMsg = pr.popMessage()) != 0) 
+			{
+				const char* addressPatern=incomingMsg->addressPattern().c_str();
+			
+				if(strcmp(addressPatern, "/effect")==0)
+				{
+					std::string name;
+					incomingMsg->arg().popStr(name);
+					fprintf(stderr, "Got effect '%s'\n", name.c_str());
+					++effectReceived;
+					
+					name="/"+name;
+					sendSimpleMessage(name.c_str());
+				}
+				else
+				if(strcmp(addressPatern, "/effects_count")==0)
+				{
+					incomingMsg->arg().popInt32(effectCount);
+					fprintf(stderr, "Effects count: %d\n", effectCount);
+				}
+			}
+		}
+	}
+	
+	
+	return true;
+}
+
 int main (int argc, char** argv)
 {
 	if(argc>1)
@@ -100,11 +144,11 @@ int main (int argc, char** argv)
 	fprintf(stderr, "Client started, will send packets to %s:%d\n", serverAddress, serverPortNumber);
 	
 	
-	
-	
 	startServer();
 	
-	waitFor(5000);
+	getEffects();
+	
+	waitFor(3000);
 	
 	quitServer();
 	
