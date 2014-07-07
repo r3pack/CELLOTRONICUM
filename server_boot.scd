@@ -4,9 +4,10 @@ var func_onFailure = {
 	'Bum!'.postln;
 };
 
-
-var func_main_loop = {
+var func_start = {
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
+	//INITIALISATION CODE HERE:
+
 };
 
 OSCdef.new(
@@ -14,13 +15,21 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		[msg, time, addr, recvPort].postln;
-		//~x.set(\freq, msg[1]);
 		~app_netaddr = addr;
-		//s.boot(recover:true); //onFailure:func_onFailure report sender!
-		//zamiast tego:
-		s.waitForBoot(func_main_loop, inf, func_onFailure);
-		//re.sendMsg('\status', s.status);
-		//re.sendMsg('\status', [s.status, s.sampleRate, s.numSynths]);
+		s.waitForBoot(func_start, inf, func_onFailure);
 	},
 	'/app_start'
 );
+
+OSCdef.new(
+	\app_quit,
+	{
+		arg msg, time, addr, recvPort;
+		[msg, time, addr, recvPort].postln;
+		s.quit;
+		'Server killed.'.postln;
+	},
+	'/app_quit'
+);
+
+OSCdef.all;
