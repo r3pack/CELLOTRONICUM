@@ -27,16 +27,7 @@
 #define OSCPKT_UDP_HH
 
 #include <sys/types.h>
-
-#ifdef _MSC_VER
-#define PLATROFM WINDOWS
-#endif
-
-#ifdef WIN32
-#define PLATROFM WINDOWS
-#endif
-
-#if PLATROFM == WINDOWS
+#if defined(_MSC_VER) || defined(_WIN32)
 /*
   if windows.h has been already included, be prepared for tons of
   compile errors. winsock2 must be included BEFORE windows.h . -- OR
@@ -46,7 +37,7 @@
 # include <winsock2.h> 
 # include <windows.h>
 # include <ws2tcpip.h>
-# ifdef _MSC_VER
+# if defined(_MSC_VER)
 #  pragma comment(lib, "ws2_32.lib")
 # endif
 #else
