@@ -12,6 +12,7 @@ SynthDef(\tutorial,{ arg out = 0, which=20, bufnum;
 
 );
 
+Klasa().someMethod;
 
 x = Synth.new(\tutorial, [\bufnum, b.bufnum ]); //tworzymy synth-a z buforem z kotem
 

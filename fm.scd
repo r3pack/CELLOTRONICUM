@@ -1,5 +1,5 @@
 
-b = Buffer.read(s, "C:\\Users\\praktykant\\zBrody3.wav");
+b = Buffer.read(s, "C:\\Users\\praktykant\\zBrody1.wav");
 
 (
 
@@ -54,7 +54,7 @@ SynthDef("fm1", { arg bufnum, bus = 0, freq = 440, carPartial = 1, modPartial = 
 
 Synth("sinefreq", [\out, 0, \bufnum, b.bufnum]);
 
-Synth("buffer", [\out, 1, \bufnum, b.bufnum]);
+Synth("buffer", [\out, 17, \bufnum, b.bufnum]);
 
 
 Synth("fm1", [\bus, 0, \freq, 440, \carPartial, 1, \modPartial, 2.4]);
