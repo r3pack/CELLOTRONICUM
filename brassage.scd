@@ -20,11 +20,11 @@ SynthDef.new(\eff_brassage, {
 	Out.ar(outbus,signal);
 }).add;
 
-//TESTS
+/*/TESTS
 x = Synth.new(\eff_brassage_minus, [\inbus, 8, \outbus, 0, \freq, 5, \amp, 1.0, \delay, 1.5]);
 x.set(\delay,0.04);
 x.set(\freq,200);
-
+*/
 //BRASSAGE - Sine wave
 SynthDef.new(\eff_brassage_sin, {
 	arg inbus=8, outbus=0, freq=0, amp=0.5, delay=0.5;
@@ -35,12 +35,13 @@ SynthDef.new(\eff_brassage_sin, {
 	Out.ar(outbus,signal);
 }).add;
 
-//TESTS
+/*/TESTS
 x = Synth.new(\eff_brassage_sin, [\inbus, 8, \outbus, 0, \freq, 5, \amp, 1.0, \delay, 1.5]);
 x.set(\delay,0.04);
 x.set(\freq,200);
-
-
+*/
+/*
 s.plotTree;
 s.meter;
 s.options.numChannels;
+*/
