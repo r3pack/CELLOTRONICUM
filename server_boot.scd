@@ -31,48 +31,30 @@ OSCdef.new(
 	'/app_quit'
 );
 
-//TEST EFFECTS
 OSCdef.new(
-	'\effect_biip',
+	\app_reboot,
 	{
-		arg msg, time, addr, recvPort;
-		[msg, time, addr, recvPort].postln;
-		(msg.asString++"Biip!").postln;
+		arg msq, time, addr, recvPort;
+		s.reboot;
+		~e=Dictionary.new(0);
 	},
-	'\effect_biip'
+	'/app_reboot'
 );
-
 OSCdef.new(
-	'\effect_biiip',
-	{
-		arg msg, time, addr, recvPort;
-		[msg, time, addr, recvPort].postln;
-		(msg.asString++"Biiip!").postln;
-	},
-	'\effect_biiip'
-);
-
-OSCdef.new(
-	'\effect_biiiip',
-	{
-		arg msg, time, addr, recvPort;
-		[msg, time, addr, recvPort].postln;
-		(msg.asString++"Biiiip!").postln;
-	},
-	'\effect_biiiip'
-);
-
-//END OF TEST EFFECTS
-
-OSCdef.new(
-	'\app_list_effects',
+	\app_list_effects,
 	{
 		arg msg, time, addr, recvPort;
 		var d = List.newClear;
-		OSCdef.all.keysDo{ |key|
-			if(key.asString.beginsWith("effect"), {d.add(key.asString);}, {});
+		var name;
+		SynthDescLib.global.synthDescs.do{ |desc|
+			if(desc.def.notNil) {
+				name = desc.name.asString;
+				//"\n SynthDef %\n".postf(name);
+				if(name.beginsWith("eff_"),{d.add(name.postln)},{});
+				//desc.def.func.postcs;
+			};
 		};
-		~app_netaddr.sendMsg('\effects_count', d.size.asInteger);
+		~app_netaddr.sendMsg('\effects_count', d.size.asInteger.postln);
 		d.do{ arg it, i;
 			~app_netaddr.sendMsg('\effect', it);
 		}
@@ -80,4 +62,22 @@ OSCdef.new(
 	'\app_list_effects'
 );
 
-OSCdef.all;
+OSCdef.new(
+	\new_effect,
+	{
+		arg msg, time, addr, recvPort;
+		var args;
+		if((msg.size > 1),{
+			args = msg[1].split($ );
+			//TEST - pucić jutro!
+			//args = "aaa eff_brassage \inbus 8 \outbus 0\eff_brassage".split($ );
+			if(args>4) {
+				~e.put( args[0] -> Synth.new("\\"++args[1], args.copyRange(2,args.size-1)));
+			};
+		},{
+			"Wrong params:".postln;
+			msg.postln;
+		});
+	},
+	'\new_effect'
+);
