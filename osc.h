@@ -16,9 +16,6 @@
 			const char* serverAddress="localhost";
 
 			UdpSocket sock;
-
-			PacketReader pr;
-			PacketWriter pw;
 			
 		public:
 			
@@ -47,7 +44,6 @@
 			bool startServer();
 
 			bool quitServer();
-		
 	};
 	
 	extern OSCConnection conn;

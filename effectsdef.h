@@ -5,16 +5,17 @@
 	class Brassage : public Effect
 	{
 		const char* getName() {return "eff_brassage";}
+		
+		static const int argsCount=2;
+		EffectArgument args[argsCount]={EffectArgument("arg1", 23), EffectArgument("arg2", 234)};
+		
+		EffectArgument* getAgrs() {return args;}
+		const int getAgrsCount() {return argsCount;}
+		
+		public:
+		Brassage(){}
 	};
 	
-	class Brassage2 : public Effect
-	{
-		const char* getName() {return "eff_brassage2";}
-	};
-	
-	extern Brassage brassage;
-	
-	extern Brassage2 brassage2;
 	
 	void registerEffects();
 	

@@ -17,6 +17,7 @@ bool OSCConnection::connect()
 
 bool OSCConnection::sendSimpleMessage(const char* str)
 {
+	PacketWriter pw;
 	Message msg(str); 
 	pw.init();
 	pw.startBundle().addMessage(msg).endBundle();

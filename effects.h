@@ -2,6 +2,10 @@
 #define EFFECTS_H
 #include <string>
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <array>
+#include "osc.h"
 
 	enum VarType{
 		TYPE_UNKNOWN,
@@ -11,45 +15,52 @@
 		TYPE_BLOB,
 		TYPES_SIZE
 	};
-
-
-	class Effect{
+	
+	class EffectArgument{
+		VarType type;
+		const char* name;
+		void* value;
+		
 		public:
-			virtual const char* getName() {return "unknown";}
+		
+		template <class T> 
+		EffectArgument(const char* n, T var) {name=n; set(var);}
+		
+		void set(int var);
+		
+		void set(float var);
+		
+		void set(std::string var);
+		
+		void getArgumentStr(std::ostringstream& ss);
+		
+		void sendArgument(const char* effect);
+		
+		~EffectArgument();
 	};
 	
-	class EffectInstance{
+	class Effect{
+	
 		private:
-			Effect* effect;
 			int id;
 			static int lastId;
 		public:
-			EffectInstance(Effect* e) {id=lastId++; effect=e;}
+			Effect() {id=lastId++;}
+		
+			virtual const char* getName() = 0;
+			virtual EffectArgument* getAgrs() = 0;
+			virtual const int getAgrsCount() = 0;
 			
-			void createInstance()
-			{
-				/*const char* args=getArgumentsNames();
-				for(int i=0, lastPos=0;1;++i)
-				{
-					if(args[i]==',' || args[i]!='\0')
-					{
-						
-						
-						if(args[i]!='\0') break;
-					}
-				}*/
-				
-				
-				
-			}
+			template <class T> void setArgument(int id, T value);
 			
+			void sendArgument(int id);
 			
-			void setVariable(std::string name, VarType type, void* value)
-			{
-			}
+			template <class T> void setAndSendArgument(int id, T value);
+			
+			void sendInstance();
+			
+			void registerEffect();
 	};
-	
-	void registerEffect(Effect* eff);
 	
 	bool checkEffectsList();
 

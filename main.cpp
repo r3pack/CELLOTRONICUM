@@ -12,7 +12,6 @@ void waitFor(int ms)
 	std::this_thread::sleep_for(dura);
 }
 
-
 int main (int argc, char** argv)
 {
 	if(argc>1)
@@ -31,6 +30,11 @@ int main (int argc, char** argv)
 	if(!conn.startServer()) exit(2);
 	
 	if(!checkEffectsList()) {conn.quitServer(); exit(3);}
+	
+	
+	Brassage br; //przykładowa instancja efektu
+	
+	br.sendInstance();
 	
 	waitFor(3000);
 	
