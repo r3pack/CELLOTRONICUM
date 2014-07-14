@@ -11,7 +11,7 @@ SynthDef.new(\eff_brassage_plus, {
 
 //BRASSAGE - Square wave (poprawiony wzór)
 SynthDef.new(\eff_brassage, {
-	arg inbus=8, outbus=0, freq=0, amp=0.5, delay=0.5;
+	arg inbus=8, outbus=0, freq=5, amp=0.5, delay=1.5;
 	var sq = Pulse.ar(freq);
 	var in = In.ar(inbus,1);
 	var delayed = DelayC.ar(in,delay,delay);
@@ -40,6 +40,7 @@ x = Synth.new(\eff_brassage_sin, [\inbus, 8, \outbus, 0, \freq, 5, \amp, 1.0, \d
 x.set(\delay,0.04);
 x.set(\freq,200);
 */
+
 /*
 s.plotTree;
 s.meter;
