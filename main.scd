@@ -1,5 +1,5 @@
 (thisProcess.nowExecutingPath.dirname +/+"server_boot.scd").loadPaths;
 (thisProcess.nowExecutingPath.dirname +/+"brassage.scd").loadPaths;
-(thisProcess.nowExecutingPath.dirname +/+"echo.scd").loadPaths;
+(thisProcess.nowExecutingPath.dirname +/+"echo.scd").loadPaths;(thisProcess.nowExecutingPath.dirname +/+"sound_sources.scd").loadPaths;
 
-~e = Dictionary.new(0);
+~p = thisProcess.nowExecutingPath.dirname;
