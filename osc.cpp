@@ -1,8 +1,14 @@
 #include "osc.h"
 
-OSCConnection conn;
+OSCConn conn;
 
-bool OSCConnection::connect() 
+int OSCConn::serverPortNumber=57120;
+
+const char* OSCConn::serverAddress="localhost";
+
+UdpSocket OSCConn::sock;
+
+bool OSCConn::connect() 
 {
 	sock.connectTo(serverAddress, serverPortNumber);
 	if(!conn.isOk()) 
@@ -15,7 +21,7 @@ bool OSCConnection::connect()
 	return true;
 }
 
-bool OSCConnection::sendSimpleMessage(const char* str)
+bool OSCConn::sendSimpleMessage(const char* str)
 {
 	PacketWriter pw;
 	Message msg(str); 
@@ -30,7 +36,7 @@ bool OSCConnection::sendSimpleMessage(const char* str)
 	return true;
 }
 
-bool OSCConnection::startServer()
+bool OSCConn::startServer()
 {
 	if(!sendSimpleMessage("/app_start")) return false;
 
@@ -64,7 +70,7 @@ bool OSCConnection::startServer()
 	return statusOK;
 }
 
-bool OSCConnection::quitServer()
+bool OSCConn::quitServer()
 {
 	fprintf(stderr, "Sending server quit message\n");
 	if(!sendSimpleMessage("/app_quit")) return false;

@@ -4,18 +4,32 @@
 	
 	class Brassage : public Effect
 	{
-		const char* getName() {return "eff_brassage";}
-		
-		static const int argsCount=2;
-		EffectArgument args[argsCount]={EffectArgument("arg1", 23), EffectArgument("arg2", 234)};
-		
-		EffectArgument* getAgrs() {return args;}
-		const int getAgrsCount() {return argsCount;}
-		
+		private:
+			static const int argsCount=2;
+			EffectArgument args[argsCount]={EffectArgument("freq", 0), EffectArgument("arg2", 234)};
 		public:
-		Brassage(){}
+			static const char*const name;
+			const char* getName() {return name;}
+			EffectArgument* getAgrs() {return args;}
+			const int getAgrsCount() {return argsCount;}
+			
+			Brassage(){}
 	};
 	
+	
+	class Playbuf : public Effect
+	{
+		private:
+			static const int argsCount=1;
+			EffectArgument args[argsCount];
+		public:
+			static const char*const name;
+			const char* getName() {return name;}
+			EffectArgument* getAgrs() {return args;}
+			const int getAgrsCount() {return argsCount;}
+			
+			Playbuf(): args({EffectArgument("bufnum", 0)}){}
+	};
 	
 	void registerEffects();
 	

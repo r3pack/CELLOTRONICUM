@@ -4,7 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include <array>
+#include <map>
+#include <stdarg.h>
 #include "osc.h"
 
 	enum VarType{
@@ -17,26 +18,30 @@
 	};
 	
 	class EffectArgument{
-		VarType type;
-		const char* name;
-		void* value;
+		friend class Effect;
+		private:
 		
+			VarType type;
+			const char* name;
+			void* value;
+			
+			void set(int var);
+			
+			void set(float var);
+			
+			void set(std::string var);
+			
+			void addArgumentToMessage(Message* msg);
+			
+			void sendArgument(int id);	
+			
 		public:
 		
-		template <class T> 
-		EffectArgument(const char* n, T var) {name=n; set(var);}
-		
-		void set(int var);
-		
-		void set(float var);
-		
-		void set(std::string var);
-		
-		void getArgumentStr(std::ostringstream& ss);
-		
-		void sendArgument(const char* effect);
-		
-		~EffectArgument();
+			EffectArgument(const char* n, int var): name(n) {set(var);}
+			EffectArgument(const char* n, float var): name(n) {set(var);}
+			EffectArgument(const char* n, std::string var): name(n) {set(var);}
+			
+			~EffectArgument();
 	};
 	
 	class Effect{
@@ -44,24 +49,31 @@
 		private:
 			int id;
 			static int lastId;
+			void sendInstance();
 		public:
-			Effect() {id=lastId++;}
+			Effect();
+			
+			~Effect();
 		
-			virtual const char* getName() = 0;
+			virtual const char* getName() {return "dupa";};
 			virtual EffectArgument* getAgrs() = 0;
 			virtual const int getAgrsCount() = 0;
 			
-			template <class T> void setArgument(int id, T value);
+			void setArgument(int argId, int value);
+			void setArgument(int argId, float value);
+			void setArgument(int argId, std::string value);
 			
-			void sendArgument(int id);
+			void sendArgument(int argId);
 			
-			template <class T> void setAndSendArgument(int id, T value);
-			
-			void sendInstance();
-			
-			void registerEffect();
+			void setAndSendArgument(int argId, int value);
+			void setAndSendArgument(int argId, float value);
+			void setAndSendArgument(int argId, std::string value);
 	};
 	
 	bool checkEffectsList();
+	
+	std::map <int, Effect*>* getEffectInstanceList();
+	
+	void registerEffect(const char* name);
 
 #endif

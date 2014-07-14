@@ -1,6 +1,6 @@
 #include "effects.h"
 #include "osc.h"
-#include <map>
+
 
 const int MAX_EFFECTS_COUNT=1000;
 
@@ -16,14 +16,14 @@ std::map<const char*, bool, cmpCStr> effectsList;
 
 bool checkEffectsList()
 {
-	if(!conn.sendSimpleMessage("/app_list_effects")) return false;
+	if(!OSCConn::sendSimpleMessage("/app_list_effects")) return false;
 
 	int effectCount=MAX_EFFECTS_COUNT;
 	int effectReceived=0;
 
-	UdpSocket& sock=conn.getSock();
+	UdpSocket& sock=OSCConn::getSock();
 	
-	while (conn.isOk() && effectReceived < effectCount)
+	while (OSCConn::isOk() && effectReceived < effectCount)
 	{
 		if (sock.receiveNextPacket(30)) 
 		{
@@ -97,28 +97,28 @@ void EffectArgument::set(std::string var)
 	value=new std::string(var);
 }
 
-void EffectArgument::getArgumentStr(std::ostringstream& ss)
+void EffectArgument::addArgumentToMessage(Message* msg)
 {
-	ss << "\\" << name << " ";
+	msg->pushStr(std::string("\\")+std::string(name));
 	switch(type)
 	{
 		case TYPE_INT:
-			ss << *(int*)value;
+			msg->pushInt32(*(int*)value);
 		break;
 		case TYPE_FLOAT:
-			ss << *(float*)value;
+			msg->pushFloat(*(float*)value);
 		break;
 		case TYPE_STRING:
-			ss << *(std::string*)value;
+			msg->pushStr(*(std::string*)value);
 		break;
 	}
-	ss << " ";
 }
 
-void EffectArgument::sendArgument(const char* effect)
+void EffectArgument::sendArgument(int id)
 {
-	std::string str="/" +  std::string(effect) + "/" + std::string(name);
-	Message msg(str); 
+	Message msg("/set_param"); 
+	msg.pushInt32(id);
+	msg.pushStr(name);
 	switch(type)
 	{
 		case TYPE_INT:
@@ -137,9 +137,9 @@ void EffectArgument::sendArgument(const char* effect)
 	pw.init();
 	pw.startBundle().addMessage(msg).endBundle();
 	
-	if(!conn.getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
-		fprintf(stderr, "Error sending an argument '%s'\n", str.c_str());
+		fprintf(stderr, "Error sending an argument '%s' of instance %d\n", name, id);
 	}
 }
 
@@ -162,62 +162,101 @@ EffectArgument::~EffectArgument()
 
 int Effect::lastId=0;
 
-template <class T>
-void Effect::setArgument(int id, T value)
+std::map <int, Effect*> effectInstanceList;
+
+std::map <int, Effect*>* getEffectInstanceList() {return &effectInstanceList;}
+
+Effect::Effect() 
 {
-	EffectArgument* args=getAgrs();
-	args[id].set(value);
+	printf("konstruktor bazowy\n");
+	id=lastId++; 
+	effectInstanceList.insert(std::pair<int, Effect*>(id, this));
 }
 
-void Effect::sendArgument(int id)
+Effect::~Effect() 
 {
-	EffectArgument* args=getAgrs();
-	args[id].sendArgument(getName());
+	effectInstanceList.erase(id);
 }
 
-template <class T>
-void Effect::setAndSendArgument(int id, T value)
+void Effect::setArgument(int argId, int value)
 {
 	EffectArgument* args=getAgrs();
-	args[id].set(value);
-	args[id].sendArgument(getName());
+	args[argId].set(value);
+}
+
+void Effect::setArgument(int argId, float value)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].set(value);
+}
+
+void Effect::setArgument(int argId, std::string value)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].set(value);
+}
+
+void Effect::sendArgument(int argId)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].sendArgument(id);
+}
+
+void Effect::setAndSendArgument(int argId, int value)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].set(value);
+	args[argId].sendArgument(id);
+}
+
+void Effect::setAndSendArgument(int argId, float value)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].set(value);
+	args[argId].sendArgument(id);
+}
+
+void Effect::setAndSendArgument(int argId, std::string value)
+{
+	EffectArgument* args=getAgrs();
+	args[argId].set(value);
+	args[argId].sendArgument(id);
 }
 
 void Effect::sendInstance()
 {
+	printf("ssend\n");
 	Message msg("/new_effect_instance"); 
-	
+	printf("ssend\n");
 	const char* name=getName();
-	
+	printf("ssend %s\n", name);
 	msg.pushInt32(id).pushStr(name);
-	
-	std::ostringstream ss;
-	
+	printf("ssend\n");
 	int argsCount=getAgrsCount();
+	printf("ssend\n");
 	EffectArgument* args=getAgrs();
-	
+	printf("ssend\n");
 	for(int i=0;i<argsCount;++i)
 	{
-		args[i].getArgumentStr(ss);
+		args[i].addArgumentToMessage(&msg);
 	}
 	
-	msg.pushStr(ss.str());
-	
-	fprintf(stderr, "Sending new instance of effect '%s', id: %d, args: %s\n", name, id, ss.str().c_str());
+	fprintf(stderr, "Sending new instance of effect '%s', id: %d\n", name, id);
+	printf("ssend\n");
 	
 	PacketWriter pw;
 	
 	pw.init();
 	pw.startBundle().addMessage(msg).endBundle();
 	
-	if(!conn.getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
 		fprintf(stderr, "Error sending instance..\n");
 	}
 	
 }
 
-void Effect::registerEffect() 
+void registerEffect(const char* name) 
 {
-	effectsList.insert(std::pair<const char*, bool>(getName(), false));
+	effectsList.insert(std::pair<const char*, bool>(name, false));
 }
