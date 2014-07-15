@@ -8,7 +8,7 @@
 			static const int argsCount=2;
 			EffectArgument args[argsCount]={EffectArgument("freq", 0), EffectArgument("arg2", 234)};
 		public:
-			static const char*const name;
+			static constexpr const char* name="eff_brassage";
 			const char* getName() {return name;}
 			EffectArgument* getAgrs() {return args;}
 			const int getAgrsCount() {return argsCount;}
@@ -23,12 +23,12 @@
 			static const int argsCount=1;
 			EffectArgument args[argsCount];
 		public:
-			static const char*const name;
+			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
 			EffectArgument* getAgrs() {return args;}
 			const int getAgrsCount() {return argsCount;}
 			
-			Playbuf(): args({EffectArgument("bufnum", 0)}){}
+			Playbuf(int bufnum): args({EffectArgument("bufnum", bufnum)}){sendInstance();}
 	};
 	
 	void registerEffects();

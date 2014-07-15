@@ -48,13 +48,15 @@
 	
 		private:
 			int id;
-			static int lastId;
-			void sendInstance();
+			static int lastId;		
 		public:
+			void sendInstance();
+			void deleteInstance();
+		
 			Effect();
 			
 			~Effect();
-		
+			
 			virtual const char* getName() {return "dupa";};
 			virtual EffectArgument* getAgrs() = 0;
 			virtual const int getAgrsCount() = 0;

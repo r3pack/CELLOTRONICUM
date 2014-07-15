@@ -41,62 +41,13 @@
 
 			static bool quitServer();
 			
-			static int getFreeBus()
-			{
-				sendSimpleMessage("/get_free_bus");
-	
-				while (sock.isOk())
-				{
-					if (sock.receiveNextPacket(30)) 
-					{
-						PacketReader pr(sock.packetData(), sock.packetSize());
-						Message *incomingMsg;
-						while (pr.isOk() && (incomingMsg = pr.popMessage()) != 0) 
-						{
-							if(strcmp(incomingMsg->addressPattern().c_str(), "/free_bus")==0)
-							{
-								int bus=-1;
-								incomingMsg->arg().popInt32(bus);
-								return bus;
-							}
-						}
-					}
-				}
-			}
+			static int getFreeBus();
 			
-			static int loadBuffer(const char* filename)
-			{
-				PacketWriter pw;
-				Message msg("/load_buffer"); 
-				msg.pushStr(filename);
-				pw.init();
-				pw.startBundle().addMessage(msg).endBundle();
-				
-				if(!sock.sendPacket(pw.packetData(), pw.packetSize()))
-				{
-					fprintf(stderr, "Error sending /load_buffer message\n");
-					return -1;
-				}
-				
-	
-				while (sock.isOk())
-				{
-					if (sock.receiveNextPacket(30)) 
-					{
-						PacketReader pr(sock.packetData(), sock.packetSize());
-						Message *incomingMsg;
-						while (pr.isOk() && (incomingMsg = pr.popMessage()) != 0) 
-						{
-							if(strcmp(incomingMsg->addressPattern().c_str(), "/new_buffer")==0)
-							{
-								int bufnum=-1;
-								incomingMsg->arg().popInt32(bufnum);
-								return bufnum;
-							}
-						}
-					}
-				}
-			}
+			static void getFreeBuses(int num, int* buses);
+			
+			static int loadBuffer(const char* filename);
+			
+			static void deleteBuffer(int bufnum);
 	};
 	
 #endif

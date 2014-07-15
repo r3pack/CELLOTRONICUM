@@ -29,7 +29,7 @@ bool checkEffectsList()
 		{
 			PacketReader pr(sock.packetData(), sock.packetSize());
 			Message *incomingMsg;
-			while (pr.isOk() && (incomingMsg = pr.popMessage()) != 0) 
+			while (pr.isOk() && (incomingMsg = pr.popMessage()) != NULL) 
 			{
 				const char* addressPatern=incomingMsg->addressPattern().c_str();
 			
@@ -99,7 +99,7 @@ void EffectArgument::set(std::string var)
 
 void EffectArgument::addArgumentToMessage(Message* msg)
 {
-	msg->pushStr(std::string("\\")+std::string(name));
+	msg->pushStr(name);
 	switch(type)
 	{
 		case TYPE_INT:
@@ -160,7 +160,7 @@ EffectArgument::~EffectArgument()
 }
 
 
-int Effect::lastId=0;
+int Effect::lastId=1;
 
 std::map <int, Effect*> effectInstanceList;
 
@@ -168,7 +168,6 @@ std::map <int, Effect*>* getEffectInstanceList() {return &effectInstanceList;}
 
 Effect::Effect() 
 {
-	printf("konstruktor bazowy\n");
 	id=lastId++; 
 	effectInstanceList.insert(std::pair<int, Effect*>(id, this));
 }
@@ -225,24 +224,17 @@ void Effect::setAndSendArgument(int argId, std::string value)
 
 void Effect::sendInstance()
 {
-	printf("ssend\n");
 	Message msg("/new_effect_instance"); 
-	printf("ssend\n");
 	const char* name=getName();
-	printf("ssend %s\n", name);
 	msg.pushInt32(id).pushStr(name);
-	printf("ssend\n");
 	int argsCount=getAgrsCount();
-	printf("ssend\n");
 	EffectArgument* args=getAgrs();
-	printf("ssend\n");
 	for(int i=0;i<argsCount;++i)
 	{
 		args[i].addArgumentToMessage(&msg);
 	}
 	
 	fprintf(stderr, "Sending new instance of effect '%s', id: %d\n", name, id);
-	printf("ssend\n");
 	
 	PacketWriter pw;
 	
@@ -252,6 +244,26 @@ void Effect::sendInstance()
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
 		fprintf(stderr, "Error sending instance..\n");
+	}
+	
+}
+
+void Effect::deleteInstance()
+{
+	Message msg("/delete_effect_instance"); 
+	const char* name=getName();
+	msg.pushInt32(id);
+	
+	fprintf(stderr, "Deleting instance of effect '%s', id: %d\n", name, id);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error deleting instance..\n");
 	}
 	
 }

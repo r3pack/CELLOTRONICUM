@@ -44,20 +44,23 @@ int main (int argc, char** argv)
 	
 	
 	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody1.wav"));
-	//printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody2.wav"));
-	//printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody3.wav"));
-	//printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody4.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody2.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody3.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody4.wav"));
 	
-	int bufnum=OSCConn::loadBuffer("zBrody4.wav");
+	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
 	
 	printf("Mam bufor: %d\n", bufnum);
 	
-	Playbuf playbuf;
+	Playbuf playbuf(bufnum);
 	
-	
-	waitFor(3000);
-	
-	OSCConn::quitServer();
+	while(1)
+	{
+		waitFor(3000);
+		playbuf.deleteInstance();
+		waitFor(3000);
+		playbuf.sendInstance();
+	}
 	
 	fprintf(stderr, "Done\n");
 }
