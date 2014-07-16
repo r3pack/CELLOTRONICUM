@@ -5,6 +5,7 @@
 #include "osc.h"
 #include "effects.h"
 #include "effectsdef.h"
+#include "graphics.h"
 
 void waitFor(int ms)
 {
@@ -12,6 +13,8 @@ void waitFor(int ms)
 	std::this_thread::sleep_for(dura);
 }
 
+
+#undef main
 int main (int argc, char** argv)
 {
 	if(argc>1)
@@ -31,12 +34,11 @@ int main (int argc, char** argv)
 	
 	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}
 	
+	initSDL();
 	
 	//Brassage br; //przykładowa instancja efektu
 	
-	waitFor(3000);
-	
-	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	/*printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
 	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
 	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
 	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
@@ -51,16 +53,57 @@ int main (int argc, char** argv)
 	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
 	
 	printf("Mam bufor: %d\n", bufnum);
+	*/
 	
-	Playbuf playbuf(bufnum);
+	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
 	
-	while(1)
+	int freebus=OSCConn::getFreeBus();
+	
+	Playbuf playbuf(bufnum, freebus);
+	
+	//Distecho distecho(50, 50, freebus);
+	
+	auto effectInstanceList=getEffectInstanceList();
+	
+	bool quit = false;
+	
+	while (!quit)
 	{
-		waitFor(3000);
-		playbuf.deleteInstance();
-		waitFor(3000);
-		playbuf.sendInstance();
+		while (SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+					quit = true;
+				break;
+				case SDL_KEYDOWN:
+				break;
+				case SDL_MOUSEMOTION:
+				case SDL_MOUSEBUTTONDOWN:
+
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+					{
+						int x=event.button.x;
+						int y=event.button.y;
+						for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+						{
+							it->second->receiveClick(x, y);
+						}
+					}
+				break;
+			}
+		}
+		
+		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+		SDL_RenderClear(render);
+		
+		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+		{
+			it->second->draw();
+		}
+		SDL_RenderPresent(render);
 	}
 	
+	quitSDL();
 	fprintf(stderr, "Done\n");
 }

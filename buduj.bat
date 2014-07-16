@@ -1,1 +1,1 @@
-g++ main.cpp effects.cpp effectsdef.cpp osc.cpp -o main -lwsock32 -lWs2_32 -std=c++11
+g++ main.cpp effects.cpp effectsdef.cpp osc.cpp graphics.cpp -o main -lSDL2 -lwsock32 -lWs2_32  -std=c++11
