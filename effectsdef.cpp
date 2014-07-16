@@ -2,5 +2,6 @@
  
 void registerEffects()
 {
-	Brassage().registerEffect();
+	registerEffect(Brassage::name);
+	registerEffect(Playbuf::name);
 };

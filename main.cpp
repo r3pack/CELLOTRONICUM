@@ -16,29 +16,51 @@ int main (int argc, char** argv)
 {
 	if(argc>1)
 	{
-		conn.setServer(argv[1]);
+		OSCConn::setServer(argv[1]);
 		if(argc>2)
 		{
-			conn.setPort(atoi(argv[2])); 
+			OSCConn::setPort(atoi(argv[2])); 
 		}
 	}
 	
 	registerEffects();
 	
-	if(!conn.connect()) exit(1);
+	if(!OSCConn::connect()) exit(1);
 	
-	if(!conn.startServer()) exit(2);
+	if(!OSCConn::startServer()) exit(2);
 	
-	if(!checkEffectsList()) {conn.quitServer(); exit(3);}
+	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}
 	
 	
-	Brassage br; //przykładowa instancja efektu
-	
-	br.sendInstance();
+	//Brassage br; //przykładowa instancja efektu
 	
 	waitFor(3000);
 	
-	conn.quitServer();
+	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	
+	
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody1.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody2.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody3.wav"));
+	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody4.wav"));
+	
+	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
+	
+	printf("Mam bufor: %d\n", bufnum);
+	
+	Playbuf playbuf(bufnum);
+	
+	while(1)
+	{
+		waitFor(3000);
+		playbuf.deleteInstance();
+		waitFor(3000);
+		playbuf.sendInstance();
+	}
 	
 	fprintf(stderr, "Done\n");
 }

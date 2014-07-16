@@ -8,44 +8,46 @@
 
 	using namespace oscpkt;
 	
-	class OSCConnection
+	class OSCConn
 	{
 		private:
-			int serverPortNumber=57120;
+			static int serverPortNumber;
 
-			const char* serverAddress="localhost";
+			static const char* serverAddress;
 
-			UdpSocket sock;
+			static UdpSocket sock;
 			
 		public:
 			
-			OSCConnection() {}
+			static void setPort(int sPN) {serverPortNumber=sPN;}
 			
-			OSCConnection(const char* sA, int sPN=57120) {serverAddress=sA; serverPortNumber=sPN;}
+			static void setServer(const char* sA, int sPN=57120) {serverAddress=sA; serverPortNumber=sPN;}
 			
-			void setPort(int sPN) {serverPortNumber=sPN;}
+			static bool connect();
 			
-			void setServer(const char* sA, int sPN=57120) {serverAddress=sA; serverPortNumber=sPN;}
+			static bool isOk() {return sock.isOk();}
 			
-			bool connect();
+			static const char* getError() {return sock.errorMessage().c_str();}
 			
-			bool isOk() {return sock.isOk();}
+			static const char* getServer() {return serverAddress;}
 			
-			const char* getError() {return sock.errorMessage().c_str();}
+			static int getPort() {return serverPortNumber;}
 			
-			const char* getServer() {return serverAddress;}
+			static UdpSocket& getSock() {return sock;}
 			
-			int getPort() {return serverPortNumber;}
+			static bool sendSimpleMessage(const char* str);
 			
-			UdpSocket& getSock() {return sock;}
-			
-			bool sendSimpleMessage(const char* str);
-			
-			bool startServer();
+			static bool startServer();
 
-			bool quitServer();
+			static bool quitServer();
+			
+			static int getFreeBus();
+			
+			static void getFreeBuses(int num, int* buses);
+			
+			static int loadBuffer(const char* filename);
+			
+			static void deleteBuffer(int bufnum);
 	};
-	
-	extern OSCConnection conn;
 	
 #endif
