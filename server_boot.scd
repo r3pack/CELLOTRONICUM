@@ -17,10 +17,25 @@ OSCdef.new(
 		arg msg, time, addr, recvPort;
 		[msg, time, addr, recvPort].postln;
 		~app_netaddr = addr;
+		s.quit;
+		~e.do({
+			arg item, i;
+			item.postln;
+			i.postln;
+			item.free;
+		});
+		~e=Dictionary.new(0);
+		~b.do({
+			arg item, i;
+			item.free;
+		});
+		~b=Dictionary.new(0);
 		s.waitForBoot(func_start, inf, func_onFailure);
 	},
 	'/app_start'
 );
+
+s.status.postln;
 
 OSCdef.new(
 	\app_quit,
@@ -79,7 +94,16 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		if((msg.size > 1),{
-			~e.put( msg[1] -> Synth.new(msg[2], msg.copyRange(3,msg.size-1)));
+			msg.copyRange(3,msg.size-1).postln;
+			if((~e[msg[1].asString] !== nil),{
+				"ERROR: Effect already exist. ".post;
+				msg.postln;
+			},{
+				"NEW SYNTH: ".post;
+				msg[2].post;
+				" args: ".post;
+					~e.add( (msg[1]).asString -> Synth.new(msg[2], (msg.copyRange(3,msg.size-1)).postln));
+			});
 		},{
 			"Wrong params:".postln;
 			msg.postln;
@@ -92,8 +116,8 @@ OSCdef.new(
 	\delete_effect_instance,
 	{
 		arg msg, time, addr, recvPort;
-		msg.postln;
-		~e.removeAt(msg[1]);
+		~e[msg[1].asString].free;
+		~e.removeAt(msg[1].asString);
 	},
 	'\delete_effect_instance'
 );
@@ -118,13 +142,17 @@ OSCdef.new(
 	\set_param,
 	{
 		arg msg, time, addr, recvPort;
-		var args, effect;
-		if(msg.size = 1) {("Invalid set_param :"++ msg).error;};
-		effect = ~e.[msg[1]];
-		effect.set(args[2], args[3]); //TODO: Być może zrobić ustawianie wielu parametrów na raz.
+		//if(msg.size = 1) {("Invalid set_param :"++ msg).error;};
+		msg.postln;
+		~e.[msg[1].asString].set((msg[2]).asSymbol, msg[3]); //TODO: Być może zrobić ustawianie wielu parametrów na raz.
 	},
 	'/set_param'
 );
+/*
+~e.["0"].set(\delay, 0.5);
+~e.postln;
+~e.["0"].moveBefore(~e["1"]);*/
+
 
 OSCdef.new(
 	\load_buffer,
@@ -133,7 +161,7 @@ OSCdef.new(
 		var buf;
 		(~p +/+ msg[1]).postln;
 		buf = Buffer.read(s, ~p +/+ msg[1]);
-		~b.put( buf.bufnum -> buf);
+		~b.add( buf.bufnum -> buf);
 		buf.postln;
 		~app_netaddr.sendMsg('\new_buffer', buf.bufnum);
 	},
@@ -157,4 +185,5 @@ OSCdef.new(
 OSCdef.new(
 	\app_all_working_effects
 );*/
+
 

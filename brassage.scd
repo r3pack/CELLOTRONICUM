@@ -41,8 +41,3 @@ x.set(\delay,0.04);
 x.set(\freq,200);
 */
 
-/*
-s.plotTree;
-s.meter;
-s.options.numChannels;
-*/
