@@ -37,6 +37,8 @@
 			
 		public:
 		
+			const char* getName() {return name;}
+		
 			EffectArgument(const char* n, int var): name(n) {set(var);}
 			EffectArgument(const char* n, float var): name(n) {set(var);}
 			EffectArgument(const char* n, std::string var): name(n) {set(var);}
@@ -52,6 +54,7 @@
 		public:
 			void sendInstance();
 			void deleteInstance();
+			void moveBefore(Effect* effect);
 		
 			Effect();
 			
@@ -61,8 +64,9 @@
 			virtual EffectArgument* getAgrs() = 0;
 			virtual const int getAgrsCount() = 0;
 			
-			virtual void draw() = 0;
-			virtual void receiveClick(int X, int Y) = 0;
+			virtual void draw(){}
+			virtual void receiveClick(int X, int Y, bool begin){}
+			virtual void receiveSecondClick(int X, int Y, bool begin){}
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);

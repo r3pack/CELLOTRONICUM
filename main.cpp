@@ -28,11 +28,11 @@ int main (int argc, char** argv)
 	
 	registerEffects();
 	
-	if(!OSCConn::connect()) exit(1);
+	/*if(!OSCConn::connect()) exit(1);
 	
 	if(!OSCConn::startServer()) exit(2);
 	
-	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}
+	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}*/
 	
 	initSDL();
 	
@@ -61,7 +61,9 @@ int main (int argc, char** argv)
 	
 	Playbuf playbuf(bufnum, freebus);
 	
-	//Distecho distecho(50, 50, freebus);
+	Distecho distecho(50, 50, freebus);
+	
+	playbuf.moveBefore(&distecho);
 	
 	auto effectInstanceList=getEffectInstanceList();
 	
@@ -78,8 +80,28 @@ int main (int argc, char** argv)
 				break;
 				case SDL_KEYDOWN:
 				break;
-				case SDL_MOUSEMOTION:
 				case SDL_MOUSEBUTTONDOWN:
+				if(event.button.button==SDL_BUTTON_LEFT)
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+					{
+						it->second->receiveClick(x, y, true);
+					}
+				}
+				else
+				if(event.button.button==SDL_BUTTON_RIGHT)
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+					{
+						it->second->receiveSecondClick(x, y, true);
+					}
+				}
+				break;
+				case SDL_MOUSEMOTION:
 
 					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
 					{
@@ -87,9 +109,20 @@ int main (int argc, char** argv)
 						int y=event.button.y;
 						for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 						{
-							it->second->receiveClick(x, y);
+							it->second->receiveClick(x, y, false);
 						}
 					}
+					else
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
+					{
+						int x=event.button.x;
+						int y=event.button.y;
+						for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+						{
+							it->second->receiveSecondClick(x, y, false);
+						}
+					}
+					
 				break;
 			}
 		}
