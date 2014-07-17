@@ -112,6 +112,58 @@ OSCdef.new(
 	'/new_effect_instance'
 );
 
+
+OSCdef.new(
+	\new_effect_instance_paused,
+	{
+		arg msg, time, addr, recvPort;
+		if((msg.size > 1),{
+			msg.copyRange(3,msg.size-1).postln;
+			if((~e[msg[1].asString] !== nil),{
+				"ERROR: Effect already exist. ".post;
+				msg.postln;
+			},{
+				"NEW SYNTH: ".post;
+				msg[2].post;
+				" args: ".post;
+					~e.add( (msg[1]).asString -> Synth.newPaused(msg[2], (msg.copyRange(3,msg.size-1)).postln));
+			});
+		},{
+			"Wrong params:".postln;
+			msg.postln;
+		});
+	},
+	'/new_effect_instance_paused'
+);
+
+OSCdef.new(
+	\unpause_effect_instance,
+	{
+		arg msg, time, addr, recvPort;
+		~e[(msg[1]).asString].run;
+	},
+	'/unpause_effect_instance'
+);
+
+
+OSCdef.new(
+	\pause_effect_instance,
+	{
+		arg msg, time, addr, recvPort;
+		~e[(msg[1]).asString].run(false);
+	},
+	'/pause_effect_instance'
+);
+
+OSCdef.new(
+	\move_before_effect_instance,
+	{
+		arg msg, time, addr, recvPort;
+		~e[(msg[1]).asString].moveBefore(~e[msg[2]]);
+	},
+	'/move_before_effect_instance'
+);
+
 OSCdef.new(
 	\delete_effect_instance,
 	{
