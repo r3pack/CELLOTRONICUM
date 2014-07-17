@@ -57,9 +57,12 @@
 			
 			~Effect();
 			
-			virtual const char* getName() {return "dupa";};
+			virtual const char* getName() = 0;
 			virtual EffectArgument* getAgrs() = 0;
 			virtual const int getAgrsCount() = 0;
+			
+			virtual void draw() = 0;
+			virtual void receiveClick(int X, int Y) = 0;
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);

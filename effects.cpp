@@ -137,6 +137,8 @@ void EffectArgument::sendArgument(int id)
 	pw.init();
 	pw.startBundle().addMessage(msg).endBundle();
 	
+	fprintf(stderr, "Sending an argument '%s' of instance %d\n", name, id);
+	
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
 		fprintf(stderr, "Error sending an argument '%s' of instance %d\n", name, id);
@@ -160,7 +162,7 @@ EffectArgument::~EffectArgument()
 }
 
 
-int Effect::lastId=1;
+int Effect::lastId=0;
 
 std::map <int, Effect*> effectInstanceList;
 

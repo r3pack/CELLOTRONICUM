@@ -93,6 +93,7 @@ int OSCConn::getFreeBus()
 				{
 					int bus=-1;
 					incomingMsg->arg().popInt32(bus);
+					fprintf(stderr, "Got free bus: %d\n", bus);
 					return bus;
 				}
 			}
@@ -131,6 +132,7 @@ void OSCConn::getFreeBuses(int num, int* buses)
 					int bus=-1;
 					incomingMsg->arg().popInt32(bus);
 					buses[busCount]=bus;
+					fprintf(stderr, "Got free bus: %d\n", bus);
 					++busCount;
 					if(busCount>=num) return;
 				}
@@ -166,6 +168,7 @@ int OSCConn::loadBuffer(const char* filename)
 				{
 					int bufnum=-1;
 					incomingMsg->arg().popInt32(bufnum);
+					fprintf(stderr, "Loaded buffer which number: %d\n", bufnum);
 					return bufnum;
 				}
 			}
