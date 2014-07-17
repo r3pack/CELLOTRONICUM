@@ -9,5 +9,7 @@
 s.plotTree;
 s.meter;
 s.options.numChannels;
+s.freqscope
 */
+
 

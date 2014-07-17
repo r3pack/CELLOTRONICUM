@@ -159,7 +159,8 @@ OSCdef.new(
 	\move_before_effect_instance,
 	{
 		arg msg, time, addr, recvPort;
-		~e[(msg[1]).asString].moveBefore(~e[msg[2]]);
+		"MOVE ".post; ~e[msg[1].asString].post; " before ".post; ~e[msg[2].asString].postln;
+		~e[(msg[1]).asString].moveBefore(~e[msg[2].asString]);
 	},
 	'/move_before_effect_instance'
 );
@@ -200,11 +201,33 @@ OSCdef.new(
 	},
 	'/set_param'
 );
-/*
-~e.["0"].set(\delay, 0.5);
-~e.postln;
-~e.["0"].moveBefore(~e["1"]);*/
 
+OSCdef.new(
+	\file_to_record,
+	{
+		arg msg, time, addr, recvPort;
+		s.prepareForRecord(~p +/+ msg[1]);
+	},
+	'/file_to_record'
+);
+
+OSCdef.new(
+	\start_record,
+	{
+		arg msg, time, addr, recvPort;
+		s.record;
+	},
+	'/start_record'
+);
+
+OSCdef.new(
+	\stop_record,
+	{
+		arg msg, time, addr, recvPort;
+		s.stopRecording;
+	},
+	'/stop_record'
+);
 
 OSCdef.new(
 	\load_buffer,
@@ -237,5 +260,10 @@ OSCdef.new(
 OSCdef.new(
 	\app_all_working_effects
 );*/
+
+/*
+~e.["0"].set(\delay, 0.5);
+~e.postln;
+~e.["0"].moveBefore(~e["1"]);*/
 
 
