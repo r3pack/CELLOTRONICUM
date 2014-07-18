@@ -137,7 +137,7 @@ void EffectArgument::sendArgument(int id)
 	pw.init();
 	pw.startBundle().addMessage(msg).endBundle();
 	
-	fprintf(stderr, "Sending an argument '%s' of instance %d\n", name, id);
+	//fprintf(stderr, "Sending an argument '%s' of instance %d\n", name, id);
 	
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
@@ -245,7 +245,7 @@ void Effect::sendInstance()
 	
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
-		fprintf(stderr, "Error sending instance..\n");
+		fprintf(stderr, "Error sending message..\n");
 	}
 	
 }
@@ -265,9 +265,32 @@ void Effect::deleteInstance()
 	
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
-		fprintf(stderr, "Error deleting instance..\n");
+		fprintf(stderr, "Error sending message..\n");
 	}
 	
+}
+
+
+void Effect::moveBefore(Effect* effect)
+{
+	int secondId=effect->id;
+
+	Message msg("/move_before_effect_instance"); 
+	const char* name=getName();
+	msg.pushInt32(id);
+	msg.pushInt32(secondId);
+	
+	fprintf(stderr, "Moving instance of effect '%s', id: %d, before instance of effect '%s', id: %d\n", name, id, effect->getName(), secondId);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending message..\n");
+	}
 }
 
 void registerEffect(const char* name) 
