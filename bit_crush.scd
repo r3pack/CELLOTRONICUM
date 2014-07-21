@@ -27,6 +27,4 @@ x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 1]);
 y.set(\samplerate, 1000);
 y.set(\bitSize, 5);
 
-
-{|in, rate= 0.5, bits= 4| Latch.ar(in, Impulse.ar(SampleRate.ir*0.5*rate)).round(0.5**bits)}.play;
 */

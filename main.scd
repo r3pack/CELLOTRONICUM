@@ -10,7 +10,10 @@
 s.plotTree;
 s.meter;
 s.options.numChannels;
-s.freqscope
+s.freqscope;
+
+SynthDef.all;
+
 */
 
 

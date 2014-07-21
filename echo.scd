@@ -25,8 +25,6 @@ SynthDef.new(\eff_shiftecho, {
 
 /*/TESTS
 x = Synth.new(\eff_shiftecho, [\inbus, 8, \outbus, 0, \delay, 0.5, \decay, 0.9, \freq, 10]);
-
-SynthDef.all;
 */
 
 //ECHO WITH CUSTOMIZED FEEDBACK?
