@@ -50,6 +50,13 @@ void quitSDL()
 }
 
 
+int Bus::lastClicked=-1;
+int Bus::lastId=0;
+
+class Bus;
+
+std::map <int, Bus*> busList;
+
 SDL_Texture* generateText(const char* text)
 {
 	SDL_Color color={0,0,0};

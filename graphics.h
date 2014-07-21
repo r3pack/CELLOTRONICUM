@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <sstream>
+#include <map>
 #include <cmath>
 
 extern SDL_Window *window;
@@ -20,16 +21,98 @@ SDL_Texture* generateText(const char* text);
 
 void drawTexture(SDL_Texture* tex, int x, int y);
 
+enum BusType{
+	BT_INBUS,
+	BT_OUTBUS
+};
+
+class Effect;
+
+class Bus;
+
+extern std::map <int, Bus*> busList;
+
 class Bus{
-    static int lastClicked;
-    static int lastId;
+	friend class Effect;
+    
+	static int lastId;
     int id;
     
     bool clicked=false;
-    static constexpr int size=15;
-    int X, Y;
+   
+    int posX, posY;
+	
+	BusType type;
+	
+	Effect* effect;
+	int argument;
+	
+	public:
+	static int lastClicked;
+	
+	static constexpr int size=15;
+	
+	int getId() {return id;}
+	Effect* getEffect() {return effect;}
+	int getArg() {return argument;}
+	
+	int getType() {return type;}
+	
+	Bus(int X, int Y, BusType t, Effect* e, int a)
+	{
+		effect=e;
+		argument=a;
+		posX=X;
+		posY=Y;
+		type=t;
+		id=lastId;
+		++lastId;
+		busList.insert(std::pair<int, Bus*>(id, this));
+	}
     
+	void draw()
+	{
+		if(lastClicked!=id) clicked=false;
+		
+		SDL_Rect rect;
+		rect.x = posX;
+		rect.y = posY;
+		rect.w = size;
+		rect.h = size;
+		if(clicked)
+			SDL_SetRenderDrawColor(render, 205, 205, 255, 255);
+		else
+			SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+		SDL_RenderFillRect(render, &rect);
+		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+		SDL_RenderDrawRect(render, &rect);
+	}
     
+	bool receiveClick(int X, int Y, bool begin)
+	{
+		X-=posX;
+		Y-=posY;
+		if(X>=0 && X<=size && Y>=0 && Y<=size && begin)
+		{
+			clicked=true;
+			lastClicked=id;
+			return true;
+		}
+		return false;
+	}
+	
+	void setPos(int X, int Y)
+	{
+		posX=X;
+		posY=Y;
+	}
+	
+	void move(int X, int Y)
+	{
+		posX+=X;
+		posY+=Y;
+	}
+	
 };
 
 
@@ -53,7 +136,7 @@ class Slider{
 	rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))) {}
 	~Slider() {SDL_DestroyTexture(valueTex);}
 	
-	bool receiveClick(int X, int Y)
+	bool receiveClick(int X, int Y, bool begin)
 	{
 		X-=posX;
 		Y-=posY;
@@ -75,6 +158,12 @@ class Slider{
 	{
 		posX=X;
 		posY=Y;
+	}
+	
+	void move(int X, int Y)
+	{
+		posX+=X;
+		posY+=Y;
 	}
 	
 	int getPosX(){return posX;}

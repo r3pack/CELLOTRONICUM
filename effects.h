@@ -38,6 +38,8 @@
 		public:
 		
 			const char* getName() {return name;}
+			
+			float getFloatValue() {if(type==TYPE_FLOAT) return *(float*)value; else return 0.0f;}
 		
 			EffectArgument(const char* n, int var): name(n) {set(var);}
 			EffectArgument(const char* n, float var): name(n) {set(var);}
