@@ -14,6 +14,35 @@
 		void free() {delete slider; SDL_DestroyTexture(nameTex);}
 	};
 	
+    struct ArgVis
+    {
+        enum VisulalisationType{
+            VT_UNKNOWN,
+            VT_INBUS,
+            VT_OUTBUS,
+            VT_SLIDER
+        } visType=VT_UNKNOWN;
+        void* data=NULL;
+        
+        ArgVis& setAsSlider(VisulalisationType type, float min, float max)
+        {
+            visType=VT_SLIDER;
+            data=new float[2];
+            return *this;
+        }
+        ArgVis& setAsInbus(VisulalisationType type)
+        {
+            visType=type;
+            return *this
+        }
+        ~ArgVis()
+        {
+            if(visType==VT_SLIDER)
+            delete data;
+        }
+        
+    };
+    
 	class EffectAutoGUI : public Effect
 	{
 		static constexpr int slider_width=30;

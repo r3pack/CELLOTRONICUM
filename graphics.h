@@ -20,6 +20,19 @@ SDL_Texture* generateText(const char* text);
 
 void drawTexture(SDL_Texture* tex, int x, int y);
 
+class Bus{
+    static int lastClicked;
+    static int lastId;
+    int id;
+    
+    bool clicked=false;
+    static constexpr int size=15;
+    int X, Y;
+    
+    
+};
+
+
 class Slider{
 	float rangeBegin;
 	float rangeEnd;
