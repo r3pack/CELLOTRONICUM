@@ -14,7 +14,7 @@ void initSDL()
 		exit(1);
 	}
 
-	if (!(window=SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 1024, SDL_WINDOW_SHOWN)))
+	if (!(window=SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1824, 1024, SDL_WINDOW_SHOWN)))
 	{
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(2);
