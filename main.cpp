@@ -59,7 +59,7 @@ int main (int argc, char** argv)
 	
 	int freebus=OSCConn::getFreeBus();
 	
-	//Playbuf playbuf(bufnum, freebus);
+	Playbuf playbuf(50, 500, bufnum, freebus);
 	
 	Distecho distecho(50, 50);
 	Distecho distecho2(350, 50);

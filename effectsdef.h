@@ -24,10 +24,21 @@
 		void free() {delete bus; SDL_DestroyTexture(nameTex);}
 	};
 	
+	struct ParamText
+	{
+		int posX, posY;
+		int param;
+		SDL_Texture* nameTex=NULL;
+		ParamText(int X, int Y, int p, const char* text): posX(X), posY(Y), param(p) {nameTex=generateText(text);}
+		
+		void free() {SDL_DestroyTexture(nameTex);}
+	};
+	
 	enum VisulalisationType{
             VT_INBUS,
             VT_OUTBUS,
-            VT_SLIDER
+            VT_SLIDER,
+			VT_TEXT
     };
 	
     struct ArgVis
@@ -42,6 +53,11 @@
 			((float*)data)[0]=min;
 			((float*)data)[1]=max;
         }
+		ArgVis(VisulalisationType type, std::string str)
+        {
+            visType=VT_TEXT;
+            data=new std::string(str);
+        }
         ArgVis(VisulalisationType type)
         {
             visType=type;
@@ -50,6 +66,9 @@
         {
             if(visType==VT_SLIDER)
             delete [] (float*)data;
+			else
+			if(visType==VT_TEXT)
+			delete (std::string*)data;
         }
         
     };
@@ -65,6 +84,7 @@
 		
 		std::vector <ParamSlider> sliders;
 		std::vector <ParamBus> buses;
+		std::vector <ParamText> texts;
 		
 		
 		int posX, posY;
@@ -88,7 +108,7 @@
 			EffectArgument* args=getAgrs();
 			int argsCount=getAgrsCount();
 			
-			height=top_padding+bottom_padding+slider_height;
+			height=top_padding+bottom_padding+Bus::size;
 			
 			int x=width=slider_period+Bus::size+slider_period;
 			
@@ -110,15 +130,24 @@
 					bus_y2+=bus_period;
 					break;
 					case VT_SLIDER:
+					{
+						height=top_padding+bottom_padding+slider_height;
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
-						printf("%f %f %f\n", min, max, args[i].getFloatValue());
 						sliders.push_back(ParamSlider(new Slider(posX+x, posY+top_padding, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
 						x+=slider_width+slider_period;
-						width+=slider_width+slider_period;
+					}
+					break;
+					case VT_TEXT:
+						texts.push_back(ParamText(posX+slider_period, posY+bus_y, i, ((std::string*)argvis[i].data)->c_str()));
+						int w;
+						SDL_QueryTexture(texts.back().nameTex, NULL, NULL, &w, NULL);
+						x=std::max(slider_period+w+slider_period, x);
 					break;
 				}
 			}
+			
+			width=x;
 			
 			for(int i=0;i<buses.size();++i)
 			{
@@ -142,6 +171,11 @@
 			for(int i=0;i<buses.size();++i)
 			{
 				buses[i].bus->move(X-posX, Y-posY);
+			}
+			for(int i=0;i<texts.size();++i)
+			{
+				texts[i].posX+=X-posX;
+				texts[i].posY+=Y-posY;
 			}
 			posX=X; posY=Y;
 		}
@@ -195,6 +229,19 @@
 				
 				SDL_RenderCopy(render, buses[i].nameTex, NULL, &nameRect);
 			}
+			for(int i=0;i<texts.size();++i)
+			{
+				int w, h;
+				SDL_QueryTexture(texts[i].nameTex, NULL, NULL, &w, &h);
+			
+				nameRect.y=texts[i].posY;
+				nameRect.x=texts[i].posX;
+				nameRect.w=w;
+				nameRect.h=h;		
+				
+				SDL_RenderCopy(render, texts[i].nameTex, NULL, &nameRect);
+			}
+			
 		}
 		
 		void receiveClick(int X, int Y, bool begin)
@@ -276,21 +323,22 @@
 	};
 	
 	
-	class Playbuf : public Effect
+	class Playbuf : public EffectAutoGUI
 	{
 		private:
 			static const int argsCount=2;
 			EffectArgument args[argsCount];
+			ArgVis argsVis[argsCount];
 		public:
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
 			EffectArgument* getAgrs() {return args;}
 			const int getAgrsCount() {return argsCount;}
+			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Playbuf(int bufnum, int outbus=0): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}){sendInstance();}
-			void draw() {}
-			
-			void receiveClick(int X, int Y) {}
+			Playbuf(int X, int Y, int bufnum, int outbus=0): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}),
+			argsVis({ArgVis(VT_TEXT, std::string(OSCConn::getBufferFileById(bufnum))), ArgVis(VT_OUTBUS)})
+			{sendInstance(); initGUI(X, Y);}
 	};
 	
 	void registerEffects();

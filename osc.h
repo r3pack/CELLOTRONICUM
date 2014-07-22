@@ -5,6 +5,8 @@
 	#define OSCPKT_OSTREAM_OUTPUT
 	#include "oscpkt/oscpkt.hh"
 	#include "oscpkt/udp.hh"
+	
+	#include <map>
 
 	using namespace oscpkt;
 	
@@ -16,6 +18,8 @@
 			static const char* serverAddress;
 
 			static UdpSocket sock;
+			
+			static std::map <int, const char*> bufferFileById;
 			
 		public:
 			
@@ -46,6 +50,8 @@
 			static void getFreeBuses(int num, int* buses);
 			
 			static int loadBuffer(const char* filename);
+			
+			static const char* getBufferFileById(int id);
 			
 			static void deleteBuffer(int bufnum);
 	};
