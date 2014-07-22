@@ -1,7 +1,9 @@
 SynthDef.new(\eff_output,{
 	arg inbus1, inbus2;
-	Out.ar(0,inbus1);
-	Out.ar(2,inbus2);
+	var in1 = In.ar(inbus1);
+	var in2 = In.ar(inbus2);
+	Out.ar(0,in1);
+	Out.ar(1,in2);
 }).add;
 
 SynthDef.new(\eff_input,{
@@ -206,6 +208,7 @@ k = Synth.new(\sin, [ \outbus, 0, \freq_bus, 27, \amp_bus, 28]);
 l = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 69.midicps, \freq_outbus, 27, \amp_outbus, 28]);
 m = Synth.new(\sin, [ \outbus, 0, \freq_bus, 29, \amp_bus, 30]);
 n = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 71.midicps, \freq_outbus, 29, \amp_outbus, 30]);
+//o = Synth.new(\eff_output, [\inbus1, 17, \inbus2, 17]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
 
 s.stopRecording;
