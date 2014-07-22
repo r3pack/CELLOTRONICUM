@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <sstream>
 #include <map>
+#include <set>
 #include <cmath>
 
 extern SDL_Window *window;
@@ -31,6 +32,10 @@ class Effect;
 class Bus;
 
 extern std::map <int, Bus*> busList;
+
+std::pair <Bus*, Bus*> getLastConnection();
+
+void drawConnections();
 
 class Bus{
 	friend class Effect;
@@ -88,24 +93,16 @@ class Bus{
 		SDL_RenderDrawRect(render, &rect);
 	}
     
-	bool receiveClick(int X, int Y, bool begin)
-	{
-		X-=posX;
-		Y-=posY;
-		if(X>=0 && X<=size && Y>=0 && Y<=size && begin)
-		{
-			clicked=true;
-			lastClicked=id;
-			return true;
-		}
-		return false;
-	}
+	bool receiveClick(int X, int Y, bool begin);
 	
 	void setPos(int X, int Y)
 	{
 		posX=X;
 		posY=Y;
 	}
+	
+	int getPosX(){return posX;}
+	int getPosY(){return posY;}
 	
 	void move(int X, int Y)
 	{
@@ -114,6 +111,7 @@ class Bus{
 	}
 	
 };
+
 
 
 class Slider{
