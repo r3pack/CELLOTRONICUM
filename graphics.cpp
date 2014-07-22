@@ -57,6 +57,75 @@ class Bus;
 
 std::map <int, Bus*> busList;
 
+std::set <std::pair <Bus*, Bus*> > connections;
+
+std::pair <Bus*, Bus*> lastConnection;
+
+std::pair <Bus*, Bus*> getLastConnection() {return lastConnection;}
+
+void drawConnections()
+{
+	for(auto it=connections.begin();it!=connections.end();++it)
+	{
+		SDL_RenderDrawLine(render, (*it).first->getPosX()+Bus::size/2, (*it).first->getPosY()+Bus::size/2,
+								   (*it).second->getPosX()+Bus::size/2, (*it).second->getPosY()+Bus::size/2);
+	}
+}
+
+bool Bus::receiveClick(int X, int Y, bool begin)
+{
+	X-=posX;
+	Y-=posY;
+	if(X>=0 && X<=size && Y>=0 && Y<=size && begin)
+	{
+		clicked=true;
+		
+		printf("lastid %d id %d\n", lastClicked, getId());
+		if(lastClicked!=-1)
+		{
+			auto it=busList.find(lastClicked);
+			if(it==busList.end())
+			{
+				fprintf(stderr, "Error: bus not found\n");
+				Bus::lastClicked=-1;
+				return false;
+			}
+			
+			Bus *bus1=it->second, *bus2=this;
+			
+			if(bus1->getType()==BT_OUTBUS) std::swap(bus1, bus2);
+			
+			if(bus1->getType()!=BT_INBUS || bus2->getType()!=BT_OUTBUS)
+			{
+				fprintf(stderr, "Error: bad buses type\n");
+				Bus::lastClicked=-1;
+				return false;
+			}
+			
+			
+			if(bus1->getEffect() == bus2->getEffect())
+			{
+				fprintf(stderr, "Error: buses come from same effect\n");
+				Bus::lastClicked=-1;
+				return false;
+			}
+			
+			auto connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
+			
+			lastConnection=*(connIt.first);
+			
+			Bus::lastClicked=-1;
+			
+			return connIt.second;
+		}
+		else
+		lastClicked=id;
+		
+		return false;
+	}
+	return false;
+}
+
 SDL_Texture* generateText(const char* text)
 {
 	SDL_Color color={0,0,0};

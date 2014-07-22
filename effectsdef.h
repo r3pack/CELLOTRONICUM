@@ -59,8 +59,9 @@
 		static constexpr int slider_width=30;
 		static constexpr int slider_period=20;
 		static constexpr int slider_height=160;
-		static constexpr int slider_top_padding=35;
-		static constexpr int slider_bottom_padding=30;
+		static constexpr int top_padding=35;
+		static constexpr int bottom_padding=30;
+		static constexpr int bus_period=35;
 		
 		std::vector <ParamSlider> sliders;
 		std::vector <ParamBus> buses;
@@ -87,14 +88,14 @@
 			EffectArgument* args=getAgrs();
 			int argsCount=getAgrsCount();
 			
-			height=slider_top_padding+slider_bottom_padding+slider_height;
+			height=top_padding+bottom_padding+slider_height;
 			
 			int x=width=slider_period+Bus::size+slider_period;
 			
 			ArgVis* argvis=getArgumentVisuals();
 			
-			int bus_y=slider_top_padding;
-			int bus_y2=slider_top_padding;
+			int bus_y=top_padding;
+			int bus_y2=top_padding;
 			
 			for(int i=0;i<argsCount;++i)
 			{
@@ -102,20 +103,31 @@
 				{
 					case VT_INBUS:
 					buses.push_back(ParamBus(new Bus(posX+slider_period, posY+bus_y, BT_INBUS, this, i), i, args[i].getName()));
+					bus_y+=bus_period;
 					break;
 					case VT_OUTBUS:
 					buses.push_back(ParamBus(new Bus(posX, posY+bus_y2, BT_OUTBUS, this, i), i, args[i].getName()));
+					bus_y2+=bus_period;
 					break;
 					case VT_SLIDER:
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
 						printf("%f %f %f\n", min, max, args[i].getFloatValue());
-						sliders.push_back(ParamSlider(new Slider(posX+x, posY+slider_top_padding, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
+						sliders.push_back(ParamSlider(new Slider(posX+x, posY+top_padding, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
 						x+=slider_width+slider_period;
 						width+=slider_width+slider_period;
 					break;
 				}
 			}
+			
+			for(int i=0;i<buses.size();++i)
+			{
+				if(buses[i].bus->getType()==BT_OUTBUS)
+				{
+					buses[i].bus->setPos(posX+x, buses[i].bus->getPosY());
+				}
+			}
+			
 			width+=Bus::size+slider_period;
 			
 			nameTex=generateText(getName());
@@ -173,6 +185,15 @@
 			for(int i=0;i<buses.size();++i)
 			{
 				buses[i].bus->draw();
+				int w, h;
+				SDL_QueryTexture(buses[i].nameTex, NULL, NULL, &w, &h);
+			
+				nameRect.y=buses[i].bus->getPosY()+Bus::size;
+				nameRect.x=buses[i].bus->getPosX()+Bus::size/2-w/2;
+				nameRect.w=w;
+				nameRect.h=h;		
+				
+				SDL_RenderCopy(render, buses[i].nameTex, NULL, &nameRect);
 			}
 		}
 		
@@ -188,40 +209,15 @@
 			{
 				if(buses[i].bus->receiveClick(X, Y, begin))
 				{
-					printf("lastid %d id %d\n", lastClicked, buses[i].bus->getId());
-					if(lastClicked!=-1)
-					{
-						auto it1=busList.find(lastClicked), it2=busList.find(buses[i].bus->getId());
-						if(it1==busList.end() || it2==busList.end())
-						{
-							fprintf(stderr, "Error: buses not found\n");
-							Bus::lastClicked=-1;
-							break;
-						}
-						
-						Bus *bus1=it1->second, *bus2=it2->second;
-						
-						if(bus1->getType()==BT_OUTBUS) std::swap(bus1, bus2);
-						
-						if(bus1->getType()!=BT_INBUS || bus2->getType()!=BT_OUTBUS)
-						{
-							fprintf(stderr, "Error: bad buses type\n");
-							Bus::lastClicked=-1;
-							break;
-						}
-						
-						
-						if(bus1->getEffect() == bus2->getEffect())
-						{
-							fprintf(stderr, "Error: buses come from same effect\n");
-							Bus::lastClicked=-1;
-							break;
-						}
-						printf("no erro %d %d\n", bus1->getEffect(), bus2->getEffect());
-						
-						
-						Bus::lastClicked=-1;
-					}
+					auto pair=getLastConnection();
+					Bus *bus1=pair.first, *bus2=pair.second;
+					bus1->getEffect()->moveBefore(bus2->getEffect());
+					int freebuf=OSCConn::getFreeBus();
+					
+					bus1->getEffect()->setArgument(bus1->getArg(), freebuf);
+					bus2->getEffect()->setArgument(bus2->getArg(), freebuf);
+					fprintf(stderr, "Connected two buses\n");
+					
 					break;
 				}
 			}

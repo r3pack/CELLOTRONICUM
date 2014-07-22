@@ -28,11 +28,11 @@ int main (int argc, char** argv)
 	
 	registerEffects();
 	
-	/*if(!OSCConn::connect()) exit(1);
+	if(!OSCConn::connect()) exit(1);
 	
 	if(!OSCConn::startServer()) exit(2);
 	
-	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}*/
+	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}
 	
 	initSDL();
 	
@@ -59,11 +59,12 @@ int main (int argc, char** argv)
 	
 	int freebus=OSCConn::getFreeBus();
 	
-	Playbuf playbuf(bufnum, freebus);
+	//Playbuf playbuf(bufnum, freebus);
 	
-	Distecho distecho(50, 50, freebus);
+	Distecho distecho(50, 50);
+	Distecho distecho2(350, 50);
 	
-	playbuf.moveBefore(&distecho);
+	//playbuf.moveBefore(&distecho);
 	
 	auto effectInstanceList=getEffectInstanceList();
 	
@@ -134,6 +135,7 @@ int main (int argc, char** argv)
 		{
 			it->second->draw();
 		}
+		drawConnections();
 		SDL_RenderPresent(render);
 	}
 	
