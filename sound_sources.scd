@@ -3,6 +3,17 @@ SynthDef.new(\eff_playbuf, {
 	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)));
 }).add;
 
+SynthDef.new(\eff_amplitude, {
+	arg inbus=8, outbus, attackTime=0.01, releseTime=0.01;
+	var in = In.ar(inbus);
+	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
+}).add;
+
+SyntDef.new(\eff_param_to_bus), {
+	arg param, bus;
+	Out.kr(bus, param);
+}).add;
+
 SynthDef.new(\eff_simple_shepard_tone, {
 	arg outbus=0, freq=440, amp=0.5;
 	var res=0;
@@ -24,7 +35,17 @@ SynthDef.new(\eff_pitch, {
 	Out.kr(outbus, hasFreq*freq);
 }).add;
 //TODO: Wystawić parametry do pitch'a.
-//
+
+SynthDef.new(\eff_tartini_pitch, {
+	arg outbus=0, inbus=8, cutoff=0.45;
+	var in = In.ar(inbus);
+	var freq, hasFreq;
+	# freq, hasFreq = Tartini.kr(in);
+	hasFreq.poll;
+	Out.kr(outbus,if((hasFreq>cutoff),freq,0));
+}).add;
+
+/*/TESTS
 
 SynthDef.new(\eff_simple_sin, {
 	arg outbus=0, freq_bus=8;
@@ -32,47 +53,47 @@ SynthDef.new(\eff_simple_sin, {
 	Out.ar(outbus,SinOsc.ar(in));
 }).add;
 
-//TESTS
 x = Synth.new(\eff_simple_sin, [\freq_bus, 16]);
 y = Synth.new(\eff_pitch, [\inbus, 8, \outbus, 16]);
 
+x = Synth.new(\eff_simple_sin, [\freq_bus, 16]);
+y = Synth.new(\eff_tartini_pitch, [\inbus, 8, \outbus, 16]);
+*/
 
 //INBUS as amp modulator :)
 SynthDef.new(\eff_shepard_mosquito, {
 	//arg outbus=0, freq=440, amp=0.5;
-	arg outbus=0, inbus=8, freq_bus, amp=0.5;
+	arg outbus=0, amp_bus, freq_bus, amp=0.5;
 	var freq = In.kr(freq_bus);
-	var in = In.ar(inbus);
+	var am = In.kr(amp_bus);
 	var res=0;
 	(6*2+1).do({
 		arg f;
-		res = res + SinOsc.ar(freq*(2**f),0,amp*in);
+		res = res + SinOsc.ar(freq*(2**f),0,amp*am);
 	});
 	Out.ar(outbus, res);
 }).add;
 
 SynthDef.new(\eff_shepard_tone, {
-	//arg outbus=0, freq=440, amp=0.5;
-	arg outbus=0, inbus=8, freq_bus, amp=0.5;
+	arg outbus=0, amp_bus, freq_bus, amp=0.5;
 	var freq = In.kr(freq_bus);
-	var in = Amplitude.ar(In.ar(inbus));
+	var am = In.kr(amp_bus);
 	var res=0;
 	(6*2+1).do({
 		arg f;
-		res = res + SinOsc.ar(freq*(2**f),0,amp*in);
+		res = res + SinOsc.ar(freq*(2**f),0,amp*am);
 	});
 	Out.ar(outbus, res);
 }).add;
 
 SynthDef.new(\eff_shepard_cycle_tone, {
-	//arg outbus=0, freq=440, amp=0.5;
-	arg outbus=0, inbus=8, freq_bus, amp=0.5;
+	arg outbus=0, amp_bus, freq_bus, amp=0.5;
 	var freq = In.kr(freq_bus);
-	var in = Amplitude.ar(In.ar(inbus));
+	var am = In.kr(amp_bus);
 	var res=0;
 	[27.5,55,110,220,440,880,1760, 1760*2, 1760*4, 1760*8].do({
 		arg f;
-		res = res + SinOsc.ar(f*(2**(frac(log2(freq)-log2(f)))),0,amp*in);
+		res = res + SinOsc.ar(f*(2**(frac(log2(freq)-log2(f)))),0,amp*am);
 	});
 	Out.ar(outbus, res);
 }).add;
@@ -102,6 +123,7 @@ z = Synth.new(\test_sin, [\outbus, 17, \out_freq, 16]);
 //TEST 2
 x = Synth.new(\eff_shepard_cycle_tone, [ \outbus, 0, \inbus, 8, \amp, 0.4, \freq_bus, 16]);
 y = Synth.new(\eff_pitch, [\inbus, 8, \outbus, 16]);
+
 //Notatka: Pitch detector ma jakies problemy z sinusami o okreslonej freq.
 
 //TEST 3
@@ -109,11 +131,10 @@ x = Synth.new(\eff_shepard_tone, [ \outbus, 0, \amp, 0.4, \freq_bus, 8]);
 x.set(\freq,150);
 */
 
-//* TODO: Fajny efekt - może by to wykorzystać?
 // Effect based on example in documentation :)
 SynthDef.new(\eff_pitch_follow, {
-	arg inbus=8, outbus=0, freq_bus;
-	var amp = Amplitude.kr(In.ar(inbus), 0.05, 0.05);
+	arg outbus=0, freq_bus, amp_bus;
+	var amp = In.kr(amp_bus); //Amplitude.kr(In.ar(inbus), 0.05, 0.05);
 	var freq = In.kr(freq_bus);
 	var out = Mix.new(VarSaw.ar(freq * [0.5,1,2], 0, LFNoise1.kr(0.3,0.1,0.1), amp));
     6.do({
@@ -133,18 +154,23 @@ x = Synth.new(\eff_pitch_follow, [ \outbus, 0, \inbus, 17, \freq_bus, 16]);
 y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
 s.stopRecording;
-
-
-/*SynthDef("pitchFollow1",{
-    var in, amp, freq, hasFreq, out;
-    in = Mix.new(SoundIn.ar([0,1]));
-    amp = Amplitude.kr(in, 0.05, 0.05);
-    # freq, hasFreq = Pitch.kr(in, ampThreshold: 0.02, median: 7);
-    //freq = Lag.kr(freq.cpsmidi.round(1).midicps, 0.05);
-    out = Mix.new(VarSaw.ar(freq * [0.5,1,2], 0, LFNoise1.kr(0.3,0.1,0.1), amp));
-    6.do({
-        out = AllpassN.ar(out, 0.040, [0.040.rand,0.040.rand], 2)
-    });
-    Out.ar(0,out)
-}).play(s);
 */
+
+SynthDef.new(\eff_goetzel,{
+	arg amp_outbus, freq_outbus, inbus=8, freq=440, overlap=1; //overlap <- (0,1]
+	var in = In.ar(inbus);
+	var bufsize = 2048;
+	var real, imag, magnitude;
+	# real, imag = Goertzel.kr(in,bufsize,freq,overlap);
+	magnitude = (real.squared + imag.squared).sqrt*(bufsize/2).reciprocal;
+	Out.kr(amp_outbus,magnitude);
+	Out.kr(freq_outbus,freq);
+}).add;
+
+/* RECORDING
+b = Buffer.read(s, ~p +/+ "zBrody1.wav");
+b.bufnum.postln;
+
+s.prepareForRecord(~p +/+ "goetzel+.aiff");
+s.record;
+
