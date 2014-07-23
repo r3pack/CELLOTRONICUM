@@ -23,7 +23,7 @@ SynthDef.new(\eff_amplitude, {
 	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
 }).add;
 
-SyntDef.new(\eff_param_to_bus), {
+SynthDef.new(\eff_param_to_bus, {
 	arg param, bus;
 	Out.kr(bus, param);
 }).add;

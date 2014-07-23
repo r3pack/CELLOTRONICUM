@@ -108,13 +108,14 @@
 			EffectArgument* args=getAgrs();
 			int argsCount=getAgrsCount();
 			
-			height=top_padding+bottom_padding+Bus::size;
+
 			
 			int x=width=slider_period+Bus::size+slider_period;
 			
 			ArgVis* argvis=getArgumentVisuals();
 			
 			int bus_y=top_padding;
+			int slider_y=0;
 			int bus_y2=top_padding;
 			
 			for(int i=0;i<argsCount;++i)
@@ -131,7 +132,7 @@
 					break;
 					case VT_SLIDER:
 					{
-						height=top_padding+bottom_padding+slider_height;
+						slider_y=slider_height;
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
 						sliders.push_back(ParamSlider(new Slider(posX+x, posY+top_padding, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
@@ -146,6 +147,8 @@
 					break;
 				}
 			}
+			
+			height=bottom_padding+std::max(std::max(bus_y, bus_y2), top_padding+slider_y);
 			
 			width=x;
 			
@@ -244,25 +247,26 @@
 			
 		}
 		
-		void receiveClick(int X, int Y, bool begin)
+		void receiveClick(int X, int Y, MouseEvent me)
 		{
+			if(me!=ME_PRESS) return;
 			for(int i=0;i<sliders.size();++i)
 			{
-				if(sliders[i].slider->receiveClick(X, Y, begin)) setAndSendArgument(sliders[i].param, sliders[i].slider->getValue());
+				if(sliders[i].slider->receiveClick(X, Y, me)) setAndSendArgument(sliders[i].param, sliders[i].slider->getValue());
 			}
 			
 			int lastClicked=Bus::lastClicked;
 			for(int i=0;i<buses.size();++i)
 			{
-				if(buses[i].bus->receiveClick(X, Y, begin))
+				if(buses[i].bus->receiveClick(X, Y, me))
 				{
 					auto pair=getLastConnection();
 					Bus *bus1=pair.first, *bus2=pair.second;
 					bus1->getEffect()->moveBefore(bus2->getEffect());
 					int freebuf=OSCConn::getFreeBus();
 					
-					bus1->getEffect()->setArgument(bus1->getArg(), freebuf);
-					bus2->getEffect()->setArgument(bus2->getArg(), freebuf);
+					bus1->getEffect()->setAndSendArgument(bus1->getArg(), freebuf);
+					bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebuf);
 					fprintf(stderr, "Connected two buses\n");
 					
 					break;
@@ -270,9 +274,9 @@
 			}
 		}
 		
-		void receiveSecondClick(int X, int Y, bool begin)
+		void receiveSecondClick(int X, int Y, MouseEvent me)
 		{
-			if(begin)
+			if(me==ME_PRESS)
 			{
 				if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)
 				{
@@ -283,9 +287,14 @@
 				else
 				focus=false;
 			}
-			else
-			if(focus)
-			setPos(X-handlePosX, Y-handlePosY);
+			else if(me==ME_REPEAT && focus)
+			{
+				setPos(X-handlePosX, Y-handlePosY);
+			}
+			else if(me==ME_RELEASE)
+			{
+				focus=false;
+			}
 		}
 		
 		~EffectAutoGUI()
@@ -316,7 +325,7 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Distecho(int X, int Y, int inbus=8, int outbus=0): 
+			Distecho(int X, int Y, int inbus=-1, int outbus=-1): 
 			args({EffectArgument("inbus", inbus), EffectArgument("outbus", outbus), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 5.0f)}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
 			{sendInstance(); initGUI(X, Y);}
@@ -336,8 +345,44 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Playbuf(int X, int Y, int bufnum, int outbus=0): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}),
+			Playbuf(int X, int Y, int bufnum, int outbus=-1): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}),
 			argsVis({ArgVis(VT_TEXT, std::string(OSCConn::getBufferFileById(bufnum))), ArgVis(VT_OUTBUS)})
+			{sendInstance(); initGUI(X, Y);}
+	};
+	
+	class Input : public EffectAutoGUI
+	{
+		private:
+			static const int argsCount=1;
+			EffectArgument args[argsCount];
+			ArgVis argsVis[argsCount];
+		public:
+			static constexpr const char* name="eff_input";
+			const char* getName() {return name;}
+			EffectArgument* getAgrs() {return args;}
+			const int getAgrsCount() {return argsCount;}
+			ArgVis* getArgumentVisuals() {return argsVis;}
+			
+			Input(int X, int Y, int outbus=-1): args({EffectArgument("outbus", outbus)}),
+			argsVis({ArgVis(VT_OUTBUS)})
+			{sendInstance(); initGUI(X, Y);}
+	};
+	
+	class Output : public EffectAutoGUI
+	{
+		private:
+			static const int argsCount=2;
+			EffectArgument args[argsCount];
+			ArgVis argsVis[argsCount];
+		public:
+			static constexpr const char* name="eff_output";
+			const char* getName() {return name;}
+			EffectArgument* getAgrs() {return args;}
+			const int getAgrsCount() {return argsCount;}
+			ArgVis* getArgumentVisuals() {return argsVis;}
+			
+			Output(int X, int Y, int inbus1=-1, int inbus2=-1): args({EffectArgument("inbus1", inbus1), EffectArgument("inbus2", inbus2)}),
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
 			{sendInstance(); initGUI(X, Y);}
 	};
 	
