@@ -17,17 +17,6 @@ SynthDef.new(\eff_playbuf, {
 	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)));
 }).add;
 
-SynthDef.new(\eff_amplitude, {
-	arg inbus=8, outbus, attackTime=0.01, releseTime=0.01;
-	var in = In.ar(inbus);
-	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
-}).add;
-
-SyntDef.new(\eff_param_to_bus), {
-	arg param, bus;
-	Out.kr(bus, param);
-}).add;
-
 SynthDef.new(\eff_simple_shepard_tone, {
 	arg outbus=0, freq=440, amp=0.5;
 	var res=0;
@@ -37,42 +26,6 @@ SynthDef.new(\eff_simple_shepard_tone, {
 	});
 	Out.ar(outbus, res);
 }).add;
-
-// PITCH DETECTION.
-SynthDef.new(\eff_pitch, {
-	arg outbus=0, inbus=8;
-	var in = In.ar(inbus);
-	var freq, hasFreq;
-	# freq, hasFreq = Pitch.kr(in, ampThreshold: 0.02, median: 7);
-	//Out.kr(outbus, if((hasFreq==1),{freq},{440}));
-//	Out.kr(outbus, freq);
-	Out.kr(outbus, hasFreq*freq);
-}).add;
-//TODO: Wystawić parametry do pitch'a.
-
-SynthDef.new(\eff_tartini_pitch, {
-	arg outbus=0, inbus=8, cutoff=0.45;
-	var in = In.ar(inbus);
-	var freq, hasFreq;
-	# freq, hasFreq = Tartini.kr(in);
-	hasFreq.poll;
-	Out.kr(outbus,if((hasFreq>cutoff),freq,0));
-}).add;
-
-/*/TESTS
-
-SynthDef.new(\eff_simple_sin, {
-	arg outbus=0, freq_bus=8;
-	var in = In.kr(freq_bus);
-	Out.ar(outbus,SinOsc.ar(in));
-}).add;
-
-x = Synth.new(\eff_simple_sin, [\freq_bus, 16]);
-y = Synth.new(\eff_pitch, [\inbus, 8, \outbus, 16]);
-
-x = Synth.new(\eff_simple_sin, [\freq_bus, 16]);
-y = Synth.new(\eff_tartini_pitch, [\inbus, 8, \outbus, 16]);
-*/
 
 //INBUS as amp modulator :)
 SynthDef.new(\eff_shepard_mosquito, {
@@ -164,55 +117,65 @@ b.bufnum.postln;
 s.prepareForRecord(~p +/+ "pitch_follow-4.aiff");
 s.record;
 
-x = Synth.new(\eff_pitch_follow, [ \outbus, 0, \inbus, 17, \freq_bus, 16]);
+x = Synth.new(\eff_pila_po_przejsciach, [ \outbus, 0, \inbus, 17, \freq_bus, 16]);
 y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
 s.stopRecording;
 */
 
-SynthDef.new(\eff_goetzel,{
-	arg amp_outbus, freq_outbus, inbus=8, freq=440, overlap=1; //overlap <- (0,1]
-	var in = In.ar(inbus);
-	var bufsize = 2048;
-	var real, imag, magnitude;
-	# real, imag = Goertzel.kr(in,bufsize,freq,overlap);
-	magnitude = (real.squared + imag.squared).sqrt*(bufsize/2).reciprocal;
-	Out.kr(amp_outbus,magnitude);
-	Out.kr(freq_outbus,freq);
-}).add;
-
-/* RECORDING - nieskończone!
-b = Buffer.read(s, ~p +/+ "zBrody1.wav");
-b.bufnum.postln;
-
-s.prepareForRecord(~p +/+ "goetzel+.aiff");
-s.record;
-SynthDef.new(\sin, {
-	arg freq_bus, amp_bus, outbus;
+SynthDef.new(\eff_ay,{
+	arg freq_bus, outbus, amp_bus, f2=0.5, f3=2, gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
+	var a = gain*In.kr(amp_bus);
+	var amp = a/(a.abs+1);
 	var freq = In.kr(freq_bus);
-	var amp = In.kr(amp_bus);
-	Out.ar(outbus, FSinOsc.ar(freq,0, amp));
+	var vola=floor(amp*15), volb=floor(amp*15), volc=floor(amp*15);
+	var ta= AY.freqtotone(freq),tb= AY.freqtotone(freq*f2),tc= AY.freqtotone(freq*f3);
+	Out.ar(outbus, AY.ar(ta,tb,tc,1,7,vola, volb, volc));
 }).add;
 
-x = Synth.new(\sin, [ \outbus, 0, \freq_bus, 16, \amp_bus, 18]);
-y = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 60.midicps, \freq_outbus, 16, \amp_outbus, 18]);
-c = Synth.new(\sin, [ \outbus, 0, \freq_bus, 19, \amp_bus, 20]);
-d = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 62.midicps, \freq_outbus, 19, \amp_outbus, 20]);
-e = Synth.new(\sin, [ \outbus, 0, \freq_bus, 21, \amp_bus, 22]);
-f = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 64.midicps, \freq_outbus, 21, \amp_outbus, 22]);
-g = Synth.new(\sin, [ \outbus, 0, \freq_bus, 23, \amp_bus, 24]);
-h = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 65.midicps, \freq_outbus, 23, \amp_outbus, 24]);
-i = Synth.new(\sin, [ \outbus, 0, \freq_bus, 25, \amp_bus, 26]);
-j = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 67.midicps, \freq_outbus, 25, \amp_outbus, 26]);
-k = Synth.new(\sin, [ \outbus, 0, \freq_bus, 27, \amp_bus, 28]);
-l = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 69.midicps, \freq_outbus, 27, \amp_outbus, 28]);
-m = Synth.new(\sin, [ \outbus, 0, \freq_bus, 29, \amp_bus, 30]);
-n = Synth.new(\eff_goetzel, [\inbus, 17, \freq, 71.midicps, \freq_outbus, 29, \amp_outbus, 30]);
-//o = Synth.new(\eff_output, [\inbus1, 17, \inbus2, 17]);
+SynthDef.new(\eff_ym,{
+	arg freq_bus, outbus, amp_bus, f2=(9.0/8.0), f3=(8.0/9.0), gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
+	var a = gain*In.kr(amp_bus);
+	var amp = a/(a.abs+1);
+	var freq = In.kr(freq_bus)/8;
+	var vola=(amp*31), volb=0, volc=0;
+	var ta= AY.freqtotone(freq),tb= AY.freqtotone(freq*f2),tc= AY.freqtotone(freq*f3);
+	Out.ar(outbus, AY.ar(ta,tb,tc,1,0,vola, volb, volc, chiptype:1));
+}).add;
+
+SynthDef.new(\eff_ay_complicated,{
+	arg freq1_bus, freq2_bus, freq3_bus, outbus, amp1_bus, amp2_bus, amp3_bus,
+	    noise=1, noise_control=8, env_freq=4, env_style=1;
+	var a1 = In.kr(amp1_bus), a2 = In.kr(amp2_bus), a3 = In.kr(amp3_bus);
+	var f1=In.kr(freq1_bus), f2=In.kr(freq2_bus), f3=In.kr(freq3_bus);
+	var vola=floor(a1*15), volb=floor(a2*15), volc=floor(a3*15);
+	var ta= AY.freqtotone(f1),tb= AY.freqtotone(f2),tc= AY.freqtotone(f3);
+	Out.ar(outbus, AY.ar(ta,tb,tc,noise,noise_control,vola, volb, volc, env_freq, env_style));
+}).add;
+
+SynthDef.new(\eff_ym_complicated,{
+	arg freq1_bus, freq2_bus, freq3_bus, outbus, amp1_bus, amp2_bus, amp3_bus,
+	    noise=1, noise_control=8, env_freq=4, env_style=1;
+	var a1 = In.kr(amp1_bus), a2 = In.kr(amp2_bus), a3 = In.kr(amp3_bus);
+	var f1=In.kr(freq1_bus), f2=In.kr(freq2_bus), f3=In.kr(freq3_bus);
+	var vola=floor(a1*31), volb=floor(a2*31), volc=floor(a3*31);
+	var ta= AY.freqtotone(f1),tb= AY.freqtotone(f2),tc= AY.freqtotone(f3);
+	Out.ar(outbus, AY.ar(ta,tb,tc,noise,noise_control,vola, volb, volc, env_freq, env_style,1));
+}).add;
+
+/*
+s.prepareForRecord(~p +/+ "ym-gain25+tartinipitch.aiff");
+s.record;
+
+x = Synth.new(\eff_ay, [\freq_bus, 16, \amp_bus, 18, \outbus, 0]);
+y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
+a = Synth.new(\eff_amplitude, [\inbus, 17, \outbus, 18]);
+z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
+
+x = Synth.new(\eff_ym, [\freq_bus, 16, \amp_bus, 18, \outbus, 0]);
+a = Synth.new(\eff_amplitude, [\inbus, 17, \outbus, 18]);
+y = Synth.new(\eff_tartini_pitch, [\inbus, 17, \outbus, 16]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
 
 s.stopRecording;
-
-74.midicps
-
 */

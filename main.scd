@@ -3,6 +3,7 @@
 (thisProcess.nowExecutingPath.dirname +/+"echo.scd").loadPaths;
 (thisProcess.nowExecutingPath.dirname +/+"bit_crush.scd").loadPaths;
 (thisProcess.nowExecutingPath.dirname +/+"sound_sources.scd").loadPaths;
+(thisProcess.nowExecutingPath.dirname +/+"base.scd").loadPaths;
 
 ~p = thisProcess.nowExecutingPath.dirname;
 
