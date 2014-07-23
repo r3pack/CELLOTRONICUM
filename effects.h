@@ -7,6 +7,7 @@
 #include <map>
 #include <stdarg.h>
 #include "osc.h"
+#include "graphics.h"
 
 	enum VarType{
 		TYPE_UNKNOWN,
@@ -67,8 +68,8 @@
 			virtual const int getAgrsCount() = 0;
 			
 			virtual void draw(){}
-			virtual void receiveClick(int X, int Y, bool begin){}
-			virtual void receiveSecondClick(int X, int Y, bool begin){}
+			virtual void receiveClick(int X, int Y, MouseEvent me){}
+			virtual void receiveSecondClick(int X, int Y, MouseEvent me){}
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);

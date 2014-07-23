@@ -72,11 +72,11 @@ void drawConnections()
 	}
 }
 
-bool Bus::receiveClick(int X, int Y, bool begin)
+bool Bus::receiveClick(int X, int Y, MouseEvent me)
 {
 	X-=posX;
 	Y-=posY;
-	if(X>=0 && X<=size && Y>=0 && Y<=size && begin)
+	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
 	{
 		clicked=true;
 		
@@ -93,9 +93,9 @@ bool Bus::receiveClick(int X, int Y, bool begin)
 			
 			Bus *bus1=it->second, *bus2=this;
 			
-			if(bus1->getType()==BT_OUTBUS) std::swap(bus1, bus2);
+			if(bus1->getType()==BT_INBUS) std::swap(bus1, bus2);
 			
-			if(bus1->getType()!=BT_INBUS || bus2->getType()!=BT_OUTBUS)
+			if(bus1->getType()!=BT_OUTBUS || bus2->getType()!=BT_INBUS)
 			{
 				fprintf(stderr, "Error: bad buses type\n");
 				Bus::lastClicked=-1;

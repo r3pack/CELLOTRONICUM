@@ -1,4 +1,4 @@
-SynthDef.new(\eff_output,{
+﻿SynthDef.new(\eff_output,{
 	arg inbus1, inbus2;
 	var in1 = In.ar(inbus1);
 	var in2 = In.ar(inbus2);

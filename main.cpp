@@ -64,6 +64,8 @@ int main (int argc, char** argv)
 	Distecho distecho(50, 50);
 	Distecho distecho2(350, 50);
 	
+	Output output(350, 500);
+	
 	//playbuf.moveBefore(&distecho);
 	
 	auto effectInstanceList=getEffectInstanceList();
@@ -88,7 +90,7 @@ int main (int argc, char** argv)
 					int y=event.button.y;
 					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 					{
-						it->second->receiveClick(x, y, true);
+						it->second->receiveClick(x, y, ME_PRESS);
 					}
 				}
 				else
@@ -98,7 +100,28 @@ int main (int argc, char** argv)
 					int y=event.button.y;
 					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 					{
-						it->second->receiveSecondClick(x, y, true);
+						it->second->receiveSecondClick(x, y, ME_PRESS);
+					}
+				}
+				break;
+				case SDL_MOUSEBUTTONUP:
+				if(event.button.button==SDL_BUTTON_LEFT)
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+					{
+						it->second->receiveClick(x, y, ME_RELEASE);
+					}
+				}
+				else
+				if(event.button.button==SDL_BUTTON_RIGHT)
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+					{
+						it->second->receiveSecondClick(x, y, ME_RELEASE);
 					}
 				}
 				break;
@@ -110,7 +133,7 @@ int main (int argc, char** argv)
 						int y=event.button.y;
 						for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 						{
-							it->second->receiveClick(x, y, false);
+							it->second->receiveClick(x, y, ME_REPEAT);
 						}
 					}
 					else
@@ -120,7 +143,7 @@ int main (int argc, char** argv)
 						int y=event.button.y;
 						for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 						{
-							it->second->receiveSecondClick(x, y, false);
+							it->second->receiveSecondClick(x, y, ME_REPEAT);
 						}
 					}
 					
@@ -140,5 +163,7 @@ int main (int argc, char** argv)
 	}
 	
 	quitSDL();
+	
+	OSCConn::quitServer();
 	fprintf(stderr, "Done\n");
 }

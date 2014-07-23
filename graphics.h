@@ -37,6 +37,12 @@ std::pair <Bus*, Bus*> getLastConnection();
 
 void drawConnections();
 
+enum MouseEvent{
+	ME_PRESS,
+	ME_REPEAT,
+	ME_RELEASE
+};
+
 class Bus{
 	friend class Effect;
     
@@ -93,7 +99,7 @@ class Bus{
 		SDL_RenderDrawRect(render, &rect);
 	}
     
-	bool receiveClick(int X, int Y, bool begin);
+	bool receiveClick(int X, int Y, MouseEvent me);
 	
 	void setPos(int X, int Y)
 	{
@@ -134,8 +140,9 @@ class Slider{
 	rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))) {}
 	~Slider() {SDL_DestroyTexture(valueTex);}
 	
-	bool receiveClick(int X, int Y, bool begin)
+	bool receiveClick(int X, int Y, MouseEvent me)
 	{
+		if(me!=ME_PRESS || me!=ME_REPEAT) return false;
 		X-=posX;
 		Y-=posY;
 		if(X>=0 && X<=width && Y>=0 && Y<=height)
