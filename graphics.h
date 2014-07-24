@@ -33,6 +33,8 @@ class Bus;
 
 extern std::map <int, Bus*> busList;
 
+std::set <std::pair <Bus*, Bus*> >* getConnections();
+
 std::pair <Bus*, Bus*> getLastConnection();
 
 void drawConnections();
@@ -43,9 +45,64 @@ enum MouseEvent{
 	ME_RELEASE
 };
 
+
+class Button{
+	int posX, posY;
+	int symbol;
+	
+	public:
+	static constexpr int size=15;
+	
+	Button(int X, int Y, int s): posX(X), posY(Y), symbol(s) {}
+	
+	void setSymbol(int s) {symbol=s;}
+	
+	void draw()
+	{
+		SDL_Rect rect;
+		rect.x = posX;
+		rect.y = posY;
+		rect.w = size;
+		rect.h = size;
+		
+		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+		SDL_RenderFillRect(render, &rect);
+		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+		SDL_RenderDrawRect(render, &rect);
+		
+		switch (symbol)
+		{
+			case 0:
+			SDL_RenderDrawLine(render, posX, posY, posX+size-2, posY+size/2);
+			SDL_RenderDrawLine(render, posX, posY+size-2, posX+size-2, posY+size/2);
+			break;
+			case 1:
+			SDL_RenderDrawLine(render, posX+size/4, posY+size/4, posX+size/4, posY+3*size/4);
+			SDL_RenderDrawLine(render, posX+3*size/4, posY+size/4, posX+3*size/4, posY+3*size/4);
+			break;
+			case 2:
+			SDL_RenderDrawLine(render, posX, posY, posX+size, posY+size);
+			SDL_RenderDrawLine(render, posX, posY+size, posX+size, posY);
+			break;
+		}
+	}
+	
+	void move(int X, int Y)
+	{
+		posX+=X;
+		posY+=Y;
+	}
+	
+	bool receiveClick(int X, int Y, MouseEvent me)
+	{
+		X-=posX; Y-=posY;
+		if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS) return true;
+		return false;
+	}
+};
+
+
 class Bus{
-	friend class Effect;
-    
 	static int lastId;
     int id;
     
@@ -79,6 +136,23 @@ class Bus{
 		id=lastId;
 		++lastId;
 		busList.insert(std::pair<int, Bus*>(id, this));
+	}
+	
+	void removeBus()
+	{
+		for(auto it=getConnections()->begin();it!=getConnections()->end();)
+		{
+			if((*it).first==this || (*it).second==this)
+			it=getConnections()->erase(it);
+			else
+			++it;
+		}
+		busList.erase(id);
+	}
+	
+	~Bus()
+	{
+		removeBus();
 	}
     
 	void draw()
@@ -138,11 +212,11 @@ class Slider{
 	
 	Slider(int pX, int pY, int w, int h, float rB, float rE, float l):
 	rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))) {}
-	~Slider() {SDL_DestroyTexture(valueTex);}
+	~Slider() {/*SDL_DestroyTexture(valueTex);*/}
 	
 	bool receiveClick(int X, int Y, MouseEvent me)
 	{
-		if(me!=ME_PRESS || me!=ME_REPEAT) return false;
+		if(me!=ME_PRESS && me!=ME_REPEAT) return false;
 		X-=posX;
 		Y-=posY;
 		if(X>=0 && X<=width && Y>=0 && Y<=height)

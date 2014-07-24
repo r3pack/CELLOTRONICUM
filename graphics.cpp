@@ -59,6 +59,8 @@ std::map <int, Bus*> busList;
 
 std::set <std::pair <Bus*, Bus*> > connections;
 
+std::set <std::pair <Bus*, Bus*> >* getConnections() {return &connections;}
+
 std::pair <Bus*, Bus*> lastConnection;
 
 std::pair <Bus*, Bus*> getLastConnection() {return lastConnection;}
@@ -80,7 +82,6 @@ bool Bus::receiveClick(int X, int Y, MouseEvent me)
 	{
 		clicked=true;
 		
-		printf("lastid %d id %d\n", lastClicked, getId());
 		if(lastClicked!=-1)
 		{
 			auto it=busList.find(lastClicked);

@@ -52,10 +52,15 @@
 	class Effect{
 	
 		private:
-			int id;
 			static int lastId;		
+		protected:
+			int id;
+			bool paused;
 		public:
-			void sendInstance();
+			bool isPaused() {return paused;}
+			void pauseInstance();
+			void unpauseInstance();
+			void sendInstance(bool paused=false);
 			void deleteInstance();
 			void moveBefore(Effect* effect);
 		
@@ -70,6 +75,7 @@
 			virtual void draw(){}
 			virtual void receiveClick(int X, int Y, MouseEvent me){}
 			virtual void receiveSecondClick(int X, int Y, MouseEvent me){}
+			virtual void receiveThridClick(int X, int Y, MouseEvent me){}
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);

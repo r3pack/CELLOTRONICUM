@@ -11,7 +11,7 @@
 		SDL_Texture* nameTex=NULL;
 		ParamSlider(Slider* s, int p, const char* text): slider(s), param(p) {nameTex=generateText(text);}
 		
-		void free() {delete slider; SDL_DestroyTexture(nameTex);}
+		void free() {delete slider; SDL_DestroyTexture(nameTex); nameTex=NULL;}
 	};
 	
 	struct ParamBus
@@ -21,7 +21,7 @@
 		SDL_Texture* nameTex=NULL;
 		ParamBus(Bus* b, int p, const char* text): bus(b), param(p) {nameTex=generateText(text);}
 		
-		void free() {delete bus; SDL_DestroyTexture(nameTex);}
+		void free() {delete bus; SDL_DestroyTexture(nameTex); nameTex=NULL;} 
 	};
 	
 	struct ParamText
@@ -30,8 +30,7 @@
 		int param;
 		SDL_Texture* nameTex=NULL;
 		ParamText(int X, int Y, int p, const char* text): posX(X), posY(Y), param(p) {nameTex=generateText(text);}
-		
-		void free() {SDL_DestroyTexture(nameTex);}
+		void free() {SDL_DestroyTexture(nameTex); nameTex=NULL;}
 	};
 	
 	enum VisulalisationType{
@@ -86,6 +85,7 @@
 		std::vector <ParamBus> buses;
 		std::vector <ParamText> texts;
 		
+		Button* pauseButton;
 		
 		int posX, posY;
 		
@@ -93,7 +93,7 @@
 			
 		int handlePosX, handlePosY;
 		
-		bool focus;
+		bool focus=false;
 		
 		SDL_Texture* nameTex;
 		
@@ -105,10 +105,11 @@
 		{
 			posX=X;
 			posY=Y;
+			
+			pauseButton=new Button(X, Y, 0);
+			
 			EffectArgument* args=getAgrs();
 			int argsCount=getAgrsCount();
-			
-
 			
 			int x=width=slider_period+Bus::size+slider_period;
 			
@@ -167,6 +168,8 @@
 		
 		void setPos(int X, int Y)
 		{
+			pauseButton->move(X-posX, Y-posY);
+			
 			for(int i=0;i<sliders.size();++i)
 			{
 				sliders[i].slider->move(X-posX, Y-posY);
@@ -204,6 +207,10 @@
 			nameRect.h=h;
 			
 			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+			
+			
+			pauseButton->setSymbol(int(isPaused()));
+			pauseButton->draw();
 			
 			for(int i=0;i<sliders.size();++i)
 			{
@@ -249,7 +256,14 @@
 		
 		void receiveClick(int X, int Y, MouseEvent me)
 		{
-			if(me!=ME_PRESS) return;
+			if(pauseButton->receiveClick(X, Y, me)) 
+			{
+				paused=!paused;
+				if(paused)
+					pauseInstance();
+				else
+					unpauseInstance();
+			}
 			for(int i=0;i<sliders.size();++i)
 			{
 				if(sliders[i].slider->receiveClick(X, Y, me)) setAndSendArgument(sliders[i].param, sliders[i].slider->getValue());
@@ -297,13 +311,28 @@
 			}
 		}
 		
+		void receiveThridClick(int X, int Y, MouseEvent me)
+		{
+			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height && me==ME_PRESS)
+			{
+				deleteInstance();
+				getEffectInstanceList()->erase(id);
+				for(int i=0;i<buses.size();++i)
+				buses[i].bus->removeBus();
+			}
+		}
+		
 		~EffectAutoGUI()
 		{
+			printf("deconstructor %p\n", this);
 			for(int i=0;i<sliders.size();++i)
-			{
-				sliders[i].free();
-			}
+			sliders[i].free();
+			for(int i=0;i<buses.size();++i)
+			buses[i].free();
+			for(int i=0;i<texts.size();++i)
+			texts[i].free();
 			SDL_DestroyTexture(nameTex);
+			delete pauseButton;
 		}
 		
 	};
@@ -347,7 +376,7 @@
 			
 			Playbuf(int X, int Y, int bufnum, int outbus=-1): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}),
 			argsVis({ArgVis(VT_TEXT, std::string(OSCConn::getBufferFileById(bufnum))), ArgVis(VT_OUTBUS)})
-			{sendInstance(); initGUI(X, Y);}
+			{sendInstance(true); initGUI(X, Y);}
 	};
 	
 	class Input : public EffectAutoGUI

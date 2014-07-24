@@ -224,9 +224,48 @@ void Effect::setAndSendArgument(int argId, std::string value)
 	args[argId].sendArgument(id);
 }
 
-void Effect::sendInstance()
+void Effect::pauseInstance()
 {
-	Message msg("/new_effect_instance"); 
+	paused=true;
+	Message msg("/pause_effect_instance");
+	msg.pushInt32(id);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending message..\n");
+	}
+}
+
+void Effect::unpauseInstance()
+{
+	paused=false;
+	Message msg("/unpause_effect_instance");
+	msg.pushInt32(id);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending message..\n");
+	}
+}
+
+void Effect::sendInstance(bool paused)
+{
+	this->paused=paused;
+	Message msg;
+	if(paused)
+	msg.init("/new_effect_instance_paused");
+	else
+	msg.init("/new_effect_instance");
 	const char* name=getName();
 	msg.pushInt32(id).pushStr(name);
 	int argsCount=getAgrsCount();
