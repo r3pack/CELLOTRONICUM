@@ -133,3 +133,67 @@ SynthDef.new(\eff_SoftClipper8,{
 	var res = SoftClipper8.ar(in);
 	Out.ar(outbus,res);
 }).add;
+
+// FILTERS
+SynthDef.new(\eff_BHiPass ,{
+	arg inbus, outbus, freq=1200, rq=1;
+	var in = In.ar(inbus);
+	var res = BHiPass.ar(in,freq, rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BHiPass4 ,{
+	arg inbus, outbus, freq=1200, rq=1;
+	var in = In.ar(inbus);
+	var res = BHiPass4.ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BHiShelf ,{
+	arg inbus, outbus, freq=1200, rs=1, gain=0;
+	var in = In.ar(inbus);
+	var res = BHiShelf.ar(in,freq, rs, gain);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BLowPass,{
+	arg inbus, outbus, freq=1200, rq=1;
+	var in = In.ar(inbus);
+	var res = BLowPass.ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BLowPass4,{
+	arg inbus, outbus, freq=1200, rq=1;
+	var in = In.ar(inbus);
+	var res = BLowPass4.ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BLowShelf,{
+	arg inbus, outbus, freq=1200, rs=1, gain=0;
+	var in = In.ar(inbus);
+	var res = BLowShelf.ar(in,freq,rs,gain);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BPeakEQ,{
+	arg inbus, outbus, freq=1200, rq=1, gain=0;
+	var in = In.ar(inbus);
+	var res = BPeakEQ.ar(in,freq,rq,gain);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BBandPass,{
+	arg inbus, outbus, freq=1200, bw=1;
+	var in = In.ar(inbus);
+	var res = BBandPass.ar(in,freq,bw);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BAllPass,{
+	arg inbus, outbus, freq=1200, rq=1;
+	var in = In.ar(inbus);
+	var res = .ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;

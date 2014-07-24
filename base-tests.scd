@@ -49,6 +49,7 @@ http://comments.gmane.org/gmane.comp.audio.supercollider.user/91961
 Sprawdzić:
 DriveNoise
 SinTone
+Spreader ?
 
 Generatory:
 Metro ?
