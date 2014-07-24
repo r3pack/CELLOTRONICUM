@@ -1,4 +1,4 @@
-﻿SynthDef.new(\eff_output,{
+SynthDef.new(\eff_output,{
 	arg inbus1, inbus2;
 	var in1 = In.ar(inbus1);
 	var in2 = In.ar(inbus2);
@@ -27,9 +27,7 @@ SynthDef.new(\eff_simple_shepard_tone, {
 	Out.ar(outbus, res);
 }).add;
 
-//INBUS as amp modulator :)
 SynthDef.new(\eff_shepard_mosquito, {
-	//arg outbus=0, freq=440, amp=0.5;
 	arg outbus=0, amp_bus, freq_bus, amp=0.5;
 	var freq = In.kr(freq_bus);
 	var am = In.kr(amp_bus);
@@ -65,39 +63,6 @@ SynthDef.new(\eff_shepard_cycle_tone, {
 	Out.ar(outbus, res);
 }).add;
 
-/* RECORDING
-b = Buffer.read(s, ~p +/+ "zBrody1.wav");
-b.bufnum.postln;
-
-s.prepareForRecord(~p +/+ "shephard_tone-4.aiff");
-s.record;
-
-x = Synth.new(\eff_shepard_cycle_tone, [ \outbus, 0, \inbus, 17, \amp, 0.4, \freq_bus, 16]);
-y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
-s.stopRecording;
-
-//TEST 1
-SynthDef.new(\test_sin,{
-	arg outbus=0, out_freq;
-	var x = XLine.kr(10, 1760*8,30);
-	Out.ar(outbus, SinOsc.ar(x));
-	Out.kr(out_freq,x);
-}).add;
-x = Synth.new(\eff_shepard_cycle_tone, [ \outbus, 0, \inbus, 17, \amp, 0.4, \freq_bus, 16]);
-z = Synth.new(\test_sin, [\outbus, 17, \out_freq, 16]);
-
-//TEST 2
-x = Synth.new(\eff_shepard_cycle_tone, [ \outbus, 0, \inbus, 8, \amp, 0.4, \freq_bus, 16]);
-y = Synth.new(\eff_pitch, [\inbus, 8, \outbus, 16]);
-
-//Notatka: Pitch detector ma jakies problemy z sinusami o okreslonej freq.
-
-//TEST 3
-x = Synth.new(\eff_shepard_tone, [ \outbus, 0, \amp, 0.4, \freq_bus, 8]);
-x.set(\freq,150);
-*/
-
 // Effect based on example in documentation :)
 SynthDef.new(\eff_pila_po_przejsciach, {
 	arg outbus=0, freq_bus, amp_bus;
@@ -109,19 +74,6 @@ SynthDef.new(\eff_pila_po_przejsciach, {
     });
     Out.ar(outbus,out)
 }).add;
-
-/* RECORDING
-b = Buffer.read(s, ~p +/+ "zBrody1.wav");
-b.bufnum.postln;
-
-s.prepareForRecord(~p +/+ "pitch_follow-4.aiff");
-s.record;
-
-x = Synth.new(\eff_pila_po_przejsciach, [ \outbus, 0, \inbus, 17, \freq_bus, 16]);
-y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
-s.stopRecording;
-*/
 
 SynthDef.new(\eff_ay,{
 	arg freq_bus, outbus, amp_bus, f2=0.5, f3=2, gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
@@ -163,19 +115,107 @@ SynthDef.new(\eff_ym_complicated,{
 	Out.ar(outbus, AY.ar(ta,tb,tc,noise,noise_control,vola, volb, volc, env_freq, env_style,1));
 }).add;
 
-/*
-s.prepareForRecord(~p +/+ "ym-gain25+tartinipitch.aiff");
-s.record;
+// STK generator pack
+//TODO: Sprawdzić który parametr jest od czego i jakie ma zakresy - najlepiej już z GUI?
+SynthDef.new(\eff_StkBandedWG,{
+	arg outbus, freq_bus, amp_bus, instr=0, bowpressure=0, bowmotion=0, integration=0, modalresonance=64, bowvelocity=0, setstriking=0, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkBandedWG.ar(freq,instr,bowpressure,bowmotion,integration,modalresonance,bowvelocity,setstriking,trig,amp);
+	Out.ar(outbus,res);
+}).add;
 
-x = Synth.new(\eff_ay, [\freq_bus, 16, \amp_bus, 18, \outbus, 0]);
-y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 16]);
-a = Synth.new(\eff_amplitude, [\inbus, 17, \outbus, 18]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
+SynthDef.new(\eff_StkBeeThree,{
+	arg outbus, freq_bus, amp_bus, op4gain=10, op3gain=20, lfospeed=64, lfodepth=0, adsrtarget=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkBeeThree.ar(freq, op4gain, op3gain, lfospeed, lfodepth, adsrtarget, trig, amp);
+	Out.ar(outbus,res);
+}).add;
 
-x = Synth.new(\eff_ym, [\freq_bus, 16, \amp_bus, 18, \outbus, 0]);
-a = Synth.new(\eff_amplitude, [\inbus, 17, \outbus, 18]);
-y = Synth.new(\eff_tartini_pitch, [\inbus, 17, \outbus, 16]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
+SynthDef.new(\eff_StkBlowHole,{
+	arg outbus, freq_bus, amp_bus, reedstiffness=64, noisegain=20, tonehole=64, register=11, breathpressure=64;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkBlowHole.ar(freq, reedstiffness, noisegain, tonehole, register, breathpressure,amp);
+	Out.ar(outbus,res);
+}).add;
 
-s.stopRecording;
-*/
+SynthDef.new(\eff_StkBowed ,{
+	arg outbus, freq_bus, amp_bus, bowpressure=64, bowposition=64, vibfreq=64, vibgain=64, loudness=64, gate=1, attackrate=1, decayrate=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkBowed.ar(freq, bowpressure, bowposition, vibfreq, vibgain, loudness, gate, attackrate, decayrate,amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkClarinet,{
+	arg outbus, freq_bus, amp_bus, reedstiffness=64, noisegain=4, vibfreq=64, vibgain=11, breathpressure=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkClarinet.ar(freq, reedstiffness, noisegain, vibfreq, vibgain, breathpressure, trig, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkFlute,{
+	arg outbus, freq_bus, amp_bus, jetDelay=49, noisegain=0.15, jetRatio=0.32;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkFlute.ar(freq, jetDelay, noisegain, jetRatio, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkMandolin,{
+	arg outbus, freq_bus, amp_bus, bodysize=64, pickposition=64, stringdamping=69, stringdetune=10, aftertouch=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkMandolin.ar(freq, bodysize, pickposition, stringdamping, stringdetune, aftertouch, trig, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkModalBar,{
+	arg outbus, freq_bus, amp_bus, instrument=0, stickhardness=64, stickposition=64, vibratogain=20, vibratofreq=20, directstickmix=64, volume=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkModalBar.ar(freq, instrument, stickhardness, stickposition, vibratogain, vibratofreq, directstickmix, volume, trig, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkMoog ,{
+	arg outbus, freq_bus, amp_bus, filterQ=10, sweeprate=20, vibfreq=64, vibgain=0, gain=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkMoog.ar(freq, filterQ, sweeprate, vibfreq, vibgain, gain, trig, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkPluck,{
+	arg outbus, freq_bus, amp_bus, decay=0.99;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkPluck.ar(freq, decay, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkSaxofony,{
+	arg outbus, freq_bus, amp_bus, reedstiffness=64, reedaperture=64, noisegain=20, blowposition=26, vibratofrequency=20, vibratogain=20, breathpressure=128, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkSaxofony.ar(freq, reedstiffness, reedaperture, noisegain, blowposition, vibratofrequency, vibratogain, breathpressure, trig, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkShakers ,{
+	arg outbus, amp_bus, instr=0, energy=64, decay=64, objects=64, resfreq=64;
+	var amp = In.kr(amp_bus);
+	var res = StkShakers.ar(instr, energy, decay, objects, resfreq, amp);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_StkVoicForm,{
+	arg outbus, freq_bus, amp_bus, vuvmix=64, vowelphon=64, vibfreq=64, vibgain=20, loudness=64, trig=1;
+	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
+	var res = StkVoicForm.ar(freq, vuvmix, vowelphon, vibfreq, vibgain, loudness, trig, amp);
+	Out.ar(outbus,res);
+}).add;
