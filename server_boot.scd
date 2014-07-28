@@ -7,8 +7,9 @@ var func_onFailure = {
 var func_start = {
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 	//INITIALISATION CODE HERE:
-	~e = Dictionary.new(0);
-	~b = Dictionary.new(0);
+	~e = Dictionary.new(0); //synths on server
+	~b = Dictionary.new(0); //buffers
+	~bus = Dictionary.new(0); //busses
 };
 
 OSCdef.new(
@@ -30,6 +31,11 @@ OSCdef.new(
 			item.free;
 		});
 		~b=Dictionary.new(0);
+		~bus.do({
+			arg item, i;
+			item.free;
+		});
+		~bus = Dictionary.new(0);
 		s.waitForBoot(func_start, inf, func_onFailure);
 	},
 	'/app_start'
@@ -53,6 +59,11 @@ OSCdef.new(
 			item.free;
 		});
 		~b=Dictionary.new(0);
+		~bus.do({
+			arg item, i;
+			item.free;
+		});
+		~bus = Dictionary.new(0);
 		s.quit;
 		'Server killed.'.postln;
 	},
@@ -66,6 +77,7 @@ OSCdef.new(
 		s.reboot;
 		~e=Dictionary.new(0);
 		~b=Dictionary.new(0);
+		~bus=Dictionary.new(0);
 	},
 	'/app_reboot'
 );
@@ -186,9 +198,20 @@ OSCdef.new(
 		},{ //just one!
 			new_bus = Bus.audio(s,1);
 		});
+		~bus.add( new_bus.index -> new_bus);
 		~app_netaddr.sendMsg('\free_bus', new_bus.index);
 	},
 	'/get_free_bus'
+);
+
+OSCdef.new(
+	\delete_bus,
+	{
+		arg msg, time, addr, recvPort;
+		var busindex = msg[1].asInt;
+		~bus.removeAt(busindex);
+	},
+	'/delete_bus'
 );
 
 OSCdef.new(
