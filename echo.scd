@@ -1,3 +1,30 @@
+// PITCH SHIFT
+
+SynthDef.new(\eff_pitchshift, {
+	arg inbus=8, outbus=0, semitones=0;
+	var in = In.ar(inbus,1);
+	var res = PitchShift.ar(in,0.2,semitones*pow(2,1/12));
+	Out.ar(outbus,res);
+}).add;
+
+//TODO: Sprawdzić czy poprawnie działa!
+
+//FREQ SHIFT
+SynthDef.new(\eff_freqshift, {
+	arg inbus=8, outbus=0, freq=10;
+	var in = In.ar(inbus,1);
+	var res = FreqShift.ar(in, freq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_freq_shift, {
+	arg inbus=8, outbus=0, freq_bus;
+	var in = In.ar(inbus,1);
+	var freq = In.kr(freq_bus,1);
+	var res = FreqShift.ar(in, freq);
+	Out.ar(outbus,res);
+}).add;
+
 ////DIST ECHO
 SynthDef.new(\eff_distecho, {
 	arg inbus=8, outbus=0, amp=0.5, delay=0.5, decay=0.5;
@@ -27,6 +54,55 @@ SynthDef.new(\eff_shiftecho, {
 x = Synth.new(\eff_shiftecho, [\inbus, 8, \outbus, 0, \delay, 0.5, \decay, 0.9, \freq, 10]);
 */
 
+//rmdelay
+SynthDef.new(\eff_rmdelay, {
+	arg inbus=8, outbus=0, delay=0.5;
+	var in = In.ar(inbus,1);
+	var delayed = in*DelayC.ar(in,delay,delay,1,in);
+	Out.ar(outbus,delayed);
+}).add;
+
+/*/TESTS
+x = Synth.new(\eff_rmdelay, [\inbus, 8, \outbus, 0, \delay, 0.0, \freq, 10]);
+*/
+
+SynthDef.new(\eff_rmdelayrec, {
+	arg inbus=8, outbus=0, delay=0.5;
+	var in = In.ar(inbus,1);
+	var del = ((in+1)/2)*delay;
+	var delayed = in*DelayC.ar(in,del,del,1,in);
+	Out.ar(outbus,delayed);
+}).add;
+
+/*/TESTS
+x = Synth.new(\eff_rmdelayrec, [\inbus, 8, \outbus, 0, \delay, 0.5]);
+*/
+
+//rmchorus
+SynthDef.new(\eff_rmchorus, { //TODO
+	arg inbus=8, outbus=0, freq=1, delay=0.5;
+	var in = In.ar(inbus,1);
+	var os = (SinOsc.kr(freq)+1)*delay;
+	var delayed = in*DelayC.ar(in,os,os,1,in);
+	Out.ar(outbus,delayed);
+}).add;
+
+/*/TESTS
+x = Synth.new(\eff_rmchorus, [\inbus, 8, \outbus, 0, \delay, 0.0, \freq, 10]);
+*/
+
+SynthDef.new(\eff_rmchorus2, {
+	arg inbus=8, outbus=0, delay=0.5;
+	var in = In.ar(inbus,1);
+	var os = (SinOsc.kr(Tartini.kr(in))+1)*delay/2;
+	var delayed = in*DelayC.ar(in,os,os,1,in);
+	Out.ar(outbus,delayed);
+}).add;
+
+/*/TESTS
+x = Synth.new(\eff_rmchorus2, [\inbus, 8, \outbus, 0, \delay, 0.5]);
+*/
+
 //ECHO WITH CUSTOMIZED FEEDBACK?
 SynthDef.new(\eff_genecho, {
 	arg inbus=8, outbus=0, feedback_input=99, feedback_output=99, delay=0, decay=0; //.zobaczyć, czy ten feedback output jest potrzebny!
@@ -35,8 +111,44 @@ SynthDef.new(\eff_genecho, {
 	Out.ar(outbus,input);
 }).add;
 
+//Wypasione ECHO!
+/*
+SynthDef.new(\eff_genecho, {
+	arg inbus=8, outbus=0, delay_bus, feedback_input=99, feedback_output=99, decay=0; //.zobaczyć, czy ten feedback output jest potrzebny!
+	var input = In.ar(inbus,1)+InFeedback.ar(feedback_input);
+	OffsetOut.ar(feedback_output, DelayC.ar(decay*input, delay, delay - ControlRate.ir.reciprocal)); // subtract block size
+	Out.ar(outbus,input);
+}).add;
+*/
+
 /*/TEST
 x = Synth.new(\eff_genecho, [\inbus, 8, \outbus, 0, \delay, 0.5, \decay, 0.7]);
+*/
+
+//wsdistortion
+SynthDef.new(\eff_wsdistortion, {
+	arg inbus=8, outbus=0, gain=2;
+	var in = In.ar(inbus,1)*gain;
+	var res = pow(in,7)+pow(in,3);
+	Out.ar(outbus,res);
+}).add;
+
+/*/TEST
+x = Synth.new(\eff_wsdistortion, [\inbus, 8, \outbus, 0, \gain, 2]);
+*/
+
+//wsdistortionwetDry
+SynthDef.new(\eff_wsdistortionwetDry, {
+	arg inbus=8, outbus=0, gain=2, freq, sin_amp=1, noise_amp=1, const_amp=0;
+	var in = In.ar(inbus,1)*gain;
+	var ing = In.ar(inbus,1)*gain;
+	var sth = min((((SinOsc.ar(freq)+1)/2)*sin_amp)+((WhiteNoise.ar()+1)/2*noise_amp)+const_amp, 1);
+	var res = (pow(ing,7)+pow(ing,3)*sth) + ((sth-1)*(-1)*in);
+	Out.ar(outbus,res);
+}).add; //TODO: Equalization
+
+/*/TEST
+x = Synth.new(\eff_wsdistortionwetDry, [\inbus, 8, \outbus, 0, \gain, 2, \freq, 5, \sin_amp, 1, \noise_amp, 1, \const_amp, 0]);
 */
 
 SynthDef.new(\gramophone, {

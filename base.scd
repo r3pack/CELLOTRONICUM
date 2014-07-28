@@ -35,7 +35,7 @@ SynthDef.new(\eff_amplitude, {
 	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
 }).add;
 
-SyntDef.new(\eff_param_to_bus, {
+SynthDef.new(\eff_param_to_bus, {
 	arg param, bus;
 	Out.kr(bus, param);
 }).add;
@@ -92,12 +92,6 @@ SynthDef.new(\eff_Clipper4, {
 }).add;
 
 //SOFT CLIP
-SynthDef.new(\eff_ ,{
-	arg inbus, outbus, ;
-	var in = In.ar(inbus);
-	var res = .ar(  );
-	Out.ar(outbus,res);
-}).add;
 
 SynthDef.new(\eff_SoftClipAmp ,{
 	arg inbus, outbus, pregain=1;
@@ -194,6 +188,6 @@ SynthDef.new(\eff_BBandPass,{
 SynthDef.new(\eff_BAllPass,{
 	arg inbus, outbus, freq=1200, rq=1;
 	var in = In.ar(inbus);
-	var res = .ar(in,freq,rq);
+	var res = BAllPass.ar(in,freq,rq);
 	Out.ar(outbus,res);
 }).add;
