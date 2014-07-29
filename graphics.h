@@ -12,13 +12,16 @@ extern SDL_Window *window;
 extern SDL_Renderer *render;
 extern SDL_Event event;
 
+const int SCREEN_WIDTH=1824;
+const int SCREEN_HEIGHT=1024;
+
 void initSDL();
 
 void quitSDL();
 
 SDL_Texture* loadTexture(const char* filename);
 
-SDL_Texture* generateText(const char* text);
+SDL_Texture* generateText(const char* text, SDL_Color color={0,0,0});
 
 void drawTexture(SDL_Texture* tex, int x, int y);
 
@@ -122,6 +125,7 @@ class Bus{
 	
 	int getId() {return id;}
 	Effect* getEffect() {return effect;}
+	
 	int getArg() {return argument;}
 	
 	int getType() {return type;}

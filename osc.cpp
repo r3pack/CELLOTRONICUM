@@ -103,6 +103,24 @@ int OSCConn::getFreeBus()
 	}
 }
 
+void OSCConn::deleteBus(int bus)
+{
+	PacketWriter pw;
+	Message msg("/delete_bus"); 
+	msg.pushInt32(bus);
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	fprintf(stderr, "Deleting bus: %d\n", bus);
+	
+	if(!sock.sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending a message '/delete_bus'\n");
+		return;
+	}
+}
+
 void OSCConn::getFreeBuses(int num, int* buses)
 {
 	int busCount=0;
