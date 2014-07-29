@@ -79,7 +79,7 @@ x = Synth.new(\eff_rmdelayrec, [\inbus, 8, \outbus, 0, \delay, 0.5]);
 */
 
 //rmchorus
-SynthDef.new(\eff_rmchorus, { //TODO
+SynthDef.new(\eff_rmchorus, {
 	arg inbus=8, outbus=0, freq=1, delay=0.5;
 	var in = In.ar(inbus,1);
 	var os = (SinOsc.kr(freq)+1)*delay;

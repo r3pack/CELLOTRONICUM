@@ -60,3 +60,17 @@ y = Synth.new(\eff_tartini_pitch, [\inbus, 17, \outbus, 16]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
 
 s.stopRecording;
+
+// TEST
+SynthDef.new(\id, {
+	arg inbus, outbus;
+	var in = In.ar(inbus,1);
+	Out.ar(outbus, in);
+}).add;
+
+
+x = Synth.new(\eff_octave_up, [\inbus, 8, \outbus, 1]);
+y = Synth.new(\id, [\inbus, 8, \outbus, 1]);
+
+y = Synth.new(\eff_octave_down, [\inbus, 8, \outbus, 0]);
+y = Synth.new(\id, [\inbus, 8, \outbus, 1]);

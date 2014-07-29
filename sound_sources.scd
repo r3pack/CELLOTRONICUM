@@ -63,6 +63,91 @@ SynthDef.new(\eff_shepard_cycle_tone, {
 	Out.ar(outbus, res);
 }).add;
 
+//SHEPHARD TONE FROM INPUT
+
+/*SynthDef.new(\eff_octave_up, { //WYSYPUJE SIĘ!
+	arg inbus=8, outbus=0, freq_bus;
+	var in = In.kr(inbus,1);
+	var freq = In.kr(freq_bus,1);
+	var del1 = 2048000/44100;
+	var del2 = (500/freq)+del1;
+//	var res = CombC.ar(in,del1,del1,0) + CombC.ar(in,del2,del2);
+	var res = in + CombC.ar(in,del2,del2);
+	Out.ar(outbus, res);
+}).add;
+
+y = Synth.new(\eff_tartini_pitch, [\inbus, 8, \outbus, 16]);
+x = Synth.new(\eff_octave_up, [\inbus, 8, \outbus, 0, \freq_bus, 16]);
+
+*/
+//WAŻNE: PD - czas w ms, tutaj w sekundach!!!
+
+SynthDef.new(\eff_octave_up, { //TODO - freq_bus lub wstawić Tartini!
+	arg inbus=8, outbus=0, freq, mul;
+	var in = In.ar(inbus,1);
+	var del2, res;
+	del2 = (0.5/freq);
+	res = (in + DelayC.ar(in,10,del2)) * mul;
+	Out.ar(outbus, res);
+}).add;
+
+SynthDef.new(\eff_octave_down, { //TODO - freq_bus lub wstawić Tartini!
+	arg inbus=8, outbus=0, freq, mul;
+	var in = In.ar(inbus,1);
+	var res = (in*SinOsc.ar(freq*0.5))*mul;
+	Out.ar(outbus, res);
+}).add;
+/* WERSJA PRZEZ BUSY - nie działa!!!
+SynthDef.new(\eff_shepard_tone_from_input, {
+	arg inbus=8, outbus=0, amp=0.5;
+	var ink = In.kr(inbus,1);
+	var in = In.ar(inbus,1);
+	var freq, hasFreq, res;
+	var bp1=Bus.audio(s), bp2=Bus.audio(s), bp3=Bus.audio(s), bp4=Bus.audio(s), bp5=Bus.audio(s);
+	var bm1=Bus.audio(s), bm2=Bus.audio(s), bm3=Bus.audio(s), bm4=Bus.audio(s);
+	var p1, p2, p3, p4, p5, m1, m2, m3, m4;
+	# freq, hasFreq = Tartini.kr(ink);
+	p1 = Synth.new(\eff_octave_up, [\inbus, inbus, \outbus, bp1, \freq, freq]);
+	p2 = Synth.new(\eff_octave_up, [\inbus, bp1, \outbus, bp2, \freq, freq*2]);
+	p3 = Synth.new(\eff_octave_up, [\inbus, bp2, \outbus, bp3, \freq, freq*4]);
+	p4 = Synth.new(\eff_octave_up, [\inbus, bp3, \outbus, bp4, \freq, freq*8]);
+	p5 = Synth.new(\eff_octave_up, [\inbus, bp4, \outbus, bp5, \freq, freq*16]);
+	m1 = Synth.new(\eff_octave_down, [\inbus, inbus, \outbus, bm1, \freq, freq]/2);
+	m2 = Synth.new(\eff_octave_down, [\inbus, bm1, \outbus, bm2, \freq, freq]/4);
+	m3 = Synth.new(\eff_octave_down, [\inbus, bm2, \outbus, bm3, \freq, freq]/8);
+	m4 = Synth.new(\eff_octave_down, [\inbus, bm3, \outbus, bm4, \freq, freq]/16);
+	res = in+In.ar(bp1,1)+In.kr(bp2,1)+In.kr(bp3,1)+In.kr(bp4,1)+In.kr(bp5,1) + In.kr(bm1,1) + In.kr(bm2,1) + In.kr(bm3,1) + In.kr(bm4,1);
+	/*res=0;
+	[27.5,55,110,220,440,880,1760, 1760*2, 1760*4, 1760*8].do({
+		arg f;
+		res = res ;
+	});*/
+	Out.ar(outbus, res);
+}).add;
+*/
+
+//TODO: Testy
+SynthDef.new(\eff_shepard_tone_from_input, {
+	arg inbus=8, outbus=0; //, amp=0.5;
+	var ink = In.kr(inbus,1);
+	var in = In.ar(inbus,1);
+	var freq, hasFreq, res;
+	var p1, p2, p3, p4, p5, m1, m2, m3, m4;
+	# freq, hasFreq = Tartini.kr(ink);
+	p1 = in + DelayC.ar(in,10,0.5*freq);
+	p2 = p1 + DelayC.ar(p1,10,0.5*freq*2);
+	p3 = p2 + DelayC.ar(p2,10,0.5*freq*4);
+	p4 = p3 + DelayC.ar(p3,10,0.5*freq*8);
+	p5 = p4 + DelayC.ar(p4,10,0.5*freq*16);
+	m1 = in*SinOsc.ar(freq/2);
+	m2 = m1*SinOsc.ar(freq/4);
+	m3 = m1*SinOsc.ar(freq/8);
+	m4 = m1*SinOsc.ar(freq/16);
+	res = p1+p2+p3+p4+p5+m1+m2+m3+m4;
+	Out.ar(outbus, res);
+}).add;
+
+
 // Effect based on example in documentation :)
 SynthDef.new(\eff_pila_po_przejsciach, {
 	arg outbus=0, freq_bus, amp_bus;
