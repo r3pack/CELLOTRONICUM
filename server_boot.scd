@@ -178,6 +178,26 @@ OSCdef.new(
 );
 
 OSCdef.new(
+	\move_to_head,
+	{
+		arg msg, time, addr, recvPort;
+		"MOVE TO HEAD:".post; ~e[msg[1].asString].post;
+		~e[(msg[1]).asString].moveToHead(~e[(msg[1]).asString].group);
+	},
+	'/move_to_head'
+);
+
+OSCdef.new(
+	\move_to_tail,
+	{
+		arg msg, time, addr, recvPort;
+		"MOVE TO TAIL".post; ~e[msg[1].asString].post;
+		~e[(msg[1]).asString].moveToTail(~e[(msg[1]).asString].group);
+	},
+	'/move_to_tail'
+);
+
+OSCdef.new(
 	\delete_effect_instance,
 	{
 		arg msg, time, addr, recvPort;
