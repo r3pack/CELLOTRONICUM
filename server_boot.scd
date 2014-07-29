@@ -178,6 +178,16 @@ OSCdef.new(
 );
 
 OSCdef.new(
+	\move_after_effect_instance,
+	{
+		arg msg, time, addr, recvPort;
+		"MOVE ".post; ~e[msg[1].asString].post; " after ".post; ~e[msg[2].asString].postln;
+		~e[(msg[1]).asString].moveAfter(~e[msg[2].asString]);
+	},
+	'/move_after_effect_instance'
+);
+
+OSCdef.new(
 	\move_to_head,
 	{
 		arg msg, time, addr, recvPort;
