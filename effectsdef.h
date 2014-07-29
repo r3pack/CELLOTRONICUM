@@ -254,8 +254,9 @@
 			
 		}
 		
-		void receiveClick(int X, int Y, MouseEvent me)
+		bool receiveClick(int X, int Y, MouseEvent me)
 		{
+			if(!(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)) return false;
 			if(pauseButton->receiveClick(X, Y, me)) 
 			{
 				paused=!paused;
@@ -276,19 +277,31 @@
 				{
 					auto pair=getLastConnection();
 					Bus *bus1=pair.first, *bus2=pair.second;
-					bus1->getEffect()->moveBefore(bus2->getEffect());
-					int freebuf=OSCConn::getFreeBus();
 					
-					bus1->getEffect()->setAndSendArgument(bus1->getArg(), freebuf);
-					bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebuf);
-					fprintf(stderr, "Connected two buses\n");
-					
+					if(bus1==NULL)
+					{
+						bus2->getEffect()->getAgrs()[bus2->getArg()].set(OSCConn::getFreeBus());
+					}
+					else
+					{
+						updateTopologicalSequence();
+						
+						int freebus=bus1->getEffect()->getAgrs()[bus1->getArg()].getIntValue();
+						
+						OSCConn::deleteBus(bus2->getEffect()->getAgrs()[bus2->getArg()].getIntValue());
+						
+						bus2->getEffect()->getAgrs()[bus2->getArg()].set(freebus);
+						
+						bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebus);
+						fprintf(stderr, "Connected two buses to %d\n", freebus);
+					}
 					break;
 				}
 			}
+			return true;
 		}
 		
-		void receiveSecondClick(int X, int Y, MouseEvent me)
+		bool receiveSecondClick(int X, int Y, MouseEvent me)
 		{
 			if(me==ME_PRESS)
 			{
@@ -297,21 +310,26 @@
 					handlePosX=X-posX;
 					handlePosY=Y-posY;
 					focus=true;
+					return true;
 				}
 				else
 				focus=false;
+				return false;
 			}
 			else if(me==ME_REPEAT && focus)
 			{
 				setPos(X-handlePosX, Y-handlePosY);
+				return true;
 			}
 			else if(me==ME_RELEASE)
 			{
 				focus=false;
+				return true;
 			}
+			return false;
 		}
 		
-		void receiveThridClick(int X, int Y, MouseEvent me)
+		bool receiveThridClick(int X, int Y, MouseEvent me)
 		{
 			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height && me==ME_PRESS)
 			{
@@ -319,7 +337,21 @@
 				getEffectInstanceList()->erase(id);
 				for(int i=0;i<buses.size();++i)
 				buses[i].bus->removeBus();
+				
+				for(auto it=effectTree.begin();it!=effectTree.end();)
+				{
+					if((*it).first==id || (*it).second==id)
+					{
+						it=effectTree.erase(it);
+					}
+					else
+					++it;
+				}
+				
+				delete this;
+				return true;
 			}
+			else return false;
 		}
 		
 		~EffectAutoGUI()
@@ -354,9 +386,9 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Distecho(int X, int Y, int inbus=-1, int outbus=-1): 
-			args({EffectArgument("inbus", inbus), EffectArgument("outbus", outbus), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 5.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
+			Distecho(int X, int Y): 
+			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 			{sendInstance(); initGUI(X, Y);}
 	};
 	
@@ -374,7 +406,7 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Playbuf(int X, int Y, int bufnum, int outbus=-1): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", outbus)}),
+			Playbuf(int X, int Y, int bufnum): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_TEXT, std::string(OSCConn::getBufferFileById(bufnum))), ArgVis(VT_OUTBUS)})
 			{sendInstance(true); initGUI(X, Y);}
 	};
@@ -392,7 +424,7 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Input(int X, int Y, int outbus=-1): args({EffectArgument("outbus", outbus)}),
+			Input(int X, int Y): args({EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
 	};
@@ -410,11 +442,13 @@
 			const int getAgrsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Output(int X, int Y, int inbus1=-1, int inbus2=-1): args({EffectArgument("inbus1", inbus1), EffectArgument("inbus2", inbus2)}),
+			Output(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
 			{sendInstance(); initGUI(X, Y);}
 	};
 	
 	void registerEffects();
+	
+	Effect* getEffect(const char* name, int X, int Y);
 	
 #endif

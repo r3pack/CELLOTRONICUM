@@ -7,6 +7,8 @@
 #include "effectsdef.h"
 #include "graphics.h"
 
+EffectCreator effectCreator;
+
 void waitFor(int ms)
 {
 	std::chrono::milliseconds dura(ms);
@@ -36,35 +38,17 @@ int main (int argc, char** argv)
 	
 	initSDL();
 	
-	//Brassage br; //przykładowa instancja efektu
-	
-	/*printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
-	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
-	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
-	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
-	printf("Dostalem busa: %d\n", OSCConn::getFreeBus());
+	effectCreator.init();
 	
 	
-	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody1.wav"));
-	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody2.wav"));
-	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody3.wav"));
-	printf("Dostalem bufor: %d\n", OSCConn::loadBuffer("zBrody4.wav"));
+	/*int bufnum=OSCConn::loadBuffer("zBrody3.wav");
 	
-	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
-	
-	printf("Mam bufor: %d\n", bufnum);
-	*/
-	
-	int bufnum=OSCConn::loadBuffer("zBrody3.wav");
-	
-	int freebus=OSCConn::getFreeBus();
-	
-	Playbuf playbuf(50, 500, bufnum, freebus);
+	Playbuf playbuf(50, 500, bufnum);
 	
 	Distecho distecho(50, 50);
 	Distecho distecho2(350, 50);
 	
-	Output output(350, 500);
+	Output output(350, 500);*/
 	
 	//playbuf.moveBefore(&distecho);
 	
@@ -80,8 +64,6 @@ int main (int argc, char** argv)
 			{
 				case SDL_QUIT:
 					quit = true;
-				break;
-				case SDL_KEYDOWN:
 				break;
 				case SDL_MOUSEBUTTONDOWN:
 					if(event.button.button==SDL_BUTTON_LEFT)
@@ -182,6 +164,9 @@ int main (int argc, char** argv)
 						}
 					}
 				break;
+				case SDL_KEYDOWN:
+					effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
+				break;
 			}
 		}
 		
@@ -192,7 +177,10 @@ int main (int argc, char** argv)
 		{
 			it->second->draw();
 		}
+		
 		drawConnections();
+		effectCreator.draw(SCREEN_WIDTH-effectCreator.getWidth()-20, 0);
+		
 		SDL_RenderPresent(render);
 	}
 	

@@ -162,7 +162,9 @@ EffectArgument::~EffectArgument()
 }
 
 
-int Effect::lastId=0;
+int Effect::lastId=1;
+
+std::set <std::pair<int, int> > Effect::effectTree;
 
 std::map <int, Effect*> effectInstanceList;
 
@@ -309,9 +311,88 @@ void Effect::deleteInstance()
 	
 }
 
+void Effect::updateTopologicalSequence()
+{
+	std::queue <int> Q;
+	std::set <std::pair<int, int> > tmp;
+	std::vector <int> sequence;
+	
+	effectTree.clear();
+	
+	for(auto it=getConnections()->begin();it!=getConnections()->end();++it)
+	effectTree.insert(std::pair<int, int>((*it).first->getEffect()->getId(), (*it).second->getEffect()->getId()));
+	
+	
+	for(auto it=effectTree.begin();it!=effectTree.end();++it)
+	{
+		int id=(*it).second;
+		auto itlow=tmp.lower_bound(std::pair<int, int>(id, -1)); 
+		if(itlow==tmp.end() || (*itlow).first!=id)
+		{
+			tmp.insert(std::pair<int,int>(id,1));
+		}
+		else
+		{
+			std::pair<int,int> buf=(*itlow);
+			buf.second+=1;
+			tmp.erase(itlow);
+			tmp.insert(buf);
+		}
+	}
+	
+	for(auto it=effectTree.begin();it!=effectTree.end();++it)
+	{
+		int id=(*it).first;
+		auto itlow=tmp.lower_bound(std::pair<int, int>(id, -1)); 
+		if(itlow==tmp.end() || (*itlow).first!=id)
+		{
+			tmp.insert(std::pair<int,int>(id,0));
+			Q.push(id);
+		}
+	}
+	
+	while(!Q.empty())
+	{
+		int u=Q.front();
+		Q.pop();
+		
+		sequence.push_back(u);
+		
+		auto itlow=effectTree.lower_bound(std::pair<int, int>(u, -1)); 
+		auto itup=effectTree.upper_bound(std::pair<int, int>(u+1, -1));
+		
+		for(auto it=itlow;it!=itup;++it)
+		{
+			auto ittmp=tmp.lower_bound(std::pair<int, int>((*it).second, -1));
+			
+			
+			std::pair<int,int> buf=(*ittmp);
+			buf.second-=1;
+			tmp.erase(ittmp);
+			
+			if(buf.second==0)
+			{
+				Q.push(buf.first);
+			}
+			else
+			{
+				tmp.insert(buf);
+			}
+		}
+		
+	}
+	
+	effectInstanceList[sequence[0]]->moveToHead();
+	
+	for(int i=1;i<sequence.size();++i)
+	{
+		effectInstanceList[sequence[i]]->moveAfter(effectInstanceList[sequence[i-1]]);
+	}
+	
+}
 
 void Effect::moveBefore(Effect* effect)
-{
+{	
 	int secondId=effect->id;
 
 	Message msg("/move_before_effect_instance"); 
@@ -329,6 +410,117 @@ void Effect::moveBefore(Effect* effect)
 	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
 	{
 		fprintf(stderr, "Error sending message..\n");
+	}
+	
+}
+
+void Effect::moveAfter(Effect* effect)
+{	
+	int secondId=effect->id;
+
+	Message msg("/move_after_effect_instance"); 
+	const char* name=getName();
+	msg.pushInt32(id);
+	msg.pushInt32(secondId);
+	
+	fprintf(stderr, "Moving instance of effect '%s', id: %d, after instance of effect '%s', id: %d\n", name, id, effect->getName(), secondId);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending message..\n");
+	}
+	
+}
+
+void Effect::moveToHead()
+{	
+	Message msg("/move_to_head"); 
+	const char* name=getName();
+	msg.pushInt32(id);
+	
+	fprintf(stderr, "Moving instance of effect '%s', id: %d to head\n", name, id);
+	
+	PacketWriter pw;
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!OSCConn::getSock().sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending message..\n");
+	}
+	
+}
+
+void EffectCreator::moveUp() 
+{
+	chosenEffect=(chosenEffect+nameTexs.size()-1)%nameTexs.size();
+	if(chosenEffect==nameTexs.size()-1) it=--effectsList.end();
+	else
+	--it;
+}
+
+void EffectCreator::moveDown()
+{
+	chosenEffect=(chosenEffect+1)%nameTexs.size();
+	if(chosenEffect==0) it=effectsList.begin();
+	else
+	++it;
+}
+
+void EffectCreator::init()
+{
+	for(auto it=effectsList.begin();it!=effectsList.end();++it)
+	{
+		nameTexs.push_back(std::pair<SDL_Texture*, SDL_Texture*>(generateText((*it).first), generateText((*it).first, {255, 0, 0})));
+		int w, h;
+		SDL_QueryTexture(nameTexs.back().first, NULL, NULL, &w, &h);
+		height+=h;
+		width=std::max(width, w);
+	}
+	it=effectsList.begin();
+}
+
+void EffectCreator::draw(int X, int Y)
+{
+	for(int i=0;i<nameTexs.size();++i)
+	{
+		
+		SDL_Texture* nameTex=((i!=chosenEffect)?nameTexs[i].first:nameTexs[i].second);
+		int w, h;
+		SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
+		SDL_Rect nameRect;
+		nameRect.x=X;
+		nameRect.y=Y;
+		nameRect.w=w;
+		nameRect.h=h;
+		SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+		Y+=h;
+	}
+}
+
+#include "effectsdef.h"
+
+void EffectCreator::receiveKeyboardEvent(SDL_Scancode scancode)
+{
+	switch(scancode)
+	{
+		case SDL_SCANCODE_UP:
+			moveUp();
+		break;
+		case SDL_SCANCODE_DOWN:
+			moveDown();
+		break;
+		case SDL_SCANCODE_RETURN:
+			int x, y;
+			SDL_GetMouseState(&x, &y);
+			getEffect((*it).first, x, y);
+		break;
 	}
 }
 

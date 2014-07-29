@@ -6,6 +6,7 @@ SDL_Event event;
 
 TTF_Font *font;
 
+
 void initSDL()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -14,7 +15,7 @@ void initSDL()
 		exit(1);
 	}
 
-	if (!(window=SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1824, 1024, SDL_WINDOW_SHOWN)))
+	if (!(window=SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN)))
 	{
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(2);
@@ -113,11 +114,16 @@ bool Bus::receiveClick(int X, int Y, MouseEvent me)
 			
 			auto connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
 			
+			if(connIt.second==false)
+			{
+				connections.erase(std::pair<Bus*, Bus*>(bus1, bus2));
+				lastConnection=std::pair<Bus*, Bus*>(NULL, bus2);
+			}
 			lastConnection=*(connIt.first);
 			
 			Bus::lastClicked=-1;
 			
-			return connIt.second;
+			return true;
 		}
 		else
 		lastClicked=id;
@@ -127,9 +133,8 @@ bool Bus::receiveClick(int X, int Y, MouseEvent me)
 	return false;
 }
 
-SDL_Texture* generateText(const char* text)
+SDL_Texture* generateText(const char* text, SDL_Color color)
 {
-	SDL_Color color={0,0,0};
 	SDL_Surface* text_surface=TTF_RenderText_Blended(font, text, color);
 	
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(render, text_surface);

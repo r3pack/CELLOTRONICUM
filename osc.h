@@ -54,6 +54,8 @@
 			static const char* getBufferFileById(int id);
 			
 			static void deleteBuffer(int bufnum);
+			
+			static void deleteBus(int bus);
 	};
 	
 #endif
