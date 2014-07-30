@@ -126,27 +126,41 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 }).add;
 */
 
-//TODO: Testy
+//Działa - dorobić zawijanie.
 SynthDef.new(\eff_shepard_tone_from_input, {
 	arg inbus=8, outbus=0; //, amp=0.5;
-	var ink = In.kr(inbus,1);
 	var in = In.ar(inbus,1);
-	var freq, hasFreq, res;
-	var p1, p2, p3, p4, p5, m1, m2, m3, m4;
-	# freq, hasFreq = Tartini.kr(ink);
-	p1 = in + DelayC.ar(in,10,0.5*freq);
-	p2 = p1 + DelayC.ar(p1,10,0.5*freq*2);
-	p3 = p2 + DelayC.ar(p2,10,0.5*freq*4);
-	p4 = p3 + DelayC.ar(p3,10,0.5*freq*8);
-	p5 = p4 + DelayC.ar(p4,10,0.5*freq*16);
-	m1 = in*SinOsc.ar(freq/2);
-	m2 = m1*SinOsc.ar(freq/4);
-	m3 = m1*SinOsc.ar(freq/8);
-	m4 = m1*SinOsc.ar(freq/16);
-	res = p1+p2+p3+p4+p5+m1+m2+m3+m4;
+	var freq, hasFreq, res, poprz;
+	var plus = [0,0,0,0,0];
+	var minus = [0,0,0,0,0];
+	var ile = 7;
+	var mi = (9.0702947845805e-005*10000);
+	var frq,hf, ostatnia_deska_ratunku;
+	# freq, hasFreq = Tartini.kr(in);
+	freq.poll;
+	frq=freq;
+	poprz = in;
+	for(0,4,{ |i|
+		hf= 1/(2*frq);
+		//ostatnia_deska_ratunku = max(mi,hf);
+		plus[i] = poprz + DelayN.ar(poprz,1,hf); //Select.ar( hf>mi ,[DC.ar(0), poprz + DelayN.ar(poprz,1,hf)]);
+		frq=frq*2;
+		poprz = plus[i];
+	});
+	frq=freq;
+	poprz=in;
+	for(0,4,{ |i|
+		minus[i] = poprz*SinOsc.ar(freq/2);
+		poprz = minus[i];
+		frq=2*frq;
+	});
+	res=in;
+	plus.do({ |e| res=res+e});
+	//res = plus[0];
+	minus.do({ |e| res=res+e});
+	res = res/11;
 	Out.ar(outbus, res);
 }).add;
-
 
 // Effect based on example in documentation :)
 SynthDef.new(\eff_pila_po_przejsciach, {

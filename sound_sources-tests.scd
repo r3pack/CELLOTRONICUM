@@ -74,3 +74,6 @@ y = Synth.new(\id, [\inbus, 8, \outbus, 1]);
 
 y = Synth.new(\eff_octave_down, [\inbus, 8, \outbus, 0]);
 y = Synth.new(\id, [\inbus, 8, \outbus, 1]);
+
+//* TEST
+x = Synth.new(\eff_shepard_tone_from_input, [\outbus, 0, \inbus, 8]);
