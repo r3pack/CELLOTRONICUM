@@ -108,8 +108,8 @@
 			
 			pauseButton=new Button(X, Y, 0);
 			
-			EffectArgument* args=getAgrs();
-			int argsCount=getAgrsCount();
+			EffectArgument* args=getArgs();
+			int argsCount=getArgsCount();
 			
 			int x=width=slider_period+Bus::size+slider_period;
 			
@@ -273,30 +273,7 @@
 			int lastClicked=Bus::lastClicked;
 			for(int i=0;i<buses.size();++i)
 			{
-				if(buses[i].bus->receiveClick(X, Y, me))
-				{
-					auto pair=getLastConnection();
-					Bus *bus1=pair.first, *bus2=pair.second;
-					
-					if(bus1==NULL)
-					{
-						bus2->getEffect()->getAgrs()[bus2->getArg()].set(OSCConn::getFreeBus());
-					}
-					else
-					{
-						updateTopologicalSequence();
-						
-						int freebus=bus1->getEffect()->getAgrs()[bus1->getArg()].getIntValue();
-						
-						OSCConn::deleteBus(bus2->getEffect()->getAgrs()[bus2->getArg()].getIntValue());
-						
-						bus2->getEffect()->getAgrs()[bus2->getArg()].set(freebus);
-						
-						bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebus);
-						fprintf(stderr, "Connected two buses to %d\n", freebus);
-					}
-					break;
-				}
+				buses[i].bus->receiveClick(X, Y, me);
 			}
 			return true;
 		}
@@ -334,19 +311,8 @@
 			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height && me==ME_PRESS)
 			{
 				deleteInstance();
-				getEffectInstanceList()->erase(id);
 				for(int i=0;i<buses.size();++i)
 				buses[i].bus->removeBus();
-				
-				for(auto it=effectTree.begin();it!=effectTree.end();)
-				{
-					if((*it).first==id || (*it).second==id)
-					{
-						it=effectTree.erase(it);
-					}
-					else
-					++it;
-				}
 				
 				delete this;
 				return true;
@@ -354,9 +320,64 @@
 			else return false;
 		}
 		
+		void saveData(FILE* file) 
+		{
+			int argsCount=getArgsCount();
+			EffectArgument* args=getArgs();
+			ArgVis* argumentVisuals=getArgumentVisuals();
+			
+			fprintf(file, "%d %d ", posX, posY);
+			
+			for(int i=0;i<argsCount;++i)
+			{
+				if(argumentVisuals[i].visType==VT_SLIDER)
+				{
+					fprintf(file, "%d %f ", i, args[i].getFloatValue());
+				}
+			}
+			
+		}
+		
+		void loadData(char* str) 
+		{
+			int argsCount=getArgsCount();
+			EffectArgument* args=getArgs();
+			ArgVis* argumentVisuals=getArgumentVisuals();
+			
+			//printf("%s\n", str);
+			
+			std::stringstream ss;
+			ss<<str;
+			
+			int ptr=0, X, Y;
+			
+			ss>>X>>Y;
+			
+			setPos(X, Y);
+			//printf("poss %d %d \n", posX, posY);
+			
+			int id;
+			float value;
+			
+			while(ss>>id>>value)
+			{	
+				//printf("Wartosci %d %f\n", id, value);
+				
+				args[id].set(value);
+				for(int i=0;i<sliders.size();++i)
+				{
+					if(sliders[i].param==id)
+					{
+						sliders[i].slider->setValue(value);
+						break;
+					}
+				}
+			}
+		}
+		
 		~EffectAutoGUI()
 		{
-			printf("deconstructor %p\n", this);
+			//printf("deconstructor %p\n", this);
 			for(int i=0;i<sliders.size();++i)
 			sliders[i].free();
 			for(int i=0;i<buses.size();++i)
@@ -382,8 +403,8 @@
 		public:
 			static constexpr const char* name="eff_distecho";
 			const char* getName() {return name;}
-			EffectArgument* getAgrs() {return args;}
-			const int getAgrsCount() {return argsCount;}
+			EffectArgument* getArgs() {return args;}
+			const int getArgsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			Distecho(int X, int Y): 
@@ -402,8 +423,8 @@
 		public:
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
-			EffectArgument* getAgrs() {return args;}
-			const int getAgrsCount() {return argsCount;}
+			EffectArgument* getArgs() {return args;}
+			const int getArgsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			Playbuf(int X, int Y, int bufnum): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", OSCConn::getFreeBus())}),
@@ -420,8 +441,8 @@
 		public:
 			static constexpr const char* name="eff_input";
 			const char* getName() {return name;}
-			EffectArgument* getAgrs() {return args;}
-			const int getAgrsCount() {return argsCount;}
+			EffectArgument* getArgs() {return args;}
+			const int getArgsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			Input(int X, int Y): args({EffectArgument("outbus", OSCConn::getFreeBus())}),
@@ -438,8 +459,8 @@
 		public:
 			static constexpr const char* name="eff_output";
 			const char* getName() {return name;}
-			EffectArgument* getAgrs() {return args;}
-			const int getAgrsCount() {return argsCount;}
+			EffectArgument* getArgs() {return args;}
+			const int getArgsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			Output(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus())}),
@@ -449,6 +470,6 @@
 	
 	void registerEffects();
 	
-	Effect* getEffect(const char* name, int X, int Y);
+	Effect* getEffect(const char* name, int X=0, int Y=0);
 	
 #endif

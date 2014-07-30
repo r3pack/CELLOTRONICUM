@@ -1,5 +1,6 @@
 #include "effects.h"
 #include "osc.h"
+#include "effectsdef.h"
 
 
 const int MAX_EFFECTS_COUNT=1000;
@@ -183,45 +184,45 @@ Effect::~Effect()
 
 void Effect::setArgument(int argId, int value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::setArgument(int argId, float value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::setArgument(int argId, std::string value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::sendArgument(int argId)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, int value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, float value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, std::string value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
@@ -270,8 +271,8 @@ void Effect::sendInstance(bool paused)
 	msg.init("/new_effect_instance");
 	const char* name=getName();
 	msg.pushInt32(id).pushStr(name);
-	int argsCount=getAgrsCount();
-	EffectArgument* args=getAgrs();
+	int argsCount=getArgsCount();
+	EffectArgument* args=getArgs();
 	for(int i=0;i<argsCount;++i)
 	{
 		args[i].addArgumentToMessage(&msg);
@@ -455,6 +456,106 @@ void Effect::moveToHead()
 		fprintf(stderr, "Error sending message..\n");
 	}
 	
+}
+
+void Effect::saveToFile(const char* filename)
+{
+	FILE* file=fopen(filename, "wb");
+	
+	if(file==NULL)
+	{
+		fprintf(stderr, "Cannot open file to save data\n");
+		return;
+	}
+
+	fprintf(file, "lastid %d\n", lastId); 
+	for(auto it=effectInstanceList.begin();it!=effectInstanceList.end();++it)
+	{
+		Effect* effect=(*it).second;
+		
+		fprintf(file, "effect %s %d \"", effect->getName(), effect->getId());
+		effect->saveData(file);
+		fprintf(file, "\"\n");
+	}
+	
+	for(auto it=getConnections()->begin();it!=getConnections()->end();++it)
+	{
+		fprintf(file, "connection %d %d %d %d\n", (*it).first->getEffect()->getId(), (*it).first->getArg(), (*it).second->getEffect()->getId(), (*it).second->getArg());
+	}
+	
+	fclose(file);
+}
+
+void Effect::loadFromFile(const char* filename)
+{
+	FILE* file=fopen(filename, "rb");
+	
+	if(file==NULL)
+	{
+		fprintf(stderr, "Cannot open file to load data\n");
+		return;
+	}
+	int lastIdTmp=0;
+	
+	char buf[2048];
+	
+	
+	while(fscanf(file, "%s", buf)!=-1)
+	{
+		if(strcmp(buf, "effect")==0)
+		{
+			int id;
+			fscanf(file, "%s %d", buf, &id);
+			
+			Effect* eff=getEffect(buf);
+			eff->id=id;
+			
+			fgets(buf, 2048, file);
+			
+			int begin;
+			int i=0;
+			for(;buf[i]!='\"';++i) {} i+=1;
+			
+			begin=i;
+			
+			for(;buf[i]!='\"';++i)
+			{
+				if(buf[i]=='\0') 
+				fgets(buf+i, 2048-i, file);
+			}
+			
+			buf[i]='\0';
+			
+			eff->loadData(buf+begin);
+		}
+		else if(strcmp(buf, "connection")==0)
+		{
+			int effId1, effId2, arg1, arg2;
+			fscanf(file, "%d %d %d %d", &effId1, &arg1, &effId2, &arg2);
+			
+			Effect* eff1=effectInstanceList[effId1];
+			Effect* eff2=effectInstanceList[effId2];
+			
+			Bus* bus1, *bus2;
+			
+			for(auto it=busList.begin();it!=busList.end();++it)
+			{
+				Bus* bus=(*it).second;
+				if(bus->getEffect()==eff1 && bus->getArg()==arg1) bus1=bus;
+				if(bus->getEffect()==eff2 && bus->getArg()==arg2) bus2=bus;
+			}
+			
+			bus1->setClicked();
+			bus2->setClicked();
+			
+			printf("ustawione\n");
+		}
+		else if(strcmp(buf, "lastid")==0)
+		{
+			fscanf(file, "%d", &lastIdTmp);
+		}
+	}
+	lastId=lastIdTmp;
 }
 
 void EffectCreator::moveUp() 

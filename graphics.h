@@ -38,8 +38,6 @@ extern std::map <int, Bus*> busList;
 
 std::set <std::pair <Bus*, Bus*> >* getConnections();
 
-std::pair <Bus*, Bus*> getLastConnection();
-
 void drawConnections();
 
 enum MouseEvent{
@@ -118,6 +116,8 @@ class Bus{
 	Effect* effect;
 	int argument;
 	
+	bool used=false;
+	
 	public:
 	static int lastClicked;
 	
@@ -147,7 +147,11 @@ class Bus{
 		for(auto it=getConnections()->begin();it!=getConnections()->end();)
 		{
 			if((*it).first==this || (*it).second==this)
-			it=getConnections()->erase(it);
+			{
+				(*it).first->used=false;
+				(*it).second->used=false;
+				it=getConnections()->erase(it);
+			}
 			else
 			++it;
 		}
@@ -177,7 +181,18 @@ class Bus{
 		SDL_RenderDrawRect(render, &rect);
 	}
     
-	bool receiveClick(int X, int Y, MouseEvent me);
+	bool receiveClick(int X, int Y, MouseEvent me)
+	{
+		X-=posX;
+		Y-=posY;
+		if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
+		{
+			return setClicked();
+		}
+		return false;
+	}
+	
+	bool setClicked();
 	
 	void setPos(int X, int Y)
 	{
@@ -235,6 +250,11 @@ class Slider{
 	{
 		float normalizedLevel=1.0f-(float(level)/float(height));
 		return rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel;
+	}
+	
+	void setValue(float value)
+	{
+		level=int((1.0f-(value-rangeBegin)/(rangeEnd-rangeBegin)) * float(height));
 	}
 	
 	void setPos(int X, int Y)

@@ -81,16 +81,20 @@
 			void moveBefore(Effect* effect);
 			void moveAfter(Effect* effect);
 			void moveToHead();
+			
+			virtual void saveData(FILE* file) {}
+			virtual void loadData(char* data) {}
+			
 		
 			Effect();
 			
-			~Effect();
+			virtual ~Effect();
 			
 			int getId() {return id;}
 			
 			virtual const char* getName() = 0;
-			virtual EffectArgument* getAgrs() = 0;
-			virtual const int getAgrsCount() = 0;
+			virtual EffectArgument* getArgs() = 0;
+			virtual const int getArgsCount() = 0;
 			
 			virtual void draw(){}
 			virtual bool receiveClick(int X, int Y, MouseEvent me){}
@@ -106,6 +110,10 @@
 			void setAndSendArgument(int argId, int value);
 			void setAndSendArgument(int argId, float value);
 			void setAndSendArgument(int argId, std::string value);
+			
+			static void saveToFile(const char* filename);
+			
+			static void loadFromFile(const char* filename);
 	};
 	
 	class EffectCreator{
@@ -132,6 +140,9 @@
 			
 			void draw(int X, int Y);
 	};
+	
+	
+
 	
 	bool checkEffectsList();
 	

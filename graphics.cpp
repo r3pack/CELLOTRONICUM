@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "effects.h"
 
 SDL_Window *window;
 SDL_Renderer *render;
@@ -62,10 +63,6 @@ std::set <std::pair <Bus*, Bus*> > connections;
 
 std::set <std::pair <Bus*, Bus*> >* getConnections() {return &connections;}
 
-std::pair <Bus*, Bus*> lastConnection;
-
-std::pair <Bus*, Bus*> getLastConnection() {return lastConnection;}
-
 void drawConnections()
 {
 	for(auto it=connections.begin();it!=connections.end();++it)
@@ -75,61 +72,74 @@ void drawConnections()
 	}
 }
 
-bool Bus::receiveClick(int X, int Y, MouseEvent me)
+bool Bus::setClicked()
 {
-	X-=posX;
-	Y-=posY;
-	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
+	clicked=true;
+	
+	if(lastClicked!=-1)
 	{
-		clicked=true;
-		
-		if(lastClicked!=-1)
+		auto it=busList.find(lastClicked);
+		if(it==busList.end())
 		{
-			auto it=busList.find(lastClicked);
-			if(it==busList.end())
-			{
-				fprintf(stderr, "Error: bus not found\n");
-				Bus::lastClicked=-1;
-				return false;
-			}
-			
-			Bus *bus1=it->second, *bus2=this;
-			
-			if(bus1->getType()==BT_INBUS) std::swap(bus1, bus2);
-			
-			if(bus1->getType()!=BT_OUTBUS || bus2->getType()!=BT_INBUS)
-			{
-				fprintf(stderr, "Error: bad buses type\n");
-				Bus::lastClicked=-1;
-				return false;
-			}
-			
-			
-			if(bus1->getEffect() == bus2->getEffect())
-			{
-				fprintf(stderr, "Error: buses come from same effect\n");
-				Bus::lastClicked=-1;
-				return false;
-			}
-			
-			auto connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
-			
-			if(connIt.second==false)
-			{
-				connections.erase(std::pair<Bus*, Bus*>(bus1, bus2));
-				lastConnection=std::pair<Bus*, Bus*>(NULL, bus2);
-			}
-			lastConnection=*(connIt.first);
-			
+			fprintf(stderr, "Error: bus not found\n");
 			Bus::lastClicked=-1;
+			return false;
+		}
+		
+		Bus *bus1=it->second, *bus2=this;
+		
+		if(bus1->getType()==BT_INBUS) std::swap(bus1, bus2);
+		
+		if(bus1->getType()!=BT_OUTBUS || bus2->getType()!=BT_INBUS)
+		{
+			fprintf(stderr, "Error: bad buses type\n");
+			Bus::lastClicked=-1;
+			return false;
+		}
+		
+		
+		if(bus1->getEffect() == bus2->getEffect())
+		{
+			fprintf(stderr, "Error: buses come from same effect\n");
+			Bus::lastClicked=-1;
+			return false;
+		}
+		
+		std::pair<std::set <std::pair<Bus*, Bus*> >::iterator, bool> connIt;
+		
+		if(connections.find(std::pair<Bus*, Bus*>(bus1, bus2)) != connections.end())
+		{
+			connections.erase(std::pair<Bus*, Bus*>(bus1, bus2));
 			
-			return true;
+			bus2->getEffect()->getArgs()[bus2->getArg()].set(OSCConn::getFreeBus());
+			
+			bus2->used=false;
 		}
 		else
-		lastClicked=id;
+		{
+			if(bus2->used==true) return false;
+			connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
+			bus2->used=true;
+			
+			Effect::updateTopologicalSequence();
+					
+			int freebus=bus1->getEffect()->getArgs()[bus1->getArg()].getIntValue();
+			
+			OSCConn::deleteBus(bus2->getEffect()->getArgs()[bus2->getArg()].getIntValue());
+			
+			bus2->getEffect()->getArgs()[bus2->getArg()].set(freebus);
+			
+			bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebus);
+			fprintf(stderr, "Connected two buses to %d\n", freebus);
+		}
 		
-		return false;
+		Bus::lastClicked=-1;
+		
+		return true;
 	}
+	else
+	lastClicked=id;
+	
 	return false;
 }
 
