@@ -95,7 +95,7 @@ int main (int argc, char** argv)
 						{
 							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 							{
-								if(it->second->receiveClick(x, y, ME_RELEASE))break;
+								it->second->receiveClick(x, y, ME_RELEASE);
 							}
 						}
 						else
@@ -103,7 +103,7 @@ int main (int argc, char** argv)
 						{
 							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 							{
-								if(it->second->receiveSecondClick(x, y, ME_RELEASE))break;
+								it->second->receiveSecondClick(x, y, ME_RELEASE);
 							}
 						}
 						else
@@ -113,7 +113,7 @@ int main (int argc, char** argv)
 							{
 								auto it2=it;
 								++it;
-								if(it2->second->receiveThridClick(x, y, ME_RELEASE))break;
+								it2->second->receiveThridClick(x, y, ME_RELEASE);
 							}
 						}
 					}
@@ -171,10 +171,10 @@ int main (int argc, char** argv)
 	
 	Effect::saveToFile("out.cello");
 	
-	for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+	/*for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 	{
 		delete (*it).second;
-	}
+	}*/
 	
 	quitSDL();
 	

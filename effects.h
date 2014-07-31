@@ -116,6 +116,18 @@
 			static void loadFromFile(const char* filename);
 	};
 	
+	struct EffectCreatorMenuEntry
+	{
+		bool isElement;
+		
+		std::vector <EffectCreatorMenuEntry*>* menuEntry;
+		const char* name;
+		SDL_Texture* nameTex;
+		SDL_Texture* nameTexRed;
+		
+		
+	};
+	
 	class EffectCreator{
 		private:
 			int chosenEffect=0;
@@ -140,9 +152,6 @@
 			
 			void draw(int X, int Y);
 	};
-	
-	
-
 	
 	bool checkEffectsList();
 	

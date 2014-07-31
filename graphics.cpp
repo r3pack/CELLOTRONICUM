@@ -16,7 +16,7 @@ void initSDL()
 		exit(1);
 	}
 
-	if (!(window=SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN)))
+	if (!(window=SDL_CreateWindow("CELLOTRONICUM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN)))
 	{
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(2);
@@ -92,6 +92,34 @@ bool Bus::setClicked()
 		
 		if(bus1->getType()!=BT_OUTBUS || bus2->getType()!=BT_INBUS)
 		{
+			if(bus1->getType()==BT_OUTBUS && bus2==bus1)
+			{
+				bus1->used=false;
+				for(auto it=connections.begin();it!=connections.end();)
+				{
+					if((*it).first==bus1)
+					{
+						(*it).second->used=false;
+						it=connections.erase(it);
+					}
+					else ++it;
+				}
+			}
+			
+			if(bus1->getType()==BT_INBUS && bus2==bus1)
+			{
+				bus1->used=false;
+				for(auto it=connections.begin();it!=connections.end();++it)
+				{
+					if((*it).second==bus1)
+					{
+						(*it).first->used=false;
+						connections.erase(it);
+						break;
+					}
+				}
+			}
+			
 			fprintf(stderr, "Error: bad buses type\n");
 			Bus::lastClicked=-1;
 			return false;

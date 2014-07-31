@@ -383,7 +383,7 @@ void Effect::updateTopologicalSequence()
 		
 	}
 	
-	effectInstanceList[sequence[0]]->moveToHead();
+	//effectInstanceList[sequence[0]]->moveToHead();
 	
 	for(int i=1;i<sequence.size();++i)
 	{
@@ -507,8 +507,11 @@ void Effect::loadFromFile(const char* filename)
 			int id;
 			fscanf(file, "%s %d", buf, &id);
 			
+			lastId=id;
+			
 			Effect* eff=getEffect(buf);
-			eff->id=id;
+			
+			if(id != eff->id) {printf("MEGA Error %d %d \n", id, eff->id); exit(0);}
 			
 			fgets(buf, 2048, file);
 			
@@ -547,8 +550,6 @@ void Effect::loadFromFile(const char* filename)
 			
 			bus1->setClicked();
 			bus2->setClicked();
-			
-			printf("ustawione\n");
 		}
 		else if(strcmp(buf, "lastid")==0)
 		{
