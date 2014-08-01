@@ -155,6 +155,7 @@ int main (int argc, char** argv)
 			}
 		}
 		
+		
 		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 		SDL_RenderClear(render);
 		
@@ -164,17 +165,17 @@ int main (int argc, char** argv)
 		}
 		
 		drawConnections();
-		effectCreator.draw(SCREEN_WIDTH-effectCreator.getWidth()-20, 0);
+		effectCreator.draw(SCREEN_WIDTH-20, 0);
 		
 		SDL_RenderPresent(render);
 	}
 	
 	Effect::saveToFile("out.cello");
 	
-	/*for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+	for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 	{
 		delete (*it).second;
-	}*/
+	}
 	
 	quitSDL();
 	

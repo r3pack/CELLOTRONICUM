@@ -19,7 +19,7 @@
 
 			static UdpSocket sock;
 			
-			static std::map <int, const char*> bufferFileById;
+			static std::map <int, std::string> bufferFileById;
 			
 		public:
 			
@@ -51,7 +51,7 @@
 			
 			static int loadBuffer(const char* filename);
 			
-			static const char* getBufferFileById(int id);
+			static std::string getBufferFileById(int id);
 			
 			static void deleteBuffer(int bufnum);
 			

@@ -320,7 +320,7 @@
 			else return false;
 		}
 		
-		void saveData(FILE* file) 
+		virtual void saveData(FILE* file) 
 		{
 			int argsCount=getArgsCount();
 			EffectArgument* args=getArgs();
@@ -338,7 +338,7 @@
 			
 		}
 		
-		void loadData(char* str) 
+		virtual void loadData(char* str) 
 		{
 			int argsCount=getArgsCount();
 			EffectArgument* args=getArgs();
@@ -420,6 +420,7 @@
 			static const int argsCount=2;
 			EffectArgument args[argsCount];
 			ArgVis argsVis[argsCount];
+			char playbufFileName[2048];
 		public:
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
@@ -427,9 +428,84 @@
 			const int getArgsCount() {return argsCount;}
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Playbuf(int X, int Y, int bufnum): args({EffectArgument("bufnum", bufnum), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_TEXT, std::string(OSCConn::getBufferFileById(bufnum))), ArgVis(VT_OUTBUS)})
-			{sendInstance(true); initGUI(X, Y);}
+			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
+			{
+				
+				
+				/*OPENFILENAME ofn;
+				ZeroMemory(&ofn, sizeof(ofn));
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = NULL ;
+				ofn.lpstrFile = playbufFileName;
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = sizeof(playbufFileName);
+				ofn.lpstrFilter = "All\0*.*\0Wave\0*.WAV\0";
+				ofn.nFilterIndex = 1;
+				ofn.lpstrFileTitle = NULL;
+				ofn.nMaxFileTitle = 0;
+				ofn.lpstrInitialDir=NULL;
+				ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
+				GetOpenFileName(&ofn);*/
+				
+				strcpy(playbufFileName,"C:\\Users\\praktykant\\kuba.wav");
+				
+				
+				
+				printf("Loading buffer from file: %s\n", playbufFileName);
+				int bufnum=OSCConn::loadBuffer(playbufFileName);
+				
+				args[0].set(bufnum);
+				*(std::string*)(argsVis[0].data)=OSCConn::getBufferFileById(bufnum);
+				
+				int lastSlash=0;
+				
+				for(int i=1;playbufFileName[i]!='\0';++i)
+				{
+					if((playbufFileName[i]=='/' || playbufFileName[i]=='\\') && playbufFileName[i-1]!='\\')
+					{
+						lastSlash=i;
+					}
+				}
+				
+				(*(std::string*)(argsVis[0].data)).erase(0, lastSlash+1);
+				
+				sendInstance(true); 
+				initGUI(X, Y);
+			}
+			
+			Playbuf(int X, int Y, const char* filename): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
+			{
+				strcpy(playbufFileName, filename);
+				
+				printf("Loading buffer from file: %s\n", playbufFileName);
+				int bufnum=OSCConn::loadBuffer(playbufFileName);
+				
+				args[0].set(bufnum);
+				*(std::string*)(argsVis[0].data)=OSCConn::getBufferFileById(bufnum);
+				
+				int lastSlash=0;
+				
+				for(int i=1;playbufFileName[i]!='\0';++i)
+				{
+					if((playbufFileName[i]=='/' || playbufFileName[i]=='\\') && playbufFileName[i-1]!='\\')
+					{
+						lastSlash=i;
+					}
+				}
+				
+				(*(std::string*)(argsVis[0].data)).erase(0, lastSlash+1);
+				
+				sendInstance(true); 
+				initGUI(X, Y);
+			}
+			
+			
+			/*void saveData(FILE* file) 
+			{
+				fprintf(file, "%s", playbufFileName);
+			}*/
 	};
 	
 	class Input : public EffectAutoGUI

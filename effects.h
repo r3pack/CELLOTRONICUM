@@ -10,6 +10,14 @@
 #include "osc.h"
 #include "graphics.h"
 
+	struct cmpCStr
+	{
+	   bool operator()(char const *a, char const *b)
+	   {
+		  return std::strcmp(a, b) < 0;
+	   }
+	};
+
 	enum VarType{
 		TYPE_UNKNOWN,
 		TYPE_INT,
@@ -85,6 +93,8 @@
 			virtual void saveData(FILE* file) {}
 			virtual void loadData(char* data) {}
 			
+			
+			
 		
 			Effect();
 			
@@ -93,6 +103,7 @@
 			int getId() {return id;}
 			
 			virtual const char* getName() = 0;
+			virtual const char* getGroup() {return "";};
 			virtual EffectArgument* getArgs() = 0;
 			virtual const int getArgsCount() = 0;
 			
@@ -118,33 +129,48 @@
 	
 	struct EffectCreatorMenuEntry
 	{
-		bool isElement;
-		
-		std::vector <EffectCreatorMenuEntry*>* menuEntry;
+		std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>* submenuEntries=NULL;
 		const char* name;
 		SDL_Texture* nameTex;
 		SDL_Texture* nameTexRed;
+		EffectCreatorMenuEntry* parent=NULL;
+		int width=0;
 		
+		int calculateWidth()
+		{
+			for(auto it=submenuEntries->begin();it!=submenuEntries->end();++it)
+			{
+				int w;
+				SDL_QueryTexture((*it).second->nameTex, NULL, NULL, &w, NULL);
+				width=std::max(width, w);
+			}
+		}
+		
+		EffectCreatorMenuEntry(const char* n, EffectCreatorMenuEntry* p, bool isElement)
+		{
+			name=n;
+			parent=p;
+			if(!isElement) submenuEntries=new std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>;
+			nameTex=generateText(name);
+			nameTexRed=generateText(name, {255,0,0});
+		}
 		
 	};
 	
 	class EffectCreator{
 		private:
-			int chosenEffect=0;
-			std::map<const char*, bool>::iterator it;
-			
-			std::vector <std::pair<SDL_Texture*, SDL_Texture*> > nameTexs;
-			
-			int height=0;
-			int width=0;
+			EffectCreatorMenuEntry* chosenEffect;
 		
 		public:	
-			int getHeight() {return height;}
-			int getWidth() {return width;}
+			static constexpr int menu_period=30;
 			
 			void moveUp();
 			
 			void moveDown();
+			
+			void enter();
+			
+			void back();
 			
 			void receiveKeyboardEvent(SDL_Scancode scancode);
 			
@@ -157,6 +183,6 @@
 	
 	std::map <int, Effect*>* getEffectInstanceList();
 	
-	void registerEffect(const char* name);
+	void registerEffect(const char* name, const char* group);
 
 #endif
