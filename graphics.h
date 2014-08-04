@@ -19,6 +19,9 @@ void initSDL();
 
 void quitSDL();
 
+void getOpenFile(char* filename, int size);
+void getSaveFile(char* filename, int size);
+
 SDL_Texture* loadTexture(const char* filename);
 
 SDL_Texture* generateText(const char* text, SDL_Color color={0,0,0});

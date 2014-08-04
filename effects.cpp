@@ -453,7 +453,7 @@ void Effect::moveToHead()
 
 void Effect::saveToFile(const char* filename)
 {
-	printf("save\n");
+	printf("Saving session to file '%s'\n", filename);
 	FILE* file=fopen(filename, "wb");
 	
 	if(file==NULL)
@@ -461,14 +461,11 @@ void Effect::saveToFile(const char* filename)
 		fprintf(stderr, "Cannot open file to save data\n");
 		return;
 	}
-
-	fprintf(file, "lastid %d\n", lastId); 
+	
 	for(auto it=effectInstanceList.begin();it!=effectInstanceList.end();++it)
 	{
 		Effect* effect=(*it).second;
-		//if(strcmp(effect->getName(), "eff_playbuf")==0) continue;
 		fprintf(file, "effect %s %d \"", effect->getName(), effect->getId());
-		printf( "effect %s %d \n", effect->getName(), effect->getId());
 		effect->saveData(file);
 		fprintf(file, "\"\n");
 	}
@@ -483,6 +480,7 @@ void Effect::saveToFile(const char* filename)
 
 void Effect::loadFromFile(const char* filename)
 {
+	printf("Loading session from file '%s'\n", filename);
 	FILE* file=fopen(filename, "rb");
 	
 	if(file==NULL)
@@ -490,7 +488,7 @@ void Effect::loadFromFile(const char* filename)
 		fprintf(stderr, "Cannot open file to load data\n");
 		return;
 	}
-	int lastIdTmp=0;
+	int maxId=lastId-1;
 	
 	char buf[2048];
 	
@@ -503,6 +501,7 @@ void Effect::loadFromFile(const char* filename)
 			fscanf(file, "%s %d", buf, &id);
 			
 			lastId=id;
+			if(id>maxId) maxId=id;
 			
 			Effect* eff;
 			
@@ -553,12 +552,8 @@ void Effect::loadFromFile(const char* filename)
 			bus1->setClicked();
 			bus2->setClicked();
 		}
-		else if(strcmp(buf, "lastid")==0)
-		{
-			fscanf(file, "%d", &lastIdTmp);
-		}
 	}
-	lastId=lastIdTmp;
+	lastId=maxId+1;
 }
 
 void EffectCreator::moveUp() 
@@ -677,9 +672,6 @@ void EffectCreator::draw(int X, int Y)
 			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
 			newY+=h;
 		}
-		
-		
-		
 	}
 }
 

@@ -15,6 +15,8 @@ void waitFor(int ms)
 	std::this_thread::sleep_for(dura);
 }
 
+char fileStr[MAX_PATH];
+
 
 #undef main
 int main (int argc, char** argv)
@@ -40,12 +42,9 @@ int main (int argc, char** argv)
 	
 	effectCreator.init();
 	
-	
 	auto effectInstanceList=getEffectInstanceList();
 	
 	bool quit = false;
-	
-	Effect::loadFromFile("out.cello");
 	
 	while (!quit)
 	{
@@ -151,6 +150,20 @@ int main (int argc, char** argv)
 				break;
 				case SDL_KEYDOWN:
 					effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
+					
+					const Uint8 *state = SDL_GetKeyboardState(NULL);
+				
+					if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
+					{
+						getSaveFile(fileStr, MAX_PATH);
+						Effect::saveToFile(fileStr);
+					}
+					else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
+					{
+						Effect::saveToFile("session_before_load.cello");
+						getOpenFile(fileStr, MAX_PATH);
+						Effect::loadFromFile(fileStr);
+					}
 				break;
 			}
 		}
@@ -170,7 +183,7 @@ int main (int argc, char** argv)
 		SDL_RenderPresent(render);
 	}
 	
-	Effect::saveToFile("out.cello");
+	Effect::saveToFile("last_session.cello");
 	
 	for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 	{

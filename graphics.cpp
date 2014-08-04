@@ -51,6 +51,55 @@ void quitSDL()
 	SDL_Quit();
 }
 
+void getOpenFile(char* filename, int size)
+{
+	#if defined(_MSC_VER) || defined(_WIN32)
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = filename;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = size;
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir=NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_READONLY;
+	GetOpenFileName(&ofn);
+	
+	while (SDL_PollEvent(&event)) {}
+	#else
+		printf("Enter file to load: ");
+		fgets(stdin, size, filename);
+	#endif
+}
+
+void getSaveFile(char* filename, int size)
+{
+	#if defined(_MSC_VER) || defined(_WIN32)
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = filename;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = size;
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir=NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR;
+	GetSaveFileName(&ofn);
+	
+	while (SDL_PollEvent(&event)) {}
+	#else
+		printf("Enter file to save: ");
+		fgets(stdin, size, filename);
+	#endif
+}
 
 int Bus::lastClicked=-1;
 int Bus::lastId=0;
@@ -173,7 +222,7 @@ bool Bus::setClicked()
 
 SDL_Texture* generateText(const char* text, SDL_Color color)
 {
-	SDL_Surface* text_surface=TTF_RenderText_Blended(font, text, color);
+	SDL_Surface* text_surface=TTF_RenderUTF8_Blended(font, text, color);
 	
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(render, text_surface);
 	SDL_FreeSurface(text_surface);

@@ -92,9 +92,6 @@
 			
 			virtual void saveData(FILE* file) {}
 			virtual void loadData(char* data) {}
-			
-			
-			
 		
 			Effect();
 			

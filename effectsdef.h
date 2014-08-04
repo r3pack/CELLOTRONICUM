@@ -81,13 +81,12 @@
 		static constexpr int bottom_padding=30;
 		static constexpr int bus_period=35;
 		
+		
 		std::vector <ParamSlider> sliders;
 		std::vector <ParamBus> buses;
 		std::vector <ParamText> texts;
 		
 		Button* pauseButton;
-		
-		int posX, posY;
 		
 		int width, height;
 			
@@ -96,6 +95,10 @@
 		bool focus=false;
 		
 		SDL_Texture* nameTex;
+		
+		protected:
+		
+		int posX, posY;
 		
 		public:
 		
@@ -420,7 +423,7 @@
 			static const int argsCount=2;
 			EffectArgument args[argsCount];
 			ArgVis argsVis[argsCount];
-			char playbufFileName[2048];
+			char playbufFileName[MAX_PATH];
 		public:
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
@@ -431,28 +434,19 @@
 			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
 			{
+				getOpenFile(playbufFileName, MAX_PATH);
 				
+				FILE* file=fopen(playbufFileName, "r");
 				
-				/*OPENFILENAME ofn;
-				ZeroMemory(&ofn, sizeof(ofn));
-				ofn.lStructSize = sizeof(ofn);
-				ofn.hwndOwner = NULL ;
-				ofn.lpstrFile = playbufFileName;
-				ofn.lpstrFile[0] = '\0';
-				ofn.nMaxFile = sizeof(playbufFileName);
-				ofn.lpstrFilter = "All\0*.*\0Wave\0*.WAV\0";
-				ofn.nFilterIndex = 1;
-				ofn.lpstrFileTitle = NULL;
-				ofn.nMaxFileTitle = 0;
-				ofn.lpstrInitialDir=NULL;
-				ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
-				GetOpenFileName(&ofn);*/
+				if(file==NULL) 
+				{
+					fprintf(stderr, "Error: File '%s' not exists\n", playbufFileName);
+					strcpy(playbufFileName, "/file/unknown");
+				}
 				
-				strcpy(playbufFileName,"C:\\Users\\praktykant\\kuba.wav");
+				fclose(file);
 				
-				
-				
-				printf("Loading buffer from file: %s\n", playbufFileName);
+				fprintf(stderr, "Loading buffer from file: %s\n", playbufFileName);
 				int bufnum=OSCConn::loadBuffer(playbufFileName);
 				
 				args[0].set(bufnum);
@@ -474,12 +468,11 @@
 				initGUI(X, Y);
 			}
 			
-			Playbuf(int X, int Y, const char* filename): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
+			Playbuf(int X, int Y, const char* data): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
 			{
-				strcpy(playbufFileName, filename);
+				sscanf(data, "%d %d %s", &X, &Y, playbufFileName);
 				
-				printf("Loading buffer from file: %s\n", playbufFileName);
 				int bufnum=OSCConn::loadBuffer(playbufFileName);
 				
 				args[0].set(bufnum);
@@ -502,10 +495,10 @@
 			}
 			
 			
-			/*void saveData(FILE* file) 
+			void saveData(FILE* file) 
 			{
-				fprintf(file, "%s", playbufFileName);
-			}*/
+				fprintf(file, "%d %d %s ", posX, posY, playbufFileName);
+			}
 	};
 	
 	class Input : public EffectAutoGUI
