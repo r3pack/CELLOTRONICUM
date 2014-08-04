@@ -91,7 +91,7 @@ void getSaveFile(char* filename, int size)
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir=NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT;
 	GetSaveFileName(&ofn);
 	
 	while (SDL_PollEvent(&event)) {}
