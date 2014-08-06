@@ -34,10 +34,13 @@ enum BusType{
 };
 
 class Effect;
-
 class Bus;
+class ControllBus;
+class Controller;
 
 extern std::map <int, Bus*> busList;
+
+extern std::map <int, ControllBus*> controllBusList;
 
 std::set <std::pair <Bus*, Bus*> >* getConnections();
 
@@ -49,8 +52,49 @@ enum MouseEvent{
 	ME_RELEASE
 };
 
+class Drawable{
+	public:
+	virtual void draw() = 0;
+	virtual void setPos(int X, int Y) = 0;
+	virtual void move(int X, int Y) = 0;
+	virtual int getPosX() = 0;
+	virtual int getPosY() = 0;
+	virtual int getWidth() = 0;
+	virtual int getHeight() = 0;
+	virtual bool receiveClick(int X, int Y, MouseEvent me) = 0;
+	virtual ~Drawable() {}
+};
 
-class Button{
+class Point : public Drawable{
+	int posX, posY;
+	
+	public:
+	void draw() {}
+	
+	void setPos(int X, int Y)
+	{
+		posX=X;
+		posY=Y;
+	}
+	
+	int getPosX(){return posX;}
+	int getPosY(){return posY;}
+	
+	void move(int X, int Y)
+	{
+		posX+=X;
+		posY+=Y;
+	}
+	
+	int getWidth() {return 0;}
+	int getHeight() {return 0;}
+	
+	bool receiveClick(int X, int Y, MouseEvent me) {return false;}
+	
+	Point(int X, int Y): posX(X), posY(Y) {}
+};
+
+class Button : public Drawable{
 	int posX, posY;
 	int symbol;
 	
@@ -74,7 +118,7 @@ class Button{
 		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
 		SDL_RenderDrawRect(render, &rect);
 		
-		switch (symbol)
+		switch(symbol)
 		{
 			case 0:
 			SDL_RenderDrawLine(render, posX, posY, posX+size-2, posY+size/2);
@@ -91,6 +135,15 @@ class Button{
 		}
 	}
 	
+	void setPos(int X, int Y)
+	{
+		posX=X;
+		posY=Y;
+	}
+	
+	int getPosX(){return posX;}
+	int getPosY(){return posY;}
+	
 	void move(int X, int Y)
 	{
 		posX+=X;
@@ -103,10 +156,13 @@ class Button{
 		if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS) return true;
 		return false;
 	}
+	
+	int getWidth() {return size;}
+	int getHeight() {return size;}
 };
 
 
-class Bus{
+class Bus : public Drawable{
 	static int lastId;
     int id;
     
@@ -212,11 +268,110 @@ class Bus{
 		posY+=Y;
 	}
 	
+	int getWidth() {return size;}
+	int getHeight() {return size;}
+	
+};
+
+
+class ControllBus : public Drawable{
+	static int lastId;
+    int id;
+    
+    bool clicked=false;
+   
+    int posX, posY;
+	
+	BusType type;
+	
+	Controller* controller;
+	
+	bool used=false;
+	
+	public:
+	static int lastClicked;
+	
+	static constexpr int size=15;
+	
+	Controller* getController() {return controller;}
+	
+	int getType() {return type;}
+	
+	ControllBus(int X, int Y, BusType t, Controller* c)
+	{
+		controller=c;
+		posX=X;
+		posY=Y;
+		type=t;
+		id=lastId;
+		++lastId;
+		controllBusList.insert(std::pair<int, ControllBus*>(id, this));
+	}
+	
+	void removeBus()
+	{
+		controllBusList.erase(id);
+	}
+	
+	~ControllBus()
+	{
+		removeBus();
+	}
+    
+	void draw()
+	{
+		if(lastClicked!=id) clicked=false;
+		
+		SDL_Rect rect;
+		rect.x = posX;
+		rect.y = posY;
+		rect.w = size;
+		rect.h = size;
+		if(clicked)
+			SDL_SetRenderDrawColor(render, 205, 255, 205, 255);
+		else
+			SDL_SetRenderDrawColor(render, 255, 255, 205, 255);
+		SDL_RenderFillRect(render, &rect);
+		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+		SDL_RenderDrawRect(render, &rect);
+	}
+    
+	bool receiveClick(int X, int Y, MouseEvent me)
+	{
+		X-=posX;
+		Y-=posY;
+		if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
+		{
+			return setClicked();
+		}
+		return false;
+	}
+	
+	bool setClicked();
+	
+	void setPos(int X, int Y)
+	{
+		posX=X;
+		posY=Y;
+	}
+	
+	int getPosX(){return posX;}
+	int getPosY(){return posY;}
+	
+	void move(int X, int Y)
+	{
+		posX+=X;
+		posY+=Y;
+	}
+	
+	int getWidth() {return size;}
+	int getHeight() {return size;}
+	
 };
 
 
 
-class Slider{
+class Slider : public Drawable{
 	float rangeBegin;
 	float rangeEnd;
 	int width;
@@ -228,22 +383,48 @@ class Slider{
 	
 	SDL_Texture* valueTex=NULL;
 	
-	float lastValue=nan("");
+	float lastValue;
+	float value;
 	
 	public:
 	
 	Slider(int pX, int pY, int w, int h, float rB, float rE, float l):
-	rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))) {}
-	~Slider() {/*SDL_DestroyTexture(valueTex);*/}
+	rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l) 
+	{
+		std::ostringstream buff;
+		buff.setf(std::ios::fixed, std:: ios::floatfield);
+		buff.precision(2);
+		buff<<getValue();
+		
+		valueTex=generateText(buff.str().c_str());
+	}
+	~Slider() {SDL_DestroyTexture(valueTex);}
 	
 	bool receiveClick(int X, int Y, MouseEvent me)
 	{
 		if(me!=ME_PRESS && me!=ME_REPEAT) return false;
 		X-=posX;
 		Y-=posY;
-		if(X>=0 && X<=width && Y>=0 && Y<=height)
+		if(X>=0 && X<=width && Y>=-15 && Y<=height+15)
 		{
+			if(Y<0) Y=0;
+			else
+			if(Y>height) Y=height;
 			level=Y;
+			float normalizedLevel=1.0f-(float(level)/float(height));
+			value=rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel;
+			
+			if(!(lastValue>=(value-0.001) && lastValue<=(value+0.001)))
+			{
+				SDL_DestroyTexture(valueTex);
+				std::ostringstream buff;
+				buff.setf(std::ios::fixed, std:: ios::floatfield);
+				buff.precision(2);
+				buff<<getValue();
+				
+				valueTex=generateText(buff.str().c_str());
+				lastValue=getValue();
+			}
 			return true;
 		}
 		return false;
@@ -251,13 +432,17 @@ class Slider{
 	
 	float getValue()
 	{
-		float normalizedLevel=1.0f-(float(level)/float(height));
-		return rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel;
+		return value;
 	}
 	
-	void setValue(float value)
+	void setValue(float v)
 	{
-		level=int((1.0f-(value-rangeBegin)/(rangeEnd-rangeBegin)) * float(height));
+		value=v;
+	}
+	
+	void setNormalizedValue(float nv)
+	{
+		value=(rangeEnd-rangeBegin)*nv+rangeBegin;
 	}
 	
 	void setPos(int X, int Y)
@@ -294,18 +479,6 @@ class Slider{
 		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
 		SDL_RenderDrawRect(render, &rect1);
 		
-		if(!(lastValue>=(getValue()-0.01) && lastValue<=(getValue()+0.01)))
-		{
-			SDL_DestroyTexture(valueTex);
-			std::ostringstream buff;
-			buff.setf(std::ios::fixed, std:: ios::floatfield);
-			buff.precision(2);
-			buff<<getValue();
-			
-			valueTex=generateText(buff.str().c_str());
-			lastValue=getValue();
-		}
-		
 		int w, h;
 		SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
 		
@@ -318,6 +491,8 @@ class Slider{
 		SDL_RenderCopy(render, valueTex, NULL, &valueRect);
 	}
 	
+	int getWidth() {return width;}
+	int getHeight() {return height;}
 	
 };
 #endif

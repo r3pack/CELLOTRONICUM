@@ -4,36 +4,33 @@
 #include "graphics.h"
 	
 	
-	struct ParamSlider
+	struct ParamDrawable
 	{
-		Slider* slider;
+		Drawable* drawable;
 		int param;
 		SDL_Texture* nameTex=NULL;
-		ParamSlider(Slider* s, int p, const char* text): slider(s), param(p) {nameTex=generateText(text);}
+		ParamDrawable(Drawable* d, int p, const char* text): drawable(d), param(p) {nameTex=generateText(text);}
 		
-		void free() {delete slider; SDL_DestroyTexture(nameTex); nameTex=NULL;}
-	};
-	
-	struct ParamBus
-	{
-		Bus* bus;
-		int param;
-		SDL_Texture* nameTex=NULL;
-		ParamBus(Bus* b, int p, const char* text): bus(b), param(p) {nameTex=generateText(text);}
+		void draw() 
+		{
+			drawable->draw();
+			int w, h;
+			SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
 		
-		void free() {delete bus; SDL_DestroyTexture(nameTex); nameTex=NULL;} 
-	};
-	
-	struct ParamText
-	{
-		int posX, posY;
-		int param;
-		SDL_Texture* nameTex=NULL;
-		ParamText(int X, int Y, int p, const char* text): posX(X), posY(Y), param(p) {nameTex=generateText(text);}
-		void free() {SDL_DestroyTexture(nameTex); nameTex=NULL;}
+			SDL_Rect nameRect;
+			nameRect.x=drawable->getPosX() + drawable->getWidth()/2 - w/2;
+			nameRect.y=drawable->getPosY() + drawable->getHeight(); 
+			nameRect.w=w;
+			nameRect.h=h;		
+			
+			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+		}
+		
+		void free() {delete drawable; SDL_DestroyTexture(nameTex);}
 	};
 	
 	enum VisulalisationType{
+			VT_NONE,
             VT_INBUS,
             VT_OUTBUS,
             VT_SLIDER,
@@ -71,25 +68,13 @@
         }
         
     };
-    
-	class EffectAutoGUI : public Effect
-	{
-		static constexpr int slider_width=30;
-		static constexpr int slider_period=20;
-		static constexpr int slider_height=160;
-		static constexpr int top_padding=35;
-		static constexpr int bottom_padding=30;
-		static constexpr int bus_period=35;
-		
-		
-		std::vector <ParamSlider> sliders;
-		std::vector <ParamBus> buses;
-		std::vector <ParamText> texts;
-		
+	
+	typedef std::pair<int, int> int_pair;
+	
+	class EffectGUI : public Effect
+	{	
 		Button* pauseButton;
 		
-		int width, height;
-			
 		int handlePosX, handlePosY;
 		
 		bool focus=false;
@@ -98,93 +83,85 @@
 		
 		protected:
 		
+		std::vector <ParamDrawable> drawables;
+		
 		int posX, posY;
+		
+		int width, height;
 		
 		public:
 		
+		static constexpr int slider_width=30;
+		static constexpr int slider_height=160;
+		
+		virtual int_pair* getVisualPositions()=0;
+		
 		virtual ArgVis* getArgumentVisuals()=0;
 		
-		void initGUI(int X, int Y)
+		void initGUI(int X, int Y, int W=0, int H=0)
 		{
 			posX=X;
 			posY=Y;
+			
+			width=W;
+			height=H;
 			
 			pauseButton=new Button(X, Y, 0);
 			
 			EffectArgument* args=getArgs();
 			int argsCount=getArgsCount();
 			
-			int x=width=slider_period+Bus::size+slider_period;
-			
 			ArgVis* argvis=getArgumentVisuals();
 			
-			int bus_y=top_padding;
-			int slider_y=0;
-			int bus_y2=top_padding;
+			std::pair<int, int>* argpos=getVisualPositions();
 			
 			for(int i=0;i<argsCount;++i)
 			{
 				switch(argvis[i].visType)
 				{
 					case VT_INBUS:
-					buses.push_back(ParamBus(new Bus(posX+slider_period, posY+bus_y, BT_INBUS, this, i), i, args[i].getName()));
-					bus_y+=bus_period;
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_INBUS, this, i), i, args[i].getName()));
 					break;
 					case VT_OUTBUS:
-					buses.push_back(ParamBus(new Bus(posX, posY+bus_y2, BT_OUTBUS, this, i), i, args[i].getName()));
-					bus_y2+=bus_period;
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_OUTBUS, this, i), i, args[i].getName()));
 					break;
 					case VT_SLIDER:
 					{
-						slider_y=slider_height;
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
-						sliders.push_back(ParamSlider(new Slider(posX+x, posY+top_padding, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
-						x+=slider_width+slider_period;
+						drawables.push_back(ParamDrawable(new Slider(posX+argpos[i].first, posY+argpos[i].second, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
 					}
 					break;
 					case VT_TEXT:
-						texts.push_back(ParamText(posX+slider_period, posY+bus_y, i, ((std::string*)argvis[i].data)->c_str()));
-						int w;
-						SDL_QueryTexture(texts.back().nameTex, NULL, NULL, &w, NULL);
-						x=std::max(slider_period+w+slider_period, x);
+						drawables.push_back(ParamDrawable(new Point(posX+argpos[i].first, posY+argpos[i].second), i, ((std::string*)argvis[i].data)->c_str()));
 					break;
 				}
 			}
 			
-			height=bottom_padding+std::max(std::max(bus_y, bus_y2), top_padding+slider_y);
-			
-			width=x;
-			
-			for(int i=0;i<buses.size();++i)
-			{
-				if(buses[i].bus->getType()==BT_OUTBUS)
-				{
-					buses[i].bus->setPos(posX+x, buses[i].bus->getPosY());
-				}
-			}
-			
-			width+=Bus::size+slider_period;
-			
 			nameTex=generateText(getName());
 		}
+		
+		int updateDrawablePositions()
+		{
+			EffectArgument* args=getArgs();
+			int argsCount=getArgsCount();
+			
+			std::pair<int, int>* argpos=getVisualPositions();
+			
+			for(int i=0;i<argsCount;++i)
+			{
+				drawables[i].drawable->setPos(posX+argpos[i].first, posY+argpos[i].second);
+			}
+		}
+		
 		
 		void setPos(int X, int Y)
 		{
 			pauseButton->move(X-posX, Y-posY);
 			
-			for(int i=0;i<sliders.size();++i)
+			for(int i=0;i<drawables.size();++i)
 			{
-				sliders[i].slider->move(X-posX, Y-posY);
-			}
-			for(int i=0;i<buses.size();++i)
-			{
-				buses[i].bus->move(X-posX, Y-posY);
-			}
-			for(int i=0;i<texts.size();++i)
-			{
-				texts[i].posX+=X-posX;
-				texts[i].posY+=Y-posY;
+				drawables[i].drawable->move(X-posX, Y-posY);
 			}
 			posX=X; posY=Y;
 		}
@@ -211,48 +188,14 @@
 			
 			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
 			
-			
 			pauseButton->setSymbol(int(isPaused()));
 			pauseButton->draw();
 			
-			for(int i=0;i<sliders.size();++i)
+			
+			
+			for(int i=0;i<drawables.size();++i)
 			{
-				sliders[i].slider->draw();
-				int w, h;
-				SDL_QueryTexture(sliders[i].nameTex, NULL, NULL, &w, &h);
-			
-				nameRect.y=sliders[i].slider->getPosY()+slider_height;
-				nameRect.x=sliders[i].slider->getPosX()+slider_width/2-w/2;
-				nameRect.w=w;
-				nameRect.h=h;		
-				
-				SDL_RenderCopy(render, sliders[i].nameTex, NULL, &nameRect);
-			}
-			
-			for(int i=0;i<buses.size();++i)
-			{
-				buses[i].bus->draw();
-				int w, h;
-				SDL_QueryTexture(buses[i].nameTex, NULL, NULL, &w, &h);
-			
-				nameRect.y=buses[i].bus->getPosY()+Bus::size;
-				nameRect.x=buses[i].bus->getPosX()+Bus::size/2-w/2;
-				nameRect.w=w;
-				nameRect.h=h;		
-				
-				SDL_RenderCopy(render, buses[i].nameTex, NULL, &nameRect);
-			}
-			for(int i=0;i<texts.size();++i)
-			{
-				int w, h;
-				SDL_QueryTexture(texts[i].nameTex, NULL, NULL, &w, &h);
-			
-				nameRect.y=texts[i].posY;
-				nameRect.x=texts[i].posX;
-				nameRect.w=w;
-				nameRect.h=h;		
-				
-				SDL_RenderCopy(render, texts[i].nameTex, NULL, &nameRect);
+				drawables[i].draw();
 			}
 			
 		}
@@ -268,16 +211,20 @@
 				else
 					unpauseInstance();
 			}
-			for(int i=0;i<sliders.size();++i)
+			
+			ArgVis* argumentVisuals=getArgumentVisuals();
+			
+			for(int i=0;i<drawables.size();++i)
 			{
-				if(sliders[i].slider->receiveClick(X, Y, me)) setAndSendArgument(sliders[i].param, sliders[i].slider->getValue());
+				if(drawables[i].drawable->receiveClick(X, Y, me))
+				{
+					if(argumentVisuals[i].visType==VT_SLIDER)
+					{
+						setAndSendArgument(drawables[i].param, ((Slider*)drawables[i].drawable)->getValue());
+					}
+				}
 			}
 			
-			int lastClicked=Bus::lastClicked;
-			for(int i=0;i<buses.size();++i)
-			{
-				buses[i].bus->receiveClick(X, Y, me);
-			}
 			return true;
 		}
 		
@@ -314,8 +261,6 @@
 			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height && me==ME_PRESS)
 			{
 				deleteInstance();
-				for(int i=0;i<buses.size();++i)
-				buses[i].bus->removeBus();
 				
 				delete this;
 				return true;
@@ -347,8 +292,6 @@
 			EffectArgument* args=getArgs();
 			ArgVis* argumentVisuals=getArgumentVisuals();
 			
-			//printf("%s\n", str);
-			
 			std::stringstream ss;
 			ss<<str;
 			
@@ -357,38 +300,106 @@
 			ss>>X>>Y;
 			
 			setPos(X, Y);
-			//printf("poss %d %d \n", posX, posY);
 			
 			int id;
 			float value;
 			
 			while(ss>>id>>value)
-			{	
-				//printf("Wartosci %d %f\n", id, value);
-				
+			{					
 				args[id].set(value);
-				for(int i=0;i<sliders.size();++i)
-				{
-					if(sliders[i].param==id)
-					{
-						sliders[i].slider->setValue(value);
-						break;
-					}
-				}
+				
+				((Slider*)drawables[id].drawable)->setValue(value);
 			}
 		}
 		
-		~EffectAutoGUI()
+		virtual ~EffectGUI()
 		{
-			//printf("deconstructor %p\n", this);
-			for(int i=0;i<sliders.size();++i)
-			sliders[i].free();
-			for(int i=0;i<buses.size();++i)
-			buses[i].free();
-			for(int i=0;i<texts.size();++i)
-			texts[i].free();
+			for(int i=0;i<drawables.size();++i)
+			drawables[i].free();
 			SDL_DestroyTexture(nameTex);
 			delete pauseButton;
+		}
+		
+	};
+	
+    
+	class EffectAutoGUI : public EffectGUI
+	{
+		std::pair<int, int>* visualPositions=NULL;
+		
+		public:
+		
+		static constexpr int slider_period=20;
+		static constexpr int top_padding=35;
+		static constexpr int bottom_padding=30;
+		static constexpr int bus_period=35;
+		
+		std::pair<int, int>* getVisualPositions()
+		{
+			return visualPositions;
+		}
+		
+		void initGUI(int X, int Y)
+		{
+			int width=0, height=0;
+		
+			posX=X;
+			posY=Y;
+			
+			EffectArgument* args=getArgs();
+			int argsCount=getArgsCount();
+			
+			visualPositions= new std::pair<int, int>[argsCount];
+			
+			int x=width=slider_period+Bus::size+slider_period;
+			
+			ArgVis* argvis=getArgumentVisuals();
+			
+			int bus_y=top_padding;
+			int slider_y=0;
+			int bus_y2=top_padding;
+			
+			for(int i=0;i<argsCount;++i)
+			{
+				switch(argvis[i].visType)
+				{
+					case VT_INBUS:
+						visualPositions[i]=int_pair(0+slider_period, bus_y);
+						bus_y+=bus_period;
+					break;
+					case VT_OUTBUS:
+						visualPositions[i]=int_pair(0, bus_y2);
+						bus_y2+=bus_period;
+					break;
+					case VT_SLIDER:
+						slider_y=slider_height;
+						visualPositions[i]=int_pair(x, 0+top_padding);
+						x+=slider_width+slider_period;
+					break;
+				}
+			}
+			
+			height=bottom_padding+std::max(std::max(bus_y, bus_y2), top_padding+slider_y);
+			
+			width=x;
+			
+			for(int i=0;i<argsCount;++i)
+			{
+				if(argvis[i].visType==VT_OUTBUS)
+				{
+					visualPositions[i].first=x;
+				}
+			}
+			
+			width+=Bus::size+slider_period;
+			
+			
+			EffectGUI::initGUI(X, Y, width, height);
+		}
+		
+		virtual ~EffectAutoGUI()
+		{
+			delete [] visualPositions;
 		}
 		
 	};
@@ -417,25 +428,20 @@
 	};
 	
 	
-	class Playbuf : public EffectAutoGUI
+	class Playbuf : public EffectGUI
 	{
 		private:
 			static const int argsCount=2;
+			
 			EffectArgument args[argsCount];
 			ArgVis argsVis[argsCount];
-			char playbufFileName[MAX_PATH];
-		public:
-			static constexpr const char* name="eff_playbuf";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
 			
-			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
+			int_pair visualPositions[argsCount];
+			
+			char playbufFileName[MAX_PATH];
+			
+			void constructor(int X, int Y)
 			{
-				getOpenFile(playbufFileName, MAX_PATH);
-				
 				FILE* file=fopen(playbufFileName, "r");
 				
 				if(file==NULL) 
@@ -465,33 +471,51 @@
 				(*(std::string*)(argsVis[0].data)).erase(0, lastSlash+1);
 				
 				sendInstance(true); 
+				
 				initGUI(X, Y);
+				
+				int w, h;
+				SDL_QueryTexture(drawables[0].nameTex, NULL, NULL, &w, &h);
+				
+				visualPositions[0].first=EffectAutoGUI::slider_period + w/2;
+				visualPositions[1].first=EffectAutoGUI::slider_period + w + EffectAutoGUI::slider_period;
+				
+				width=visualPositions[1].first + Bus::size + EffectAutoGUI::slider_period;
+				height=visualPositions[1].second + Bus::size + EffectAutoGUI::bottom_padding;
+				updateDrawablePositions();
 			}
 			
-			Playbuf(int X, int Y, const char* data): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)})
+			
+		public:
+			static constexpr const char* name="eff_playbuf";
+			const char* getName() {return name;}
+			EffectArgument* getArgs() {return args;}
+			const int getArgsCount() {return argsCount;}
+			ArgVis* getArgumentVisuals() {return argsVis;}
+			int_pair* getVisualPositions() {return visualPositions;}
+			
+			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)}),
+			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding)})
 			{
-				sscanf(data, "%d %d %s", &X, &Y, playbufFileName);
+				getOpenFile(playbufFileName, MAX_PATH);
 				
-				int bufnum=OSCConn::loadBuffer(playbufFileName);
+				constructor(X, Y);
+			}
+			
+			Playbuf(const char* data): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)}),
+			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding)})
+			{
+				std::stringstream ss;
+				ss<<data;
+				int X, Y;
+				ss>>X>>Y;
 				
-				args[0].set(bufnum);
-				*(std::string*)(argsVis[0].data)=OSCConn::getBufferFileById(bufnum);
+				ss.ignore(1, ' ');
+				ss.getline(playbufFileName, MAX_PATH);
 				
-				int lastSlash=0;
-				
-				for(int i=1;playbufFileName[i]!='\0';++i)
-				{
-					if((playbufFileName[i]=='/' || playbufFileName[i]=='\\') && playbufFileName[i-1]!='\\')
-					{
-						lastSlash=i;
-					}
-				}
-				
-				(*(std::string*)(argsVis[0].data)).erase(0, lastSlash+1);
-				
-				sendInstance(true); 
-				initGUI(X, Y);
+				constructor(X, Y);
 			}
 			
 			

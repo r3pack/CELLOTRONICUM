@@ -104,9 +104,14 @@ void getSaveFile(char* filename, int size)
 int Bus::lastClicked=-1;
 int Bus::lastId=0;
 
+int ControllBus::lastClicked=-1;
+int ControllBus::lastId=0;
+
 class Bus;
 
 std::map <int, Bus*> busList;
+
+std::map <int, ControllBus*> controllBusList;
 
 std::set <std::pair <Bus*, Bus*> > connections;
 
@@ -220,6 +225,11 @@ bool Bus::setClicked()
 	return false;
 }
 
+bool ControllBus::setClicked()
+{
+	clicked=true;
+}
+	
 SDL_Texture* generateText(const char* text, SDL_Color color)
 {
 	SDL_Surface* text_surface=TTF_RenderUTF8_Blended(font, text, color);

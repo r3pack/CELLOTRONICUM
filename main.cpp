@@ -6,6 +6,7 @@
 #include "effects.h"
 #include "effectsdef.h"
 #include "graphics.h"
+#include "controllersdef.h"
 
 EffectCreator effectCreator;
 
@@ -31,6 +32,7 @@ int main (int argc, char** argv)
 	}
 	
 	registerEffects();
+	registerControllers();
 	
 	if(!OSCConn::connect()) exit(1);
 	
@@ -44,7 +46,11 @@ int main (int argc, char** argv)
 	
 	auto effectInstanceList=getEffectInstanceList();
 	
+	auto controllerInstanceList=getControllerInstanceList();
+	
 	bool quit = false;
+	
+	//MousePosXController mposx(100, 100);
 	
 	while (!quit)
 	{
@@ -65,6 +71,11 @@ int main (int argc, char** argv)
 							{
 								if(it->second->receiveClick(x, y, ME_PRESS))break;
 							}
+							
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								if(it->second->receiveClick(x, y, ME_PRESS))break;
+							}
 						}
 						else
 						if(event.button.button==SDL_BUTTON_RIGHT)
@@ -73,11 +84,23 @@ int main (int argc, char** argv)
 							{
 								if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
 							}
+							
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
+							}
 						}
 						else
 						if(event.button.button==SDL_BUTTON_MIDDLE)
 						{
 							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+							{
+								auto it2=it;
+								++it;
+								if(it2->second->receiveThridClick(x, y, ME_PRESS))break;
+							}
+							
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
 							{
 								auto it2=it;
 								++it;
@@ -96,6 +119,10 @@ int main (int argc, char** argv)
 							{
 								it->second->receiveClick(x, y, ME_RELEASE);
 							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								if(it->second->receiveClick(x, y, ME_RELEASE))break;
+							}
 						}
 						else
 						if(event.button.button==SDL_BUTTON_RIGHT)
@@ -104,11 +131,21 @@ int main (int argc, char** argv)
 							{
 								it->second->receiveSecondClick(x, y, ME_RELEASE);
 							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								it->second->receiveSecondClick(x, y, ME_RELEASE);
+							}
 						}
 						else
 						if(event.button.button==SDL_BUTTON_MIDDLE)
 						{
 							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+							{
+								auto it2=it;
+								++it;
+								it2->second->receiveThridClick(x, y, ME_RELEASE);
+							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
 							{
 								auto it2=it;
 								++it;
@@ -127,6 +164,10 @@ int main (int argc, char** argv)
 							{
 								if(it->second->receiveClick(x, y, ME_REPEAT))break;
 							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								if(it->second->receiveClick(x, y, ME_REPEAT))break;
+							}
 						}
 						else
 						if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -135,11 +176,21 @@ int main (int argc, char** argv)
 							{
 								if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
 							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+							{
+								if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
+							}
 						}
 						else
 						if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE))
 						{
 							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+							{
+								auto it2=it;
+								++it;
+								if(it2->second->receiveThridClick(x, y, ME_REPEAT))break;
+							}
+							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
 							{
 								auto it2=it;
 								++it;
@@ -177,6 +228,11 @@ int main (int argc, char** argv)
 			it->second->draw();
 		}
 		
+		for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+		{
+			it->second->draw();
+		}
+
 		drawConnections();
 		effectCreator.draw(SCREEN_WIDTH-20, 0);
 		

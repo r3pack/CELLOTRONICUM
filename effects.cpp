@@ -1,7 +1,8 @@
 #include "effects.h"
 #include "osc.h"
 #include "effectsdef.h"
-
+#include "controllers.h"
+#include "controllersdef.h"
 
 const int MAX_EFFECTS_COUNT=1000;
 
@@ -528,7 +529,7 @@ void Effect::loadFromFile(const char* filename)
 			
 			buf[i]='\0';
 			
-			if(playbuf) eff=new Playbuf(0, 0, buf+begin);
+			if(playbuf) eff=new Playbuf(buf+begin);
 			else
 			eff->loadData(buf+begin);
 		}
@@ -603,6 +604,11 @@ void EffectCreator::enter()
 	{
 		int x, y;
 		SDL_GetMouseState(&x, &y);
+		
+		if(strncmp(chosenEffect->name, "ctr_", 4)==0)
+		getController(chosenEffect->name, x, y);
+		else
+		if(strncmp(chosenEffect->name, "eff_", 4)==0)
 		getEffect(chosenEffect->name, x, y);
 	}
 	else
@@ -633,6 +639,15 @@ void EffectCreator::init()
 
 		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
 	}
+	
+	auto mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false))).first;
+	
+	for(auto it=getControllerList()->begin();it!=getControllerList()->end();++it)
+	{
+		const char* name=(*it);
+		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+	}
+	
 	for(auto it=chosenEffect->submenuEntries->begin();it!=chosenEffect->submenuEntries->end();++it)
 	{
 		(*it).second->calculateWidth();
