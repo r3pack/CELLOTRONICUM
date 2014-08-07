@@ -121,7 +121,7 @@ int main (int argc, char** argv)
 							}
 							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
 							{
-								if(it->second->receiveClick(x, y, ME_RELEASE))break;
+								it->second->receiveClick(x, y, ME_RELEASE);
 							}
 						}
 						else

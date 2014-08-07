@@ -7,14 +7,24 @@ class MousePosController : public Controller
 {
 	public:
 	
-	static constexpr const char* name="ctr_mouseposx";
+	static constexpr const char* name="ctr_mousepos";
+	static constexpr int busCount=2;
+	const char* busNames[busCount]={"posX", "posY"};
+	
 	const char* getName() {return name;}
+	int getBusCount() {return busCount;}
+	const char* const* getBusNames() {return busNames;}
 	MousePosController(int X, int Y)
 	{
 		initGUI(X, Y);
 	}
 	
-	float getValue(int id) {return 0.0f;}
+	float getValue(int id) 
+	{
+		int pos[2];
+		SDL_GetMouseState(&pos[0], &pos[1]);
+		return pos[id];
+	}
 };
 
 void registerControllers();

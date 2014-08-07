@@ -7,9 +7,8 @@
 	struct ParamDrawable
 	{
 		Drawable* drawable;
-		int param;
 		SDL_Texture* nameTex=NULL;
-		ParamDrawable(Drawable* d, int p, const char* text): drawable(d), param(p) {nameTex=generateText(text);}
+		ParamDrawable(Drawable* d, const char* text): drawable(d) {nameTex=generateText(text);}
 		
 		void draw() 
 		{
@@ -91,8 +90,8 @@
 		
 		public:
 		
-		static constexpr int slider_width=30;
-		static constexpr int slider_height=160;
+		static const int slider_width=30;
+		static const int slider_height=160;
 		
 		virtual int_pair* getVisualPositions()=0;
 		
@@ -120,20 +119,20 @@
 				switch(argvis[i].visType)
 				{
 					case VT_INBUS:
-					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_INBUS, this, i), i, args[i].getName()));
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_INBUS, this, i), args[i].getName()));
 					break;
 					case VT_OUTBUS:
-					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_OUTBUS, this, i), i, args[i].getName()));
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_OUTBUS, this, i), args[i].getName()));
 					break;
 					case VT_SLIDER:
 					{
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
-						drawables.push_back(ParamDrawable(new Slider(posX+argpos[i].first, posY+argpos[i].second, slider_width, slider_height, min, max, args[i].getFloatValue()), i, args[i].getName()));
+						drawables.push_back(ParamDrawable(new Slider(posX+argpos[i].first, posY+argpos[i].second, slider_width, slider_height, min, max, args[i].getFloatValue(), this, i), args[i].getName()));
 					}
 					break;
 					case VT_TEXT:
-						drawables.push_back(ParamDrawable(new Point(posX+argpos[i].first, posY+argpos[i].second), i, ((std::string*)argvis[i].data)->c_str()));
+						drawables.push_back(ParamDrawable(new Point(posX+argpos[i].first, posY+argpos[i].second), ((std::string*)argvis[i].data)->c_str()));
 					break;
 				}
 			}
@@ -172,7 +171,7 @@
 			rect.x = posX; rect.y = posY;
 			rect.w = width;
 			rect.h = height;
-			SDL_SetRenderDrawColor(render, 220, 220, 220, 255);
+			SDL_SetRenderDrawColor(render, 0xE9, 0xF1, 0xFE, 255);
 			SDL_RenderFillRect(render, &rect);
 			SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
 			SDL_RenderDrawRect(render, &rect);
@@ -216,13 +215,7 @@
 			
 			for(int i=0;i<drawables.size();++i)
 			{
-				if(drawables[i].drawable->receiveClick(X, Y, me))
-				{
-					if(argumentVisuals[i].visType==VT_SLIDER)
-					{
-						setAndSendArgument(drawables[i].param, ((Slider*)drawables[i].drawable)->getValue());
-					}
-				}
+				if(drawables[i].drawable->receiveClick(X, Y, me)) break;
 			}
 			
 			return true;
@@ -230,6 +223,10 @@
 		
 		bool receiveSecondClick(int X, int Y, MouseEvent me)
 		{
+			for(int i=0;i<drawables.size();++i)
+			{
+				if(drawables[i].drawable->receiveSecondClick(X, Y, me)) return true;
+			}
 			if(me==ME_PRESS)
 			{
 				if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)
@@ -329,10 +326,10 @@
 		
 		public:
 		
-		static constexpr int slider_period=20;
-		static constexpr int top_padding=35;
-		static constexpr int bottom_padding=30;
-		static constexpr int bus_period=35;
+		static const int slider_period=20;
+		static const int top_padding=35;
+		static const int bottom_padding=30;
+		static const int bus_period=35;
 		
 		std::pair<int, int>* getVisualPositions()
 		{

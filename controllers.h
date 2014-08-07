@@ -52,26 +52,51 @@ class Controller{
 	int handlePosX, handlePosY;
 	
 	bool focus=false;
+	bool paused=false;
+	
+	Button* pauseButton;
 	
 	protected:
 	
 	std::vector <ParamControllBus> outBuses;
 	
+	std::vector <std::pair<int, Slider*> > controlledSliders;
+	
 	int posX, posY;
 	
-	int width=height;
+	int width=0;
 	
 	public:
+	static const int bus_period=35;
+	static const int top_padding=35;
+	static const int bottom_padding=30;
 	
-	static constexpr int bus_period=30;
-	static constexpr int height=50;
+	
+	virtual float getValue(int id) = 0;
+	virtual bool valueIsReady(int id) {return true;}
+	virtual const char* getName() = 0;
+	virtual int getBusCount() = 0;
+	virtual const char* const* getBusNames() = 0;
+	
+	static constexpr int height=top_padding+bottom_padding+ControllBus::size;
 	
 	int getId() {return id;}
+	
+	bool isPaused() {return paused;}
 	
 	Controller()
 	{
 		id=lastId++;
 		getControllerInstanceList()->insert(std::pair<int, Controller*>(id, this));
+	}
+	
+	void step()
+	{
+		for(int i=0;i<controlledSliders.size();++i)
+		{
+			if(valueIsReady(controlledSliders[i].first))
+			controlledSliders[i].second->setNormalizedValue(getValue(controlledSliders[i].first));
+		}
 	}
 	
 	void initGUI(int X, int Y)
@@ -80,12 +105,19 @@ class Controller{
 		posY=Y;
 		nameTex=generateText(getName());
 		
-		for(int i=0;i<outBuses.size();++i)
+		pauseButton=new Button(X, Y, 0);
+		
+		int x=bus_period;
+		
+		int busCount=getBusCount();
+		for(int i=0;i<busCount;++i)
 		{
-			ControllBus* bus=new ControllBus(X, Y, BT_OUTBUS, this);
-			outBuses.push_back(ParamControllBus(bus, i, getName()));
+			ControllBus* bus=new ControllBus(posX+x, posY+top_padding, BT_OUTBUS, this);
+			outBuses.push_back(ParamControllBus(bus, i, getBusNames()[i]));
 			controllerByBus.insert(std::pair<ControllBus*, Controller*>(bus, this));
+			x+=bus_period+ControllBus::size;
 		}
+		width=x;
 	}
 	
 	virtual ~Controller()
@@ -97,11 +129,9 @@ class Controller{
 		getControllerInstanceList()->erase(id);
 		
 		SDL_DestroyTexture(nameTex);
+		
+		delete pauseButton;
 	}
-	
-	
-	virtual float getValue(int id) = 0;
-	virtual const char* getName() = 0;
 	
 	void setPos(int X, int Y)
 	{
@@ -109,12 +139,20 @@ class Controller{
 		{
 			outBuses[i].bus->move(X-posX, Y-posY);
 		}
+		pauseButton->move(X-posX, Y-posY);
+		posX=X;
+		posY=Y;
 	}
 	
 	bool receiveClick(int X, int Y, MouseEvent me)
 	{
 		if(!(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)) return false;
 
+		if(pauseButton->receiveClick(X, Y, me)) 
+		{
+			paused=!paused;
+		}
+		
 		for(int i=0;i<outBuses.size();++i)
 		{
 			outBuses[i].bus->receiveClick(X, Y, me);
@@ -170,7 +208,7 @@ class Controller{
 		rect.x = posX; rect.y = posY;
 		rect.w = width;
 		rect.h = height;
-		SDL_SetRenderDrawColor(render, 220, 220, 220, 255);
+		SDL_SetRenderDrawColor(render, 0xE9, 0xF1, 0xFE, 255);
 		SDL_RenderFillRect(render, &rect);
 		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
 		SDL_RenderDrawRect(render, &rect);
@@ -186,6 +224,10 @@ class Controller{
 		nameRect.h=h;
 		
 		SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+		
+		pauseButton->setSymbol(int(isPaused()));
+		pauseButton->draw();
+		
 		
 		for(int i=0;i<outBuses.size();++i)
 		{

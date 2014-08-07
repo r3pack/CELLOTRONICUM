@@ -107,6 +107,9 @@ int Bus::lastId=0;
 int ControllBus::lastClicked=-1;
 int ControllBus::lastId=0;
 
+int Slider::lastClicked=-1;
+int Slider::lastId=0;
+
 class Bus;
 
 std::map <int, Bus*> busList;
@@ -225,9 +228,10 @@ bool Bus::setClicked()
 	return false;
 }
 
-bool ControllBus::setClicked()
+void Slider::setValue(float v)
 {
-	clicked=true;
+	value=v;
+	effect->setAndSendArgument(argument, value);
 }
 	
 SDL_Texture* generateText(const char* text, SDL_Color color)
