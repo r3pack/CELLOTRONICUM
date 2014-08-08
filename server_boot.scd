@@ -287,8 +287,8 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		var buf;
-		(~p +/+ msg[1]).postln;
-		buf = Buffer.read(s, ~p +/+ msg[1]);
+		(msg[1]).postln;
+		buf = Buffer.read(s, msg[1]);
 		~b.add( buf.bufnum -> buf);
 		buf.postln;
 		~app_netaddr.sendMsg('\new_buffer', buf.bufnum);

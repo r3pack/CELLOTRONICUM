@@ -1,18 +1,13 @@
 #include "effects.h"
 #include "osc.h"
-
+#include "effectsdef.h"
+#include "controllers.h"
+#include "controllersdef.h"
 
 const int MAX_EFFECTS_COUNT=1000;
 
-struct cmpCStr
-{
-   bool operator()(char const *a, char const *b)
-   {
-      return std::strcmp(a, b) < 0;
-   }
-};
+std::map<const char*, std::pair<const char*, bool>, cmpCStr> effectsList;
 
-std::map<const char*, bool, cmpCStr> effectsList;
 
 bool checkEffectsList()
 {
@@ -45,7 +40,7 @@ bool checkEffectsList()
 					if(it != effectsList.end())
 					{
 						fprintf(stderr, ", which exist on client side (OK)\n");
-						(*it).second=true;
+						(*it).second.second=true;
 					}
 					else
 					{
@@ -69,7 +64,7 @@ bool checkEffectsList()
 	
 	for(auto it=effectsList.begin();it!=effectsList.end();++it)
 	{
-		if(!((*it).second)) 
+		if(!((*it).second.second)) 
 		{
 			gotAllEffects=false;
 			fprintf(stderr, "Effect '%s' not found on server side!!! Program will be closed!\n", (*it).first);
@@ -183,45 +178,45 @@ Effect::~Effect()
 
 void Effect::setArgument(int argId, int value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::setArgument(int argId, float value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::setArgument(int argId, std::string value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 }
 
 void Effect::sendArgument(int argId)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, int value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, float value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
 
 void Effect::setAndSendArgument(int argId, std::string value)
 {
-	EffectArgument* args=getAgrs();
+	EffectArgument* args=getArgs();
 	args[argId].set(value);
 	args[argId].sendArgument(id);
 }
@@ -270,8 +265,8 @@ void Effect::sendInstance(bool paused)
 	msg.init("/new_effect_instance");
 	const char* name=getName();
 	msg.pushInt32(id).pushStr(name);
-	int argsCount=getAgrsCount();
-	EffectArgument* args=getAgrs();
+	int argsCount=getArgsCount();
+	EffectArgument* args=getArgs();
 	for(int i=0;i<argsCount;++i)
 	{
 		args[i].addArgumentToMessage(&msg);
@@ -382,7 +377,7 @@ void Effect::updateTopologicalSequence()
 		
 	}
 	
-	effectInstanceList[sequence[0]]->moveToHead();
+	//effectInstanceList[sequence[0]]->moveToHead();
 	
 	for(int i=1;i<sequence.size();++i)
 	{
@@ -457,50 +452,241 @@ void Effect::moveToHead()
 	
 }
 
+void Effect::saveToFile(const char* filename)
+{
+	printf("Saving session to file '%s'\n", filename);
+	FILE* file=fopen(filename, "wb");
+	
+	if(file==NULL)
+	{
+		fprintf(stderr, "Cannot open file to save data\n");
+		return;
+	}
+	
+	for(auto it=effectInstanceList.begin();it!=effectInstanceList.end();++it)
+	{
+		Effect* effect=(*it).second;
+		fprintf(file, "effect %s %d \"", effect->getName(), effect->getId());
+		effect->saveData(file);
+		fprintf(file, "\"\n");
+	}
+	
+	for(auto it=getConnections()->begin();it!=getConnections()->end();++it)
+	{
+		fprintf(file, "connection %d %d %d %d\n", (*it).first->getEffect()->getId(), (*it).first->getArg(), (*it).second->getEffect()->getId(), (*it).second->getArg());
+	}
+	
+	fclose(file);
+}
+
+void Effect::loadFromFile(const char* filename)
+{
+	printf("Loading session from file '%s'\n", filename);
+	FILE* file=fopen(filename, "rb");
+	
+	if(file==NULL)
+	{
+		fprintf(stderr, "Cannot open file to load data\n");
+		return;
+	}
+	int maxId=lastId-1;
+	
+	char buf[2048];
+	
+	
+	while(fscanf(file, "%s", buf)!=-1)
+	{
+		if(strcmp(buf, "effect")==0)
+		{
+			int id;
+			fscanf(file, "%s %d", buf, &id);
+			
+			lastId=id;
+			if(id>maxId) maxId=id;
+			
+			Effect* eff;
+			
+			bool playbuf=false;
+			
+			if(strcmp(buf, "eff_playbuf")==0) playbuf=true;
+			else
+			eff=getEffect(buf);
+			
+			fgets(buf, 2048, file);
+			
+			int begin;
+			int i=0;
+			for(;buf[i]!='\"';++i) {} i+=1;
+			
+			begin=i;
+			
+			for(;buf[i]!='\"';++i)
+			{
+				if(buf[i]=='\0') 
+				fgets(buf+i, 2048-i, file);
+			}
+			
+			
+			buf[i]='\0';
+			
+			if(playbuf) eff=new Playbuf(buf+begin);
+			else
+			eff->loadData(buf+begin);
+		}
+		else if(strcmp(buf, "connection")==0)
+		{
+			int effId1, effId2, arg1, arg2;
+			fscanf(file, "%d %d %d %d", &effId1, &arg1, &effId2, &arg2);
+			
+			Effect* eff1=effectInstanceList[effId1];
+			Effect* eff2=effectInstanceList[effId2];
+			
+			Bus* bus1, *bus2;
+			
+			for(auto it=busList.begin();it!=busList.end();++it)
+			{
+				Bus* bus=(*it).second;
+				if(bus->getEffect()==eff1 && bus->getArg()==arg1) bus1=bus;
+				if(bus->getEffect()==eff2 && bus->getArg()==arg2) bus2=bus;
+			}
+			
+			bus1->setClicked();
+			bus2->setClicked();
+		}
+	}
+	lastId=maxId+1;
+}
+
 void EffectCreator::moveUp() 
 {
-	chosenEffect=(chosenEffect+nameTexs.size()-1)%nameTexs.size();
-	if(chosenEffect==nameTexs.size()-1) it=--effectsList.end();
-	else
-	--it;
+	EffectCreatorMenuEntry* parent=chosenEffect->parent;
+	if(parent==NULL) return;
+	
+	auto it=parent->submenuEntries->begin();
+	for(;it!=parent->submenuEntries->end();++it)
+	{
+		if((*it).second==chosenEffect) break;
+	}
+	
+	if(it==parent->submenuEntries->begin())
+	{
+		it=--parent->submenuEntries->end();
+	}
+	else --it;
+	
+	chosenEffect=(*it).second;
 }
 
 void EffectCreator::moveDown()
 {
-	chosenEffect=(chosenEffect+1)%nameTexs.size();
-	if(chosenEffect==0) it=effectsList.begin();
-	else
+	EffectCreatorMenuEntry* parent=chosenEffect->parent;
+	if(parent==NULL) return;
+	
+	auto it=parent->submenuEntries->begin();
+	for(;it!=parent->submenuEntries->end();++it)
+	{
+		if((*it).second==chosenEffect) break;
+	}
+	
 	++it;
+	
+	if(it==parent->submenuEntries->end())
+	{
+		it=parent->submenuEntries->begin();
+	}
+	
+	chosenEffect=(*it).second;
+}
+
+void EffectCreator::enter()
+{
+	if(chosenEffect->submenuEntries==NULL)
+	{
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		
+		if(strncmp(chosenEffect->name, "ctr_", 4)==0)
+		getController(chosenEffect->name, x, y);
+		else
+		if(strncmp(chosenEffect->name, "eff_", 4)==0)
+		getEffect(chosenEffect->name, x, y);
+	}
+	else
+	{
+		chosenEffect=chosenEffect->submenuEntries->begin()->second;
+	}
+}
+
+void EffectCreator::back()
+{
+	if(chosenEffect->parent->parent!=NULL)
+	chosenEffect=chosenEffect->parent;
 }
 
 void EffectCreator::init()
 {
+	chosenEffect=new EffectCreatorMenuEntry("", NULL, false);
 	for(auto it=effectsList.begin();it!=effectsList.end();++it)
 	{
-		nameTexs.push_back(std::pair<SDL_Texture*, SDL_Texture*>(generateText((*it).first), generateText((*it).first, {255, 0, 0})));
-		int w, h;
-		SDL_QueryTexture(nameTexs.back().first, NULL, NULL, &w, &h);
-		height+=h;
-		width=std::max(width, w);
+		const char* name=(*it).first;
+		const char* group=(*it).second.first;
+		
+		auto mapIt=chosenEffect->submenuEntries->find(group);
+		if(mapIt==chosenEffect->submenuEntries->end())
+		{
+			mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(group, new EffectCreatorMenuEntry(group, chosenEffect, false))).first;
+		}
+
+		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
 	}
-	it=effectsList.begin();
+	
+	auto mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false))).first;
+	
+	for(auto it=getControllerList()->begin();it!=getControllerList()->end();++it)
+	{
+		const char* name=(*it);
+		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+	}
+	
+	for(auto it=chosenEffect->submenuEntries->begin();it!=chosenEffect->submenuEntries->end();++it)
+	{
+		(*it).second->calculateWidth();
+	}
+	
+	chosenEffect->calculateWidth();
+	
+	chosenEffect=chosenEffect->submenuEntries->begin()->second;
 }
 
 void EffectCreator::draw(int X, int Y)
 {
-	for(int i=0;i<nameTexs.size();++i)
-	{
+	EffectCreatorMenuEntry* actualEntry=chosenEffect;
+	EffectCreatorMenuEntry* oldEntry=NULL;
+
+	
+	while(1)
+	{	
+		int newY=Y;
 		
-		SDL_Texture* nameTex=((i!=chosenEffect)?nameTexs[i].first:nameTexs[i].second);
-		int w, h;
-		SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
-		SDL_Rect nameRect;
-		nameRect.x=X;
-		nameRect.y=Y;
-		nameRect.w=w;
-		nameRect.h=h;
-		SDL_RenderCopy(render, nameTex, NULL, &nameRect);
-		Y+=h;
+		oldEntry=actualEntry;
+		actualEntry=actualEntry->parent;
+		
+		if(actualEntry==NULL) break;
+	
+		X-=actualEntry->width+menu_period;
+		for(auto it=actualEntry->submenuEntries->begin();it!=actualEntry->submenuEntries->end();++it)
+		{
+			SDL_Texture* nameTex=(((*it).second==oldEntry)?(*it).second->nameTexRed:(*it).second->nameTex);
+			int w, h;
+			SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
+			SDL_Rect nameRect;
+			nameRect.x=X;
+			nameRect.y=newY;
+			nameRect.w=w;
+			nameRect.h=h;
+			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+			newY+=h;
+		}
 	}
 }
 
@@ -517,14 +703,16 @@ void EffectCreator::receiveKeyboardEvent(SDL_Scancode scancode)
 			moveDown();
 		break;
 		case SDL_SCANCODE_RETURN:
-			int x, y;
-			SDL_GetMouseState(&x, &y);
-			getEffect((*it).first, x, y);
+			enter();
+		break;
+		case SDL_SCANCODE_BACKSPACE:
+		case SDL_SCANCODE_LEFT:
+			back();
 		break;
 	}
 }
 
-void registerEffect(const char* name) 
+void registerEffect(const char* name, const char* group) 
 {
-	effectsList.insert(std::pair<const char*, bool>(name, false));
+	effectsList.insert(std::pair<const char*, std::pair<const char*, bool> >(name, std::pair<const char*, bool>(group, false)));
 }

@@ -8,7 +8,7 @@ const char* OSCConn::serverAddress="localhost";
 
 UdpSocket OSCConn::sock;
 
-std::map <int, const char*> OSCConn::bufferFileById;
+std::map <int, std::string> OSCConn::bufferFileById;
 
 bool OSCConn::connect() 
 {
@@ -188,7 +188,7 @@ int OSCConn::loadBuffer(const char* filename)
 				{
 					int bufnum=-1;
 					incomingMsg->arg().popInt32(bufnum);
-					bufferFileById.insert(std::pair<int, const char*>(bufnum, filename));
+					bufferFileById.insert(std::pair<int, std::string>(bufnum, std::string(filename)));
 					fprintf(stderr, "Loaded buffer which number: %d\n", bufnum);
 					return bufnum;
 				}
@@ -197,7 +197,7 @@ int OSCConn::loadBuffer(const char* filename)
 	}
 }
 
-const char* OSCConn::getBufferFileById(int id)
+std::string OSCConn::getBufferFileById(int id)
 {
 	auto it=bufferFileById.find(id);
 	if(it==bufferFileById.end())
