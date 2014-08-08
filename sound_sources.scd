@@ -82,9 +82,10 @@ x = Synth.new(\eff_octave_up, [\inbus, 8, \outbus, 0, \freq_bus, 16]);
 */
 //WAŻNE: PD - czas w ms, tutaj w sekundach!!!
 
-SynthDef.new(\eff_octave_up, { //TODO - freq_bus lub wstawić Tartini!
-	arg inbus=8, outbus=0, freq, mul;
+SynthDef.new(\eff_octave_up, {
+	arg inbus=8, outbus=0, freq_bus, mul;
 	var in = In.ar(inbus,1);
+	var freq = In.kr(freq_bus,1);
 	var del2, res;
 	del2 = (0.5/freq);
 	res = (in + DelayC.ar(in,10,del2)) * mul;
@@ -92,11 +93,13 @@ SynthDef.new(\eff_octave_up, { //TODO - freq_bus lub wstawić Tartini!
 }).add;
 
 SynthDef.new(\eff_octave_down, { //TODO - freq_bus lub wstawić Tartini!
-	arg inbus=8, outbus=0, freq, mul;
+	arg inbus=8, outbus=0, freq_bus, mul;
 	var in = In.ar(inbus,1);
+	var freq = In.kr(freq_bus,1);
 	var res = (in*SinOsc.ar(freq*0.5))*mul;
 	Out.ar(outbus, res);
 }).add;
+
 /* WERSJA PRZEZ BUSY - nie działa!!!
 SynthDef.new(\eff_shepard_tone_from_input, {
 	arg inbus=8, outbus=0, amp=0.5;
@@ -131,8 +134,8 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 	arg inbus=8, outbus=0; //, amp=0.5;
 	var in = In.ar(inbus,1);
 	var freq, hasFreq, res, poprz;
-	var plus = [0,0,0,0,0];
-	var minus = [0,0,0,0,0];
+	var plus = [0,0,0,0,0,0,0];
+	var minus = [0,0,0,0,0,0,0];
 	var ile = 7;
 	var mi = (9.0702947845805e-005*10000);
 	var frq,hf, ostatnia_deska_ratunku;
@@ -140,7 +143,7 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 	freq.poll;
 	frq=freq;
 	poprz = in;
-	for(0,4,{ |i|
+	for(0,6,{ |i|
 		hf= 1/(2*frq);
 		//ostatnia_deska_ratunku = max(mi,hf);
 		plus[i] = poprz + DelayN.ar(poprz,1,hf); //Select.ar( hf>mi ,[DC.ar(0), poprz + DelayN.ar(poprz,1,hf)]);
@@ -149,7 +152,7 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 	});
 	frq=freq;
 	poprz=in;
-	for(0,4,{ |i|
+	for(0,6,{ |i|
 		minus[i] = poprz*SinOsc.ar(freq/2);
 		poprz = minus[i];
 		frq=2*frq;
@@ -159,6 +162,36 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 	//res = plus[0];
 	minus.do({ |e| res=res+e});
 	res = res/11;
+	Out.ar(outbus, res);
+}).add;
+
+SynthDef.new(\eff_shepard_cycle_tone_from_input, {
+	arg inbus=8, outbus=0; //, amp=0.5;
+	var in = In.ar(inbus,1);
+	var freq, hasFreq, res, poprz;
+	var which;
+	var all = [0,0,0, 0,0,0, 0,0,0, in, 0,0,0, 0,0,0, 0,0,0];
+	var mi = (9.0702947845805e-005*10000);
+	var frq,hf;
+	# freq, hasFreq = Tartini.kr(in);
+	freq.poll;
+	which = min(max(0,floor(18-log2(freq))),18);
+	frq=freq;
+	poprz = in;
+	for(10,18,{ |i|
+		hf= 1/(2*frq);
+		all[i] = poprz + DelayN.ar(poprz,1,hf);
+		frq=frq*2;
+		poprz = all[i];
+	});
+	frq=freq;
+	poprz=in;
+	for(8,0,{ |i|
+		all[i] = poprz*SinOsc.ar(freq/2);
+		poprz = all[i];
+		frq=2*frq;
+	});
+	res = SelectXFocus(which,all,3);
 	Out.ar(outbus, res);
 }).add;
 
