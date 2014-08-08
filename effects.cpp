@@ -471,6 +471,14 @@ void Effect::saveToFile(const char* filename)
 		fprintf(file, "\"\n");
 	}
 	
+	for(auto it=getControllerInstanceList()->begin();it!=getControllerInstanceList()->end();++it)
+	{
+		Controller* controller=(*it).second;
+		fprintf(file, "controller %s %d \"", controller->getName(), controller->getId());
+		controller->saveData(file);
+		fprintf(file, "\"\n");
+	}
+	
 	for(auto it=getConnections()->begin();it!=getConnections()->end();++it)
 	{
 		fprintf(file, "connection %d %d %d %d\n", (*it).first->getEffect()->getId(), (*it).first->getArg(), (*it).second->getEffect()->getId(), (*it).second->getArg());
@@ -532,6 +540,34 @@ void Effect::loadFromFile(const char* filename)
 			if(playbuf) eff=new Playbuf(buf+begin);
 			else
 			eff->loadData(buf+begin);
+		}
+		else if(strcmp(buf, "controller")==0)
+		{
+			int id;
+			fscanf(file, "%s %d", buf, &id);
+			
+			Controller::lastId=id;
+			if(id>maxId) maxId=id;
+			
+			Controller* ctr=getController(buf);
+			
+			fgets(buf, 2048, file);
+			
+			int begin;
+			int i=0;
+			for(;buf[i]!='\"';++i) {} i+=1;
+			
+			begin=i;
+			
+			for(;buf[i]!='\"';++i)
+			{
+				if(buf[i]=='\0') 
+				fgets(buf+i, 2048-i, file);
+			}
+			
+			buf[i]='\0';
+			
+			ctr->loadData(buf+begin);
 		}
 		else if(strcmp(buf, "connection")==0)
 		{

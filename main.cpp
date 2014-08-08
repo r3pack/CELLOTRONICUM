@@ -50,8 +50,6 @@ int main (int argc, char** argv)
 	
 	bool quit = false;
 	
-	//MousePosXController mposx(100, 100);
-	
 	while (!quit)
 	{
 		while (SDL_PollEvent(&event))
@@ -219,6 +217,10 @@ int main (int argc, char** argv)
 			}
 		}
 		
+		for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+		{
+			it->second->step();
+		}
 		
 		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 		SDL_RenderClear(render);

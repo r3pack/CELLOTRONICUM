@@ -1,6 +1,7 @@
 #ifndef CONTROLLERS_H
 #define CONTROLLERS_H
 #include "graphics.h"
+#include <list>
 #include <vector>
 #include <cstring>
 
@@ -44,6 +45,10 @@ struct ParamControllBus
 };
 
 class Controller{
+	friend class ControllBus;
+	friend class Slider;
+	friend class Effect;
+
 	int id;
 	static int lastId;
 	
@@ -60,7 +65,7 @@ class Controller{
 	
 	std::vector <ParamControllBus> outBuses;
 	
-	std::vector <std::pair<int, Slider*> > controlledSliders;
+	std::list <std::pair<int, Slider*> > controlledSliders;
 	
 	int posX, posY;
 	
@@ -92,10 +97,10 @@ class Controller{
 	
 	void step()
 	{
-		for(int i=0;i<controlledSliders.size();++i)
+		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
 		{
-			if(valueIsReady(controlledSliders[i].first))
-			controlledSliders[i].second->setNormalizedValue(getValue(controlledSliders[i].first));
+			if(valueIsReady(it->first))
+			it->second->setNormalizedValue(getValue(it->first));
 		}
 	}
 	
@@ -126,6 +131,12 @@ class Controller{
 		{
 			controllerByBus.erase(outBuses[i].bus);
 		}
+		
+		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+		{
+			it->second->controlledBy=NULL;
+		}
+		
 		getControllerInstanceList()->erase(id);
 		
 		SDL_DestroyTexture(nameTex);
@@ -162,6 +173,10 @@ class Controller{
 	
 	bool receiveSecondClick(int X, int Y, MouseEvent me)
 	{
+		for(int i=0;i<outBuses.size();++i)
+		{
+			if(outBuses[i].bus->receiveSecondClick(X, Y, me)) return true;
+		}
 		if(me==ME_PRESS)
 		{
 			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)
@@ -202,6 +217,10 @@ class Controller{
 		else return false;
 	}
 	
+	void saveData(FILE* file);
+	
+	void loadData(char* str);
+	
 	void draw()
 	{
 		SDL_Rect rect;
@@ -228,10 +247,17 @@ class Controller{
 		pauseButton->setSymbol(int(isPaused()));
 		pauseButton->draw();
 		
-		
 		for(int i=0;i<outBuses.size();++i)
 		{
 			outBuses[i].draw();
+		}
+		
+		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+		{
+			ControllBus* bus=outBuses[it->first].bus;
+			Slider* slider=it->second;
+			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
+								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY());
 		}
 		
 	}

@@ -72,6 +72,8 @@
 	
 	class EffectGUI : public Effect
 	{	
+		friend class Controller;
+	
 		Button* pauseButton;
 		
 		int handlePosX, handlePosY;
