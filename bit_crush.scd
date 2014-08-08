@@ -54,6 +54,16 @@ SynthDef.new(\eff_mobile_phone_lag2, {
 	Out.ar(outbus, res);
 }).add;
 
+SynthDef.new(\eff_mobile_phone_lag3, {
+	arg inbus=8, outbus=0, freq=5, width=0.5;
+	var in = In.ar(inbus,1);
+	var hfreq = freq/2;
+	var hwid  = width/2;
+	var pulse = Pulse.ar(PinkNoise.kr(freq),WhiteNoise.kr(width));
+	var res = in*BBandPass.ar(pulse,5,3);
+	Out.ar(outbus, res);
+}).add;
+
 /* TESTS
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 b.bufnum.postln;
@@ -71,8 +81,12 @@ x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 0]);
 y = Synth.new(\eff_mobile_phone_lag2, [\inbus, 16, \outbus, 0, \freq, 5, \width, 0.5]);
 x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 0]);
 
-y = Synth.new(\eff_mobile_phone_lag2, [\inbus, 16, \outbus, 0, \freq, 3, \width, 0.7]);
-x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 0]);
+y = Synth.new(\eff_mobile_phone_lag2, [\inbus, 16, \outbus, 0, \freq, 10, \width, 0.9]);
+x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 2]);
+
+y = Synth.new(\eff_mobile_phone_lag3, [\inbus, 16, \outbus, 0, \freq, 5, \width, 0.5]);
+x = Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 2]);
+
 
 s.stopRecording;
 */
