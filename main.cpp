@@ -18,6 +18,188 @@ void waitFor(int ms)
 
 char fileStr[MAX_PATH];
 
+bool checkInputs()
+{
+	bool quit = false;
+	
+	auto effectInstanceList=getEffectInstanceList();
+	
+	auto controllerInstanceList=getControllerInstanceList();
+
+	while (SDL_PollEvent(&event))
+	{
+		switch(event.type)
+		{
+			case SDL_QUIT:
+				quit = true;
+			break;
+			case SDL_MOUSEBUTTONDOWN:
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					if(event.button.button==SDL_BUTTON_LEFT)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							if(it->second->receiveClick(x, y, ME_PRESS))break;
+						}
+						
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							if(it->second->receiveClick(x, y, ME_PRESS))break;
+						}
+					}
+					else
+					if(event.button.button==SDL_BUTTON_RIGHT)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
+						}
+						
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
+						}
+					}
+					else
+					if(event.button.button==SDL_BUTTON_MIDDLE)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+						{
+							auto it2=it;
+							++it;
+							if(it2->second->receiveThridClick(x, y, ME_PRESS))break;
+						}
+						
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							auto it2=it;
+							++it;
+							if(it2->second->receiveThridClick(x, y, ME_PRESS))break;
+						}
+					}
+				}
+			break;
+			case SDL_MOUSEBUTTONUP:
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					if(event.button.button==SDL_BUTTON_LEFT)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							it->second->receiveClick(x, y, ME_RELEASE);
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							it->second->receiveClick(x, y, ME_RELEASE);
+						}
+					}
+					else
+					if(event.button.button==SDL_BUTTON_RIGHT)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							it->second->receiveSecondClick(x, y, ME_RELEASE);
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							it->second->receiveSecondClick(x, y, ME_RELEASE);
+						}
+					}
+					else
+					if(event.button.button==SDL_BUTTON_MIDDLE)
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+						{
+							auto it2=it;
+							++it;
+							it2->second->receiveThridClick(x, y, ME_RELEASE);
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							auto it2=it;
+							++it;
+							it2->second->receiveThridClick(x, y, ME_RELEASE);
+						}
+					}
+				}
+			break;
+			case SDL_MOUSEMOTION:
+				{
+					int x=event.button.x;
+					int y=event.button.y;
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							if(it->second->receiveClick(x, y, ME_REPEAT))break;
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							if(it->second->receiveClick(x, y, ME_REPEAT))break;
+						}
+					}
+					else
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
+						{
+							if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
+						}
+					}
+					else
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE))
+					{
+						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
+						{
+							auto it2=it;
+							++it;
+							if(it2->second->receiveThridClick(x, y, ME_REPEAT))break;
+						}
+						for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
+						{
+							auto it2=it;
+							++it;
+							if(it2->second->receiveThridClick(x, y, ME_REPEAT))break;
+						}
+					}
+				}
+			break;
+			case SDL_KEYDOWN:
+				effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
+				
+				const Uint8 *state = SDL_GetKeyboardState(NULL);
+			
+				if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
+				{
+					getSaveFile(fileStr, MAX_PATH);
+					Effect::saveToFile(fileStr);
+				}
+				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
+				{
+					Effect::saveToFile("session_before_load.cello");
+					Effect::clearAll();
+					getOpenFile(fileStr, MAX_PATH);
+					Effect::loadFromFile(fileStr);
+				}
+				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_E])
+				{
+					Effect::saveToFile("session_before_erase.cello");
+					Effect::clearAll();
+				}
+			break;
+		}
+	}
+	
+	return quit;
+}
+
 
 #undef main
 int main (int argc, char** argv)
@@ -48,181 +230,15 @@ int main (int argc, char** argv)
 	
 	auto controllerInstanceList=getControllerInstanceList();
 	
-	bool quit = false;
 	
-	while (!quit)
+	while (!checkInputs())
 	{
-		while (SDL_PollEvent(&event))
-		{
-			switch(event.type)
-			{
-				case SDL_QUIT:
-					quit = true;
-				break;
-				case SDL_MOUSEBUTTONDOWN:
-					{
-						int x=event.button.x;
-						int y=event.button.y;
-						if(event.button.button==SDL_BUTTON_LEFT)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								if(it->second->receiveClick(x, y, ME_PRESS))break;
-							}
-							
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								if(it->second->receiveClick(x, y, ME_PRESS))break;
-							}
-						}
-						else
-						if(event.button.button==SDL_BUTTON_RIGHT)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
-							}
-							
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								if(it->second->receiveSecondClick(x, y, ME_PRESS))break;
-							}
-						}
-						else
-						if(event.button.button==SDL_BUTTON_MIDDLE)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
-							{
-								auto it2=it;
-								++it;
-								if(it2->second->receiveThridClick(x, y, ME_PRESS))break;
-							}
-							
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								auto it2=it;
-								++it;
-								if(it2->second->receiveThridClick(x, y, ME_PRESS))break;
-							}
-						}
-					}
-				break;
-				case SDL_MOUSEBUTTONUP:
-					{
-						int x=event.button.x;
-						int y=event.button.y;
-						if(event.button.button==SDL_BUTTON_LEFT)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								it->second->receiveClick(x, y, ME_RELEASE);
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								it->second->receiveClick(x, y, ME_RELEASE);
-							}
-						}
-						else
-						if(event.button.button==SDL_BUTTON_RIGHT)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								it->second->receiveSecondClick(x, y, ME_RELEASE);
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								it->second->receiveSecondClick(x, y, ME_RELEASE);
-							}
-						}
-						else
-						if(event.button.button==SDL_BUTTON_MIDDLE)
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
-							{
-								auto it2=it;
-								++it;
-								it2->second->receiveThridClick(x, y, ME_RELEASE);
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								auto it2=it;
-								++it;
-								it2->second->receiveThridClick(x, y, ME_RELEASE);
-							}
-						}
-					}
-				break;
-				case SDL_MOUSEMOTION:
-					{
-						int x=event.button.x;
-						int y=event.button.y;
-						if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								if(it->second->receiveClick(x, y, ME_REPEAT))break;
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								if(it->second->receiveClick(x, y, ME_REPEAT))break;
-							}
-						}
-						else
-						if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
-							{
-								if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								if(it->second->receiveSecondClick(x, y, ME_REPEAT))break;
-							}
-						}
-						else
-						if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE))
-						{
-							for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
-							{
-								auto it2=it;
-								++it;
-								if(it2->second->receiveThridClick(x, y, ME_REPEAT))break;
-							}
-							for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
-							{
-								auto it2=it;
-								++it;
-								if(it2->second->receiveThridClick(x, y, ME_REPEAT))break;
-							}
-						}
-					}
-				break;
-				case SDL_KEYDOWN:
-					effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
-					
-					const Uint8 *state = SDL_GetKeyboardState(NULL);
-				
-					if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
-					{
-						getSaveFile(fileStr, MAX_PATH);
-						Effect::saveToFile(fileStr);
-					}
-					else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
-					{
-						Effect::saveToFile("session_before_load.cello");
-						getOpenFile(fileStr, MAX_PATH);
-						Effect::loadFromFile(fileStr);
-					}
-				break;
-			}
-		}
-		
 		for(auto it=controllerInstanceList->rbegin();it!=controllerInstanceList->rend();++it)
 		{
 			it->second->step();
 		}
 		
-		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+		setColor(COLOR_CLEARCOLOR);
 		SDL_RenderClear(render);
 		
 		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)

@@ -1,6 +1,7 @@
 #ifndef CONTROLLERS_H
 #define CONTROLLERS_H
 #include "graphics.h"
+#include "drawables.h"
 #include <list>
 #include <vector>
 #include <cstring>
@@ -97,6 +98,7 @@ class Controller{
 	
 	void step()
 	{
+		if(paused) return;
 		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
 		{
 			if(valueIsReady(it->first))
@@ -110,7 +112,7 @@ class Controller{
 		posY=Y;
 		nameTex=generateText(getName());
 		
-		pauseButton=new Button(X, Y, 0);
+		pauseButton=new Button(X+2, Y+2, 0);
 		
 		int x=bus_period;
 		
@@ -223,15 +225,7 @@ class Controller{
 	
 	void draw()
 	{
-		SDL_Rect rect;
-		rect.x = posX; rect.y = posY;
-		rect.w = width;
-		rect.h = height;
-		SDL_SetRenderDrawColor(render, 0xE9, 0xF1, 0xFE, 255);
-		SDL_RenderFillRect(render, &rect);
-		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
-		SDL_RenderDrawRect(render, &rect);
-	
+		drawWindow(posX, posY, width, height);
 	
 		int w, h;
 		SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
@@ -256,8 +250,13 @@ class Controller{
 		{
 			ControllBus* bus=outBuses[it->first].bus;
 			Slider* slider=it->second;
+			
+			if(bus->getPosY()+ControllBus::size/2 <= slider->getPosY() + slider->getHeight()/2)
 			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
 								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY());
+			else
+			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
+								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY()+slider->getHeight());
 		}
 		
 	}
