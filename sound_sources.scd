@@ -92,7 +92,7 @@ SynthDef.new(\eff_octave_up, {
 	Out.ar(outbus, res);
 }).add;
 
-SynthDef.new(\eff_octave_down, { //TODO - freq_bus lub wstawić Tartini!
+SynthDef.new(\eff_octave_down, {
 	arg inbus=8, outbus=0, freq_bus, mul;
 	var in = In.ar(inbus,1);
 	var freq = In.kr(freq_bus,1);
