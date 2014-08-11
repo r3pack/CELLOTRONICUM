@@ -157,7 +157,7 @@ EffectArgument::~EffectArgument()
 }
 
 
-int Effect::lastId=1;
+int Effect::lastId=0;
 
 std::set <std::pair<int, int> > Effect::effectTree;
 
@@ -591,6 +591,39 @@ void Effect::loadFromFile(const char* filename)
 		}
 	}
 	lastId=maxId+1;
+}
+
+void Effect::clearAll()
+{
+
+	while(!effectInstanceList.empty())
+	{
+		Effect* ptr=effectInstanceList.begin()->second;
+		ptr->deleteInstance();
+		delete ptr;
+	}
+	
+	for(auto it=getControllerInstanceList()->begin();it!=getControllerInstanceList()->end();++it)
+	{
+		delete it->second;
+	}
+
+	getConnections()->clear();
+	busList.clear();
+	controllBusList.clear();
+	sliderList.clear();
+	effectInstanceList.clear();
+	getControllerInstanceList()->clear();
+	
+	Bus::lastClicked=-1;
+	Bus::lastId=0;
+	ControllBus::lastClicked=-1;
+	ControllBus::lastId=0;
+	Slider::lastClicked=-1;
+	Slider::lastId=0;
+
+	lastId=0;
+	Controller::lastId=0;
 }
 
 void EffectCreator::moveUp() 

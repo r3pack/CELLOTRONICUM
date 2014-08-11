@@ -9,6 +9,7 @@
 #include <queue>
 #include "osc.h"
 #include "graphics.h"
+#include "drawables.h"
 
 	struct cmpCStr
 	{
@@ -58,14 +59,6 @@
 			EffectArgument(const char* n, std::string var): name(n) {set(var);}
 			
 			~EffectArgument();
-	};
-	
-	struct EffectCmp
-	{
-		bool operator()(Effect* s1, Effect* s2) const
-		{
-			return s1<s2;
-		}
 	};
 		
 	class Effect{
@@ -122,6 +115,8 @@
 			static void saveToFile(const char* filename);
 			
 			static void loadFromFile(const char* filename);
+			
+			static void clearAll();
 	};
 	
 	struct EffectCreatorMenuEntry
@@ -149,7 +144,7 @@
 			parent=p;
 			if(!isElement) submenuEntries=new std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>;
 			nameTex=generateText(name);
-			nameTexRed=generateText(name, {255,0,0});
+			nameTexRed=generateText(name, COLOR_SELECTED_TEXT);
 		}
 		
 	};
@@ -159,7 +154,7 @@
 			EffectCreatorMenuEntry* chosenEffect;
 		
 		public:	
-			static constexpr int menu_period=30;
+			static const int menu_period=30;
 			
 			void moveUp();
 			
