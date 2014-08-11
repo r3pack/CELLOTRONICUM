@@ -83,7 +83,7 @@ x = Synth.new(\eff_octave_up, [\inbus, 8, \outbus, 0, \freq_bus, 16]);
 //WAŻNE: PD - czas w ms, tutaj w sekundach!!!
 
 SynthDef.new(\eff_octave_up, {
-	arg inbus=8, outbus=0, freq_bus, mul;
+	arg inbus=8, outbus=0, freq_bus, mul=0.7;
 	var in = In.ar(inbus,1);
 	var freq = In.kr(freq_bus,1);
 	var del2, res;
@@ -93,7 +93,7 @@ SynthDef.new(\eff_octave_up, {
 }).add;
 
 SynthDef.new(\eff_octave_down, {
-	arg inbus=8, outbus=0, freq_bus, mul;
+	arg inbus=8, outbus=0, freq_bus, mul=0.7;
 	var in = In.ar(inbus,1);
 	var freq = In.kr(freq_bus,1);
 	var res = (in*SinOsc.ar(freq*0.5))*mul;

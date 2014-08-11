@@ -70,12 +70,6 @@ SynthDef.new(\id, {
 }).add;
 
 
-x = Synth.new(\eff_octave_up, [\inbus, 8, \outbus, 1]);
-y = Synth.new(\id, [\inbus, 8, \outbus, 1]);
-
-y = Synth.new(\eff_octave_down, [\inbus, 8, \outbus, 0]);
-y = Synth.new(\id, [\inbus, 8, \outbus, 1]);
-
 x = Synth.new(\eff_octave_up, [\inbus, 17, \freq_bus, 16, \outbus, 0]);
 y = Synth.new(\eff_pitch, [\inbus, 17, \outbus, 0]);
 z = Synth.new(\eff_playbuf, [\outbus, 0, \bufnum, 1]);

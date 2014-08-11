@@ -16,5 +16,3 @@ s.freqscope;
 SynthDef.all;
 
 */
-
-

@@ -30,6 +30,8 @@ SynthDef.new(\eff_rand_pitchshift2, {
 	Out.ar(outbus,res+in);
 }).add;
 
+//TODO: Pitch shifter na delayach!
+
 /*/ TESTS
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 b.bufnum.postln;
