@@ -1,13 +1,54 @@
 // PITCH SHIFT
 
 SynthDef.new(\eff_pitchshift, {
-	arg inbus=8, outbus=0, semitones=0;
+	arg inbus=8, outbus=0, semitones=0, window_size=0.2;
 	var in = In.ar(inbus,1);
-	var res = PitchShift.ar(in,0.2,semitones*pow(2,1/12));
+	var res = PitchShift.ar(in,window_size,semitones*pow(2,1/12));
 	Out.ar(outbus,res);
 }).add;
 
-//TODO: Sprawdzić czy poprawnie działa!
+SynthDef.new(\eff_rand_pitchshift, {
+	arg inbus=8, outbus=0, freq=2;
+	var in = In.ar(inbus,1);
+	var trig = Impulse.kr(freq);
+	var pp = 1/2;
+	var index = TWindex.kr(trig,[pp, pp]);
+	var selection = Select.kr(index, [5,7]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
+	var res = PitchShift.ar(in,0.2,(selection*pow(2,1/12)));
+	var resfreq = Tartini.kr(res).poll();
+	Out.ar(outbus,res*SinOsc.ar(resfreq*0.5)+in);
+}).add;
+
+SynthDef.new(\eff_rand_pitchshift2, {
+	arg inbus=8, outbus=0, freq=2;
+	var in = In.ar(inbus,1);
+	var trig = Impulse.kr(freq);
+	var pp = 1/2;
+	var index = TWindex.kr(trig,[pp, pp]);
+	var selection = Select.kr(index, [5,7,12]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
+	var res = PitchShift.ar(in,0.2,(selection*pow(2,1/12)));
+	Out.ar(outbus,res+in);
+}).add;
+
+/*/ TESTS
+b = Buffer.read(s, ~p +/+ "zBrody1.wav");
+b.bufnum.postln;
+b = Buffer.read(s, ~p +/+ "G-DUR.aiff");
+
+s.prepareForRecord(~p +/+ "rand_pitchshift2.aiff");
+s.record;
+
+x = Synth.new(\eff_rand_pitchshift, [\inbus, 17, \outbus, 0]);
+z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
+
+//z = Synth.new(\eff_playbuf, [\outbus, 1, \bufnum, 0]);
+
+x.set(\freq, 5);
+
+s.stopRecording;
+
+x = Synth.new(\eff_rand_pitchshift, [\inbus, 8, \outbus, 0]);
+*/
 
 //FREQ SHIFT
 SynthDef.new(\eff_freqshift, {
