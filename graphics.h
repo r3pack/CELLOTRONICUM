@@ -37,10 +37,13 @@ class Effect;
 class Bus;
 class ControllBus;
 class Controller;
+class Slider;
 
 extern std::map <int, Bus*> busList;
 
 extern std::map <int, ControllBus*> controllBusList;
+
+extern std::map <int, Slider*> sliderList;
 
 std::set <std::pair <Bus*, Bus*> >* getConnections();
 
@@ -254,6 +257,8 @@ class Bus : public Drawable{
 	
 	bool setClicked();
 	
+	bool receiveSecondClick(int X, int Y, MouseEvent me);
+	
 	void setPos(int X, int Y)
 	{
 		posX=X;
@@ -276,6 +281,7 @@ class Bus : public Drawable{
 
 
 class ControllBus : public Drawable{
+	friend class Slider;
 	static int lastId;
     int id;
     
@@ -348,11 +354,11 @@ class ControllBus : public Drawable{
 		return false;
 	}
 	
-	bool setClicked()
-	{
-		clicked=true;
-		lastClicked=id;
-	}
+	bool setClicked();
+	
+	bool receiveSecondClick(int X, int Y, MouseEvent me);
+	
+	static bool connectControllBusWithSlider();
 	
 	void setPos(int X, int Y)
 	{
@@ -375,12 +381,15 @@ class ControllBus : public Drawable{
 };
 
 
-
 class Slider : public Drawable{
+	friend class ControllBus;
+	friend class Controller;
+	
 	static int lastId;
     int id;
 	static int lastClicked;
 	bool clicked=false;
+	Controller* controlledBy=NULL;
 
 	float rangeBegin;
 	float rangeEnd;
@@ -399,6 +408,8 @@ class Slider : public Drawable{
 	float lastValue;
 	float value;
 	
+	void removeConnections();
+	
 	public:
 	
 	Slider(int pX, int pY, int w, int h, float rB, float rE, float l, Effect* e, int a):
@@ -412,8 +423,11 @@ class Slider : public Drawable{
 		buff<<getValue();
 		
 		valueTex=generateText(buff.str().c_str());
+		
+		sliderList.insert(std::pair<int, Slider*>(id, this));
 	}
-	~Slider() {SDL_DestroyTexture(valueTex);}
+	
+	~Slider();
 	
 	bool receiveClick(int X, int Y, MouseEvent me)
 	{
@@ -425,21 +439,9 @@ class Slider : public Drawable{
 			if(Y<0) Y=0;
 			else
 			if(Y>height) Y=height;
-			level=Y;
-			float normalizedLevel=1.0f-(float(level)/float(height));
-			setValue(rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel);
 			
-			if(!(lastValue>=(value-0.001) && lastValue<=(value+0.001)))
-			{
-				SDL_DestroyTexture(valueTex);
-				std::ostringstream buff;
-				buff.setf(std::ios::fixed, std:: ios::floatfield);
-				buff.precision(2);
-				buff<<getValue();
-				
-				valueTex=generateText(buff.str().c_str());
-				lastValue=getValue();
-			}
+			float normalizedLevel=1.0f-(float(Y)/float(height));
+			setValue(rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel);
 			
 			return true;
 		}
@@ -449,7 +451,7 @@ class Slider : public Drawable{
 	bool receiveSecondClick(int X, int Y, MouseEvent me)
 	{
 		X-=posX; Y-=posY;
-		if(X>=0 && X<=width && Y>=-15 && Y<=height+15 && me==ME_PRESS) 
+		if(X>=0 && X<=width && Y>=0 && Y<=height && me==ME_PRESS) 
 		{
 			setClicked();
 			return true;
@@ -457,11 +459,7 @@ class Slider : public Drawable{
 		return false;
 	}
 	
-	void setClicked()
-	{
-		clicked=true;
-		lastClicked=id;
-	}
+	void setClicked();
 	
 	float getValue()
 	{
@@ -472,7 +470,7 @@ class Slider : public Drawable{
 	
 	void setNormalizedValue(float nv)
 	{
-		value=(rangeEnd-rangeBegin)*nv+rangeBegin;
+		setValue((rangeEnd-rangeBegin)*nv+rangeBegin);
 	}
 	
 	void setPos(int X, int Y)
@@ -509,7 +507,12 @@ class Slider : public Drawable{
 		if(clicked)
 		SDL_SetRenderDrawColor(render, 205, 255, 205, 255);
 		else
-		SDL_SetRenderDrawColor(render, 205, 205, 255, 255);
+		{
+			if(controlledBy!=NULL)
+			SDL_SetRenderDrawColor(render, 255, 255, 205, 255);
+			else
+			SDL_SetRenderDrawColor(render, 205, 205, 255, 255);
+		}
 		SDL_RenderFillRect(render, &rect2);
 		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
 		SDL_RenderDrawRect(render, &rect1);
