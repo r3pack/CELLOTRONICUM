@@ -100,35 +100,6 @@ SynthDef.new(\eff_octave_down, {
 	Out.ar(outbus, res);
 }).add;
 
-/* WERSJA PRZEZ BUSY - nie działa!!!
-SynthDef.new(\eff_shepard_tone_from_input, {
-	arg inbus=8, outbus=0, amp=0.5;
-	var ink = In.kr(inbus,1);
-	var in = In.ar(inbus,1);
-	var freq, hasFreq, res;
-	var bp1=Bus.audio(s), bp2=Bus.audio(s), bp3=Bus.audio(s), bp4=Bus.audio(s), bp5=Bus.audio(s);
-	var bm1=Bus.audio(s), bm2=Bus.audio(s), bm3=Bus.audio(s), bm4=Bus.audio(s);
-	var p1, p2, p3, p4, p5, m1, m2, m3, m4;
-	# freq, hasFreq = Tartini.kr(ink);
-	p1 = Synth.new(\eff_octave_up, [\inbus, inbus, \outbus, bp1, \freq, freq]);
-	p2 = Synth.new(\eff_octave_up, [\inbus, bp1, \outbus, bp2, \freq, freq*2]);
-	p3 = Synth.new(\eff_octave_up, [\inbus, bp2, \outbus, bp3, \freq, freq*4]);
-	p4 = Synth.new(\eff_octave_up, [\inbus, bp3, \outbus, bp4, \freq, freq*8]);
-	p5 = Synth.new(\eff_octave_up, [\inbus, bp4, \outbus, bp5, \freq, freq*16]);
-	m1 = Synth.new(\eff_octave_down, [\inbus, inbus, \outbus, bm1, \freq, freq]/2);
-	m2 = Synth.new(\eff_octave_down, [\inbus, bm1, \outbus, bm2, \freq, freq]/4);
-	m3 = Synth.new(\eff_octave_down, [\inbus, bm2, \outbus, bm3, \freq, freq]/8);
-	m4 = Synth.new(\eff_octave_down, [\inbus, bm3, \outbus, bm4, \freq, freq]/16);
-	res = in+In.ar(bp1,1)+In.kr(bp2,1)+In.kr(bp3,1)+In.kr(bp4,1)+In.kr(bp5,1) + In.kr(bm1,1) + In.kr(bm2,1) + In.kr(bm3,1) + In.kr(bm4,1);
-	/*res=0;
-	[27.5,55,110,220,440,880,1760, 1760*2, 1760*4, 1760*8].do({
-		arg f;
-		res = res ;
-	});*/
-	Out.ar(outbus, res);
-}).add;
-*/
-
 //Działa - dorobić zawijanie.
 SynthDef.new(\eff_shepard_tone_from_input, {
 	arg inbus=8, outbus=0; //, amp=0.5;
@@ -145,7 +116,6 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 	poprz = in;
 	for(0,6,{ |i|
 		hf= 1/(2*frq);
-		//ostatnia_deska_ratunku = max(mi,hf);
 		plus[i] = poprz + DelayN.ar(poprz,1,hf); //Select.ar( hf>mi ,[DC.ar(0), poprz + DelayN.ar(poprz,1,hf)]);
 		frq=frq*2;
 		poprz = plus[i];
@@ -166,7 +136,7 @@ SynthDef.new(\eff_shepard_tone_from_input, {
 }).add;
 
 SynthDef.new(\eff_shepard_cycle_tone_from_input, {
-	arg inbus=8, outbus=0; //, amp=0.5;
+	arg inbus=8, outbus=0, octaves=3; //, amp=0.5;
 	var in = In.ar(inbus,1);
 	var freq, hasFreq, res, poprz;
 	var which;
@@ -191,7 +161,7 @@ SynthDef.new(\eff_shepard_cycle_tone_from_input, {
 		poprz = all[i];
 		frq=2*frq;
 	});
-	res = SelectXFocus(which,all,3);
+	res = SelectXFocus(which,all,octaves);
 	Out.ar(outbus, res);
 }).add;
 
@@ -207,6 +177,17 @@ SynthDef.new(\eff_pila_po_przejsciach, {
     Out.ar(outbus,out)
 }).add;
 
+SynthDef.new(\eff_ay_simple,{
+	arg freq_bus, outbus, amp_bus, gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
+	var a = gain*In.kr(amp_bus);
+	var amp = a/(a.abs+1);
+	var freq = In.kr(freq_bus);
+	var vola=floor(amp*15);
+	var ta= AY.freqtotone(freq);
+	Out.ar(outbus, AY.ar(ta,ta,ta,1,7,vola, vola, vola));
+}).add;
+
+
 SynthDef.new(\eff_ay,{
 	arg freq_bus, outbus, amp_bus, f2=0.5, f3=2, gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
 	var a = gain*In.kr(amp_bus);
@@ -215,6 +196,16 @@ SynthDef.new(\eff_ay,{
 	var vola=floor(amp*15), volb=floor(amp*15), volc=floor(amp*15);
 	var ta= AY.freqtotone(freq),tb= AY.freqtotone(freq*f2),tc= AY.freqtotone(freq*f3);
 	Out.ar(outbus, AY.ar(ta,tb,tc,1,7,vola, volb, volc));
+}).add;
+
+SynthDef.new(\eff_ym_simple,{
+	arg freq_bus, outbus, amp_bus, gain = 25; //współcznynniki f2 i f3 odpowiadają za interwały od tonu bazowego.
+	var a = gain*In.kr(amp_bus);
+	var amp = a/(a.abs+1);
+	var freq = In.kr(freq_bus)/8;
+	var vola=(amp*31);
+	var ta= AY.freqtotone(freq);
+	Out.ar(outbus, AY.ar(ta,ta,ta,1,0,vola, vola, vola, chiptype:1));
 }).add;
 
 SynthDef.new(\eff_ym,{
