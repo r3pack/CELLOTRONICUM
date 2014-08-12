@@ -80,8 +80,8 @@ x = Synth.new(\eff_shepard_cycle_tone_from_input, [\inbus, 8, \outbus, 0, \octav
 
 s.stopRecording;
 
-
 y.set(\octaves, 3);
+
 
 //CHIP AY - simple
 
@@ -97,6 +97,7 @@ s.stopRecording;
 
 y.set(\gain, 25);
 
+
 //CHIP AY
 
 f = "ay.aiff"
@@ -110,6 +111,7 @@ a = Synth.new(\eff_amplitude, [\inbus, 8, \outbus, 18]);
 s.stopRecording;
 
 y.set(\gain, 25);
+
 
 //CHIP YM - simple
 
@@ -269,3 +271,19 @@ s.record;
 x = Synth.new(\eff_rand_pitchshift2, [\inbus, 8, \outbus, 0]);
 
 s.stopRecording;
+
+//GRAMOPHONE
+
+f = "gramophone.aiff"
+s.prepareForRecord(~p +/+ f);
+s.record;
+
+x = Synth.new(\gramophone, [\inbus, 8, \outbus, 0, \noise_amp, 0.8, \rq, 1, \freq, 1000, \imp_freq, 5, \blip_freq, 3, \gain, 2]);
+
+s.stopRecording;
+
+x.set(\noise_amp, 0.5);
+x.set(\imp_freq, 5);
+x.set(\blip_freq, 3);
+x.set(\gain, 2);
+x.set(\freq,1200);
