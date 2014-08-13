@@ -30,6 +30,10 @@
 			VT_NONE,
             VT_INBUS,
             VT_OUTBUS,
+			VT_FREQ_INBUS,
+			VT_FREQ_OUTBUS,
+			VT_AMP_INBUS,
+			VT_AMP_OUTBUS,
             VT_SLIDER,
 			VT_TEXT
     };
@@ -124,6 +128,18 @@
 					case VT_OUTBUS:
 					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_OUTBUS, this, i), args[i].getName()));
 					break;
+					case VT_FREQ_INBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_FREQ_INBUS, this, i), args[i].getName()));
+					break;
+					case VT_FREQ_OUTBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_FREQ_OUTBUS, this, i), args[i].getName()));
+					break;
+					case VT_AMP_INBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_AMP_INBUS, this, i), args[i].getName()));
+					break;
+					case VT_AMP_OUTBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_AMP_OUTBUS, this, i), args[i].getName()));
+					break;
 					case VT_SLIDER:
 					{
 						float min=((float*)argvis[i].data)[0];
@@ -138,6 +154,23 @@
 			}
 			
 			nameTex=generateText(getName());
+		}
+		
+		void quitGUI()
+		{
+			for(int i=0;i<drawables.size();++i)
+			drawables[i].free();
+			EffectArgument* args=getArgs();
+			int argsCount=getArgsCount();
+			ArgVis* argvis=getArgumentVisuals();
+		
+			for(int i=0;i<argsCount;++i)
+			{
+				if(argvis[i].visType==VT_OUTBUS || argvis[i].visType==VT_INBUS)
+				{
+					OSCConn::deleteBus(args[i].getIntValue());
+				}
+			}
 		}
 		
 		int updateDrawablePositions()
@@ -304,8 +337,6 @@
 		
 		virtual ~EffectGUI()
 		{
-			for(int i=0;i<drawables.size();++i)
-			drawables[i].free();
 			SDL_DestroyTexture(nameTex);
 			delete pauseButton;
 		}
@@ -356,10 +387,14 @@
 				switch(argvis[i].visType)
 				{
 					case VT_INBUS:
+					case VT_FREQ_INBUS:
+					case VT_AMP_INBUS:
 						visualPositions[i]=int_pair(0+slider_period, bus_y);
 						bus_y+=bus_period;
 					break;
 					case VT_OUTBUS:
+					case VT_FREQ_OUTBUS:
+					case VT_AMP_OUTBUS:
 						visualPositions[i]=int_pair(0, bus_y2);
 						bus_y2+=bus_period;
 					break;

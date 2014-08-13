@@ -1,4 +1,5 @@
 #include "osc.h"
+#include <chrono>
 
 OSCConn conn;
 
@@ -9,6 +10,22 @@ const char* OSCConn::serverAddress="localhost";
 UdpSocket OSCConn::sock;
 
 std::map <int, std::string> OSCConn::bufferFileById;
+
+std::chrono::time_point<std::chrono::system_clock> operationStart;
+
+void setOperationStart()
+{
+	operationStart=std::chrono::system_clock::now();
+}
+
+bool checkIfTimeout(double seconds)
+{
+	
+	std::chrono::duration<double> time=std::chrono::system_clock::now() - operationStart;
+	if(time.count()>seconds) return true;
+	else return false;
+}
+
 
 bool OSCConn::connect() 
 {
@@ -45,6 +62,7 @@ bool OSCConn::startServer()
 	int pid=0;
 	bool statusOK=false;
 	
+	setOperationStart();
 	while (sock.isOk() && !statusOK)
 	{
 		if (sock.receiveNextPacket(30)) 
@@ -61,6 +79,11 @@ bool OSCConn::startServer()
 					break;
 				}
 			}
+		}
+		if(checkIfTimeout(15.0f))
+		{
+			printf("Fail to start the server (Timeout)\n");
+			return 0;
 		}
 	}
 	
@@ -83,6 +106,7 @@ int OSCConn::getFreeBus()
 {
 	sendSimpleMessage("/get_free_bus");
 
+	setOperationStart();
 	while (sock.isOk())
 	{
 		if (sock.receiveNextPacket(30)) 
@@ -100,6 +124,12 @@ int OSCConn::getFreeBus()
 				}
 			}
 		}
+		if(checkIfTimeout(1.0f))
+		{
+			printf("Fail to get free bus (Timeout)\n");
+			return 0;
+		}
+		
 	}
 }
 
@@ -138,7 +168,7 @@ void OSCConn::getFreeBuses(int num, int* buses)
 		return;
 	}
 	
-
+	setOperationStart();
 	while (sock.isOk())
 	{
 		if (sock.receiveNextPacket(30)) 
@@ -158,6 +188,12 @@ void OSCConn::getFreeBuses(int num, int* buses)
 				}
 			}
 		}
+		if(checkIfTimeout(3.0f))
+		{
+			printf("Fail to get free buses (Timeout)\n");
+			while(busCount<num) buses[busCount++]=0;
+			return;
+		}
 	}
 }
 
@@ -175,7 +211,7 @@ int OSCConn::loadBuffer(const char* filename)
 		return -1;
 	}
 	
-
+	setOperationStart();
 	while (sock.isOk())
 	{
 		if (sock.receiveNextPacket(30)) 
@@ -193,6 +229,11 @@ int OSCConn::loadBuffer(const char* filename)
 					return bufnum;
 				}
 			}
+		}
+		if(checkIfTimeout(3.0f))
+		{
+			printf("Fail to load buffer (Timeout)\n");
+			return -1;
 		}
 	}
 }
@@ -216,6 +257,8 @@ void OSCConn::deleteBuffer(int bufnum)
 	pw.startBundle().addMessage(msg).endBundle();
 	
 	bufferFileById.erase(bufnum);
+	
+	fprintf(stderr, "Deleting buffer which number: %d\n", bufnum);
 	
 	if(!sock.sendPacket(pw.packetData(), pw.packetSize()))
 	{

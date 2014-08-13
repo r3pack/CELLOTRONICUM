@@ -253,7 +253,7 @@ class Controller{
 			
 			if(bus->getPosY()+ControllBus::size/2 <= slider->getPosY() + slider->getHeight()/2)
 			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
-								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY());
+								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY()-Slider::slider_bus_height/2);
 			else
 			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
 								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY()+slider->getHeight());
