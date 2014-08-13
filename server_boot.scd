@@ -239,6 +239,7 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		var busindex = msg[1].asInt;
+		~bus[busindex].free();
 		~bus.removeAt(busindex);
 	},
 	'/delete_bus'
