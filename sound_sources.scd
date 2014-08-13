@@ -56,11 +56,11 @@ SynthDef.new(\eff_shepard_cycle_tone, {
 	var freq = In.kr(freq_bus);
 	var am = In.kr(amp_bus);
 	var res=0;
-	[27.5,55,110,220,440,880,1760, 1760*2, 1760*4, 1760*8].do({
+	[55,110,220,440,880,1760, 1760*2].do({
 		arg f;
 		res = res + SinOsc.ar(f*(2**(frac(log2(freq)-log2(f)))),0,amp*am);
 	});
-	Out.ar(outbus, res);
+	Out.ar(outbus, res); // TODO: Lowpass na wyjsciu
 }).add;
 
 //SHEPHARD TONE FROM INPUT

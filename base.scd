@@ -13,19 +13,19 @@ SynthDef.new(\eff_normalizer, {
 }).add;
 
 SynthDef.new(\eff_mix, {
-	arg inbus1, inbus2, outbus;
+	arg inbus1, inbus2, outbus, max_amp1 = 0.5;
 	var i1 = In.ar(inbus1);
 	var i2 = In.ar(inbus2);
-	var res = Mix.new([i1, i2]);
+	var res = Mix.new([i1*max_amp1, i2*(1-max_amp2)]);
 	Out.ar(outbus,res);
 }).add;
 
 SynthDef.new(\eff_mix3, {
-	arg inbus1, inbus2, inbus3, outbus;
+	arg inbus1, inbus2, inbus3, outbus, max_amp1 = 0.333, max_amp2 = 0.333;
 	var i1 = In.ar(inbus1);
 	var i2 = In.ar(inbus2);
 	var i3 = In.ar(inbus3);
-	var res = Mix.new([i1, i2, i3]);
+	var res = Mix.new([i1*max_amp1, i2*max_amp2, i3*(1-max_amp1-max_amp2)]);
 	Out.ar(outbus,res);
 }).add;
 
