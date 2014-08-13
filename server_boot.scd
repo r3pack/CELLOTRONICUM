@@ -303,6 +303,7 @@ OSCdef.new(
 		arg msg, time, addr, recvPort;
 		var buf = ~b.[msg[1]];
 		~b.removeAt(msg[1]);
+		buf.free();
 		~app_netaddr.sendMsg('\buffer_deleted', msg[1]);
 	},
 	'/delete_buffer'
