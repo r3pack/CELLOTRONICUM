@@ -18,7 +18,11 @@
 
 	enum BusType{
 		BT_INBUS,
-		BT_OUTBUS
+		BT_OUTBUS,
+		BT_FREQ_INBUS,
+		BT_FREQ_OUTBUS,
+		BT_AMP_INBUS,
+		BT_AMP_OUTBUS
 	};
 
 	enum MouseEvent{
@@ -194,21 +198,7 @@
 			busList.insert(std::pair<int, Bus*>(id, this));
 		}
 		
-		void removeBus()
-		{
-			for(auto it=getConnections()->begin();it!=getConnections()->end();)
-			{
-				if((*it).first==this || (*it).second==this)
-				{
-					(*it).first->used=false;
-					(*it).second->used=false;
-					it=getConnections()->erase(it);
-				}
-				else
-				++it;
-			}
-			busList.erase(id);
-		}
+		void removeBus();
 		
 		~Bus()
 		{
@@ -219,7 +209,13 @@
 		{
 			if(lastClicked!=id) clicked=false;
 			
-			SDL_Color color=COLOR_AUDIO_BUS;
+			SDL_Color color;
+			if(type==BT_INBUS || type==BT_OUTBUS)
+			color=COLOR_AUDIO_BUS;
+			else if(type==BT_FREQ_INBUS || type==BT_FREQ_OUTBUS)
+			color=COLOR_FREQ_BUS;
+			else if(type==BT_AMP_INBUS || type==BT_AMP_OUTBUS)
+			color=COLOR_AMP_BUS;
 			
 			SDL_Rect rect;
 			rect.x = posX;
@@ -235,16 +231,7 @@
 			SDL_RenderDrawRect(render, &rect);
 		}
 		
-		bool receiveClick(int X, int Y, MouseEvent me)
-		{
-			X-=posX;
-			Y-=posY;
-			if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
-			{
-				return setClicked();
-			}
-			return false;
-		}
+		bool receiveClick(int X, int Y, MouseEvent me);
 		
 		bool setClicked();
 		
@@ -382,6 +369,8 @@
 		friend class Controller;
 		friend class Effect;
 		
+		static const int slider_bus_height=8;
+		
 		static int lastId;
 		int id;
 		static int lastClicked;
@@ -436,6 +425,12 @@
 			Y-=posY;
 			if(X>=0 && X<=width && Y>=-15 && Y<=height+15)
 			{
+				if(Y<0 && Y>=-slider_bus_height && me==ME_PRESS) 
+				{
+					setClicked();
+					return true;
+				}
+			
 				if(Y<0) Y=0;
 				else
 				if(Y>height) Y=height;
@@ -451,9 +446,13 @@
 		bool receiveSecondClick(int X, int Y, MouseEvent me)
 		{
 			X-=posX; Y-=posY;
-			if(X>=0 && X<=width && Y>=0 && Y<=height && me==ME_PRESS) 
+			if(Y<0 && Y>=-slider_bus_height && me==ME_PRESS) 
 			{
-				setClicked();
+				if(controlledBy!=NULL)
+				{
+					removeConnections();
+				}
+			
 				return true;
 			}
 			return false;
@@ -504,24 +503,39 @@
 			
 			setColor(COLOR_SLIDER2);
 			SDL_RenderFillRect(render, &rect1);
-			if(clicked)
-			setColor(getDarkerColor(COLOR_SLIDER1));
+			
+			SDL_Color color;
+			
+			if(controlledBy!=NULL)
+			color=COLOR_SLIDER_CONTROLLED;
 			else
-			{
-				if(controlledBy!=NULL)
-				setColor(COLOR_CONTROLL_BUS);
-				else
-				setColor(COLOR_SLIDER1);
-			}
+			color=COLOR_SLIDER1;
+			
+			if(clicked)
+			color=getDarkerColor(color);
+			
+			setColor(color);
+			
 			SDL_RenderFillRect(render, &rect2);
 			setColor(COLOR_SLIDER_BORDER);
 			SDL_RenderDrawRect(render, &rect1);
+			
+			SDL_Rect controllRect;
+			controllRect.x = posX;
+			controllRect.y = posY-slider_bus_height+1;
+			controllRect.w = width;
+			controllRect.h = slider_bus_height;
+			
+			setColor((clicked?getDarkerColor(COLOR_CONTROLL_BUS):COLOR_CONTROLL_BUS));
+			SDL_RenderFillRect(render, &controllRect);
+			setColor(COLOR_SLIDER_BORDER);
+			SDL_RenderDrawRect(render, &controllRect);
 			
 			int w, h;
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
 			
 			SDL_Rect valueRect;
-			valueRect.y=posY+level-h;
+			valueRect.y=posY+(level-h>=0?level-h:0);
 			valueRect.x=posX+width/2-w/2;
 			valueRect.w=w;
 			valueRect.h=h;

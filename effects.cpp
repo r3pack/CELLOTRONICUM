@@ -591,6 +591,7 @@ void Effect::loadFromFile(const char* filename)
 		}
 	}
 	lastId=maxId+1;
+	updateTopologicalSequence();
 }
 
 void Effect::clearAll()

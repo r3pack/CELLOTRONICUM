@@ -33,6 +33,23 @@ void drawConnections()
 	}
 }
 
+void Bus::removeBus()
+{
+	for(auto it=getConnections()->begin();it!=getConnections()->end();)
+	{
+		if((*it).first==this || (*it).second==this)
+		{
+			(*it).first->used=false;
+			(*it).second->used=false;
+			(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
+			it=getConnections()->erase(it);
+		}
+		else
+		++it;
+	}
+	busList.erase(id);
+}
+
 bool Bus::setClicked()
 {
 	clicked=true;
@@ -49,10 +66,12 @@ bool Bus::setClicked()
 		
 		Bus *bus1=it->second, *bus2=this;
 		
-		if(bus1->getType()==BT_INBUS) std::swap(bus1, bus2);
+		if(bus1->getType()%2==0) std::swap(bus1, bus2);
 		
-		if(bus1->getType()!=BT_OUTBUS || bus2->getType()!=BT_INBUS)
-		{	
+		if(!((bus1->getType()==BT_OUTBUS && bus2->getType()==BT_INBUS) ||
+		     (bus1->getType()==BT_FREQ_OUTBUS && bus2->getType()==BT_FREQ_INBUS) ||
+		     (bus1->getType()==BT_AMP_OUTBUS && bus2->getType()==BT_AMP_INBUS)))
+		{
 			fprintf(stderr, "Error: bad buses type\n");
 			Bus::lastClicked=-1;
 			return false;
@@ -72,7 +91,7 @@ bool Bus::setClicked()
 		{
 			connections.erase(std::pair<Bus*, Bus*>(bus1, bus2));
 			
-			bus2->getEffect()->getArgs()[bus2->getArg()].set(OSCConn::getFreeBus());
+			bus2->getEffect()->setAndSendArgument(bus2->getArg(), OSCConn::getFreeBus());
 			
 			bus2->used=false;
 		}
@@ -82,13 +101,9 @@ bool Bus::setClicked()
 			connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
 			bus2->used=true;
 			
-			Effect::updateTopologicalSequence();
-					
 			int freebus=bus1->getEffect()->getArgs()[bus1->getArg()].getIntValue();
 			
 			OSCConn::deleteBus(bus2->getEffect()->getArgs()[bus2->getArg()].getIntValue());
-			
-			bus2->getEffect()->getArgs()[bus2->getArg()].set(freebus);
 			
 			bus2->getEffect()->setAndSendArgument(bus2->getArg(), freebus);
 			fprintf(stderr, "Connected two buses to %d\n", freebus);
@@ -104,6 +119,21 @@ bool Bus::setClicked()
 	return false;
 }
 
+bool Bus::receiveClick(int X, int Y, MouseEvent me)
+{
+	X-=posX;
+	Y-=posY;
+	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
+	{
+		if(setClicked())
+		{
+			Effect::updateTopologicalSequence();
+		}
+		return true;
+	}
+	return false;
+}
+
 bool Bus::receiveSecondClick(int X, int Y, MouseEvent me)
 {
 	X-=posX;
@@ -111,13 +141,15 @@ bool Bus::receiveSecondClick(int X, int Y, MouseEvent me)
 	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
 	{
 		used=false;
-		if(getType()==BT_OUTBUS)
+		if(getType()%2==1)
 		{
 			used=false;
 			for(auto it=connections.begin();it!=connections.end();)
 			{
 				if((*it).first==this)
-				{
+				{	
+					(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
+			
 					(*it).second->used=false;
 					it=connections.erase(it);
 				}
@@ -125,13 +157,15 @@ bool Bus::receiveSecondClick(int X, int Y, MouseEvent me)
 			}
 		}
 			
-		if(getType()==BT_INBUS)
+		if(getType()%2==0)
 		{
 			used=false;
 			for(auto it=connections.begin();it!=connections.end();++it)
 			{
 				if((*it).second==this)
 				{
+					(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
+				
 					(*it).first->used=false;
 					connections.erase(it);
 					break;
@@ -262,11 +296,6 @@ void Slider::setClicked()
 	if(clicked==true && lastClicked==id) {clicked=false; lastClicked=-1;}
 	else
 	{
-		if(controlledBy!=NULL)
-		{
-			removeConnections();
-			return;
-		}
 		clicked=true;
 		lastClicked=id;
 		

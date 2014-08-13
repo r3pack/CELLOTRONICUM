@@ -5,7 +5,7 @@ void registerEffects()
 	registerEffect(Distecho::name, "Effects");
 	registerEffect(RMChorus::name, "Effects");
 	registerEffect(FreqShift::name, "Effects");
-	registerEffect(Playbuf::name, "Effects");
+	registerEffect(Playbuf::name, "IO_Effects");
 	registerEffect(Output::name, "IO_Effects");
 	registerEffect(Mix::name, "IO_Effects");
 	registerEffect(Mix3::name, "IO_Effects");

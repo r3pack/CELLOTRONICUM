@@ -24,6 +24,7 @@
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 			{sendInstance(); initGUI(X, Y);}
+			~Distecho() {quitGUI();}
 	};
 	
 	class RMChorus : public EffectAutoGUI
@@ -45,6 +46,7 @@
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 20.0f), EffectArgument("delay", 0.15f)}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
 			{sendInstance(); initGUI(X, Y);}
+			~RMChorus() {quitGUI();}
 	};
 	
 	class FreqShift : public EffectAutoGUI
@@ -66,6 +68,7 @@
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f)}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f)})
 			{sendInstance(); initGUI(X, Y);}
+			~FreqShift() {quitGUI();}
 	};
 	
 	class Mix : public EffectAutoGUI
@@ -87,6 +90,7 @@
 			args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
+			~Mix() {quitGUI();}
 	};
 	
 	class Mix3 : public EffectAutoGUI
@@ -108,12 +112,14 @@
 			args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
+			~Mix3() {quitGUI();}
 	};
 	
 	
 	class Playbuf : public EffectGUI
 	{
 		private:
+			int bufnum=-1;
 			static const int argsCount=2;
 			
 			EffectArgument args[argsCount];
@@ -136,7 +142,7 @@
 				fclose(file);
 				
 				fprintf(stderr, "Loading buffer from file: %s\n", playbufFileName);
-				int bufnum=OSCConn::loadBuffer(playbufFileName);
+				bufnum=OSCConn::loadBuffer(playbufFileName);
 				
 				args[0].set(bufnum);
 				*(std::string*)(argsVis[0].data)=OSCConn::getBufferFileById(bufnum);
@@ -206,6 +212,7 @@
 			{
 				fprintf(file, "%d %d %s ", posX, posY, playbufFileName);
 			}
+			~Playbuf() {quitGUI(); OSCConn::deleteBuffer(bufnum);}
 	};
 	
 	class Input : public EffectAutoGUI
@@ -224,6 +231,7 @@
 			Input(int X, int Y): args({EffectArgument("outbus", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
+			~Input() {quitGUI();}
 	};
 	
 	class Output : public EffectAutoGUI
@@ -242,6 +250,7 @@
 			Output(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus())}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
 			{sendInstance(); initGUI(X, Y);}
+			~Output() {quitGUI();}
 	};
 	
 	void registerEffects();
