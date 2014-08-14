@@ -29,13 +29,6 @@ SynthDef.new(\eff_harmonizer_4, {
 	w2.poll();
 	Out.ar(outbus,(in+p1+p2+p3+p4)/5);
 }).add;
-/* //TESTS
-b = Buffer.read(s, ~p +/+ "zBrody2.wav");
-
-x = Synth.new(\eff_harmonizer_4, [\inbus, 16, \outbus, 0,\semitones1, 3, \amp1, 0.1, \amp_threshold1, 0.07, \ampmax1, 0.2, \semitones2, 7, \amp2, 0.9, \amp_threshold2, 0.12, \ampmax2, 0.2 ]);
-Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 3]);
-
-*/
 
 SynthDef.new(\eff_harmonizer_5, {
 	arg inbus=8, outbus=0,
@@ -68,6 +61,8 @@ SynthDef.new(\eff_harmonizer_5, {
 	var w5 = ceil(thresh(amp ,amp_threshold5));
 	var a5 = Clip.ar((amp5*(amp-amp_threshold5))/(ampmax5-amp_threshold5), 0, amp5);
 	var p5 = Select.ar( w5, [DC.ar(0), PitchShift.ar(in, 0.2,(pow(2,semitones5/12)), mul: w5*a5)]);
+
+	amp.poll();
 
 	Out.ar(outbus,(in+p1+p2+p3+p4+p5)/6);
 }).add;
@@ -208,6 +203,42 @@ SynthDef.new(\eff_harmonizer_8, {
 
 	Out.ar(outbus,(in+p1+p2+p3+p4+p5+p6+p7+p8)/8);
 }).add;
+
+
+/*
+//TESTS
+b = Buffer.read(s, ~p +/+ "D-DUR.aiff");
+
+
+s.prepareForRecord(~p +/+ "d-dur-harmonizer.aiff");
+s.record;
+
+x = Synth.new(\eff_harmonizer_5,
+	[\inbus, 16, \outbus, 0,
+		\semitones1, -4, \amp1, 0.6, \amp_threshold1, 0.08, \ampmax1, 0.11,
+		\semitones2, -9, \amp2, 0.6, \amp_threshold2, 0.09, \ampmax2, 0.12,
+		\semitones3, -14, \amp3, 0.6, \amp_threshold3, 0.1, \ampmax3, 0.13,
+		\semitones4, -19, \amp4, 0.6, \amp_threshold4, 0.11, \ampmax4, 0.14,
+		\semitones5, 7, \amp5, 0, \amp_threshold5, 0.2, \ampmax5, 0.25,
+]);
+Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 14]);
+
+
+s.stopRecording;
+
+
+s.prepareForRecord(~p +/+ "harmonizer2.aiff");
+s.record;
+
+x = Synth.new(\eff_harmonizer_5,
+	[\inbus, 16, \outbus, 0,
+		\semitones1, 3, \amp1, 0.1, \amp_threshold1, 0.07, \ampmax1, 0.15,
+		\semitones2, 7, \amp2, 0.9, \amp_threshold2, 0.13, \ampmax2, 0.18,
+//		\semitones3, 19, \amp3, 0.3, \amp_threshold3, 0.17, \ampmax3, 0.21,
+//		\semitones4, -5, \amp4, 0.3, \amp_threshold4, 0.18, \ampmax4, 0.2,
+//		\semitones5, 0.01, \amp5, 0.1, \amp_threshold5, 0.2, \ampmax5, 0.22,
+]);
+Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 6]);
 
 
 /*

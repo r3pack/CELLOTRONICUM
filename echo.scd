@@ -8,18 +8,6 @@ SynthDef.new(\eff_pitchshift, {
 }).add;
 
 SynthDef.new(\eff_rand_pitchshift, {
-	arg inbus=8, outbus=0, freq=2;
-	var in = In.ar(inbus,1);
-	var trig = Impulse.kr(freq);
-	var pp = 1/3;
-	var index = TWindex.kr(trig,[pp, pp, pp]);
-	var selection = Select.kr(index, [5,7,12]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
-	var res = BBandPass.ar(PitchShift.ar(in,0.2,(pow(2,selection/12))), 440, 4);
-	var resfreq = Tartini.kr(res).poll();
-	Out.ar(outbus,res*SinOsc.ar(resfreq*0.5)+in);
-}).add;
-
-SynthDef.new(\eff_rand_pitchshift2, {
 	arg inbus=8, outbus=0, freq=5;
 	var in = In.ar(inbus,1);
 	var trig = Impulse.kr(freq);
@@ -29,7 +17,6 @@ SynthDef.new(\eff_rand_pitchshift2, {
 	var res = BBandPass.ar(PitchShift.ar(in,0.2,(pow(2,selection/12))), 440, 4);
 	Out.ar(outbus,res+in);
 }).add;
-
 
 /*
 // TESTS

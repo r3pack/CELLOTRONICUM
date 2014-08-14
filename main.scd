@@ -18,12 +18,6 @@ SynthDef.all;
 
 Zwykły sygnał opóźnić o czas potrzebny do pitch detection.
 
-Octave down - wystawić ten parametr
-
 Zrobić pitch shift ze zmianą szybkosci odtwarzania
-
-Harmonizer - do zwykłego dzwieku pitch shiftowane kopie, im glosniej, tym wiecej dzwiekow sie dolancza, prog od ktorego sie pojawia skladowa, najwieksza mozliwa glosnosc. Zafiksowac na 8 skladowych.
-
-
 
 */

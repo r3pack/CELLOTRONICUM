@@ -93,10 +93,10 @@ SynthDef.new(\eff_octave_up, {
 }).add;
 
 SynthDef.new(\eff_octave_down, {
-	arg inbus=8, outbus=0, freq_bus, mul=0.7;
+	arg inbus=8, outbus=0, freq_bus, mul=0.7, freq_mul=0.5;
 	var in = In.ar(inbus,1);
 	var freq = In.kr(freq_bus,1);
-	var res = (in*SinOsc.ar(freq*0.5))*mul;
+	var res = (in*SinOsc.ar(freq*freq_mul))*mul;
 	Out.ar(outbus, res);
 }).add;
 
