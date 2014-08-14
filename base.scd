@@ -16,7 +16,7 @@ SynthDef.new(\eff_mix, {
 	arg inbus1, inbus2, outbus, max_amp1 = 0.5;
 	var i1 = In.ar(inbus1);
 	var i2 = In.ar(inbus2);
-	var res = Mix.new([i1*max_amp1, i2*(1-max_amp2)]);
+	var res = Mix.new([i1*max_amp1, i2*(1-max_amp1)]);
 	Out.ar(outbus,res);
 }).add;
 

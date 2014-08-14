@@ -5,7 +5,6 @@ SynthDef.new(\eff_brassage_plus, {
 	var in = In.ar(inbus,1);
 	var delayed = DelayC.ar(in,delay,delay);
 	var signal = in*sq+delayed*sq;
-	//var signal = in*sq-delayed*sq;
 	Out.ar(outbus,signal);
 }).add;
 
@@ -15,7 +14,6 @@ SynthDef.new(\eff_brassage, {
 	var sq = Pulse.ar(freq);
 	var in = In.ar(inbus,1);
 	var delayed = DelayC.ar(in,delay,delay);
-	//var signal = in*sq+delayed*sq;
 	var signal = in*sq-delayed*(sq-1);
 	Out.ar(outbus,signal);
 }).add;

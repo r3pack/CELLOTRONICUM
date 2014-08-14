@@ -3,7 +3,7 @@
 SynthDef.new(\eff_pitchshift, {
 	arg inbus=8, outbus=0, semitones=0, window_size=0.2;
 	var in = In.ar(inbus,1);
-	var res = PitchShift.ar(in,window_size,semitones*pow(2,1/12));
+	var res = PitchShift.ar(in,window_size,pow(2,semitones/12));
 	Out.ar(outbus,res);
 }).add;
 
@@ -11,63 +11,28 @@ SynthDef.new(\eff_rand_pitchshift, {
 	arg inbus=8, outbus=0, freq=2;
 	var in = In.ar(inbus,1);
 	var trig = Impulse.kr(freq);
-	var pp = 1/2;
-	var index = TWindex.kr(trig,[pp, pp]);
-	var selection = Select.kr(index, [5,7]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
-	var res = PitchShift.ar(in,0.2,(selection*pow(2,1/12)));
+	var pp = 1/3;
+	var index = TWindex.kr(trig,[pp, pp, pp]);
+	var selection = Select.kr(index, [5,7,12]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
+	var res = BBandPass.ar(PitchShift.ar(in,0.2,(pow(2,selection/12))), 440, 4);
 	var resfreq = Tartini.kr(res).poll();
 	Out.ar(outbus,res*SinOsc.ar(resfreq*0.5)+in);
 }).add;
 
 SynthDef.new(\eff_rand_pitchshift2, {
-	arg inbus=8, outbus=0, freq=2;
+	arg inbus=8, outbus=0, freq=5;
 	var in = In.ar(inbus,1);
 	var trig = Impulse.kr(freq);
-	var pp = 1/2;
-	var index = TWindex.kr(trig,[pp, pp]);
+	var pp = 1/3;
+	var index = TWindex.kr(trig,[pp, pp, pp]);
 	var selection = Select.kr(index, [5,7,12]); //do interwałów konsonansowych niedoskonałych potrzebny jest chyba pitch detector
-	var res = PitchShift.ar(in,0.2,(selection*pow(2,1/12)));
+	var res = BBandPass.ar(PitchShift.ar(in,0.2,(pow(2,selection/12))), 440, 4);
 	Out.ar(outbus,res+in);
 }).add;
 
 
-SynthDef.new(\eff_harmonizer_4, {
-	arg inbus=8, outbus=0,
-	    amp_attack=0.02, amp_release=0.5,
-	   // int,     0 do 1     0 do 1      0 do 1
-	    semitones1, amp1=0, amp_threshold1=0.06, ampmax1=0.09,
-	    semitones2, amp2=0, amp_threshold2, ampmax2,
-	    semitones3, amp3=0, amp_threshold3, ampmax3,
-	    semitones4, amp4=0, amp_threshold4, ampmax4;
-	var in = In.ar(inbus,1);
-	var res = in;
-	var amp = Amplitude.ar(in, amp_attack,amp_release);
-	var w1 = ceil(thresh(amp ,amp_threshold1));
-	var a1 = Clip.ar((amp1*(amp-amp_threshold1))/(ampmax1-amp_threshold1), 0, amp1);
-	var p1 = Select.ar( w1, [DC.ar(0), PitchShift.ar(in, 0.2,(semitones1*pow(2,1/12)), mul: w1*a1)]);
-
-	var w2 = ceil(thresh(amp ,amp_threshold2));
-	var a2 = Clip.ar((amp2*(amp-amp_threshold2))/(ampmax2-amp_threshold2), 0, amp2);
-	var p2 = Select.ar( w2, [DC.ar(0), PitchShift.ar(in, 0.2,(semitones2*pow(2,1/12)), mul: w2*a2)]);
-
-	var w3 = ceil(thresh(amp ,amp_threshold3));
-	var a3 = Clip.ar((amp3*(amp-amp_threshold3))/(ampmax3-amp_threshold3), 0, amp3);
-	var p3 = Select.ar( w3, [DC.ar(0), PitchShift.ar(in, 0.2,(semitones3*pow(2,1/12)), mul: w3*a3)]);
-
-	var w4 = ceil(thresh(amp ,amp_threshold4));
-	var a4 = Clip.ar((amp4*(amp-amp_threshold4))/(ampmax4-amp_threshold4), 0, amp4);
-	var p4 = Select.ar( w1, [DC.ar(0), PitchShift.ar(in, 0.2,(semitones4*pow(2,1/12)), mul: w4*a4)]);
-	Out.ar(outbus,(in+p1+p2+p3+p4)/5);
-}).add;
-
-b = Buffer.read(s, ~p +/+ "zBrody1.wav");
-
-x = Synth.new(\eff_harmonizer_4, [\inbus, 17, \outbus, 0]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
-
-//TODO: Pitch shifter na delayach!
-
-/*/ TESTS
+/*
+// TESTS
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 b.bufnum.postln;
 b = Buffer.read(s, ~p +/+ "G-DUR.aiff");
@@ -75,8 +40,8 @@ b = Buffer.read(s, ~p +/+ "G-DUR.aiff");
 s.prepareForRecord(~p +/+ "rand_pitchshift2.aiff");
 s.record;
 
-x = Synth.new(\eff_rand_pitchshift, [\inbus, 17, \outbus, 0]);
-z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 1]);
+x = Synth.new(\eff_rand_pitchshift2, [\inbus, 17, \outbus, 0]);
+z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 4]);
 
 //z = Synth.new(\eff_playbuf, [\outbus, 1, \bufnum, 0]);
 
