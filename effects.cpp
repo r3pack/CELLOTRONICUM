@@ -6,7 +6,15 @@
 
 const int MAX_EFFECTS_COUNT=1000;
 
-std::map<const char*, std::pair<const char*, bool>, cmpCStr> effectsList;
+
+struct EffectEntry{
+	bool checked;
+	const char* group;
+	const char* subgroup;
+	EffectEntry(bool c, const char* g, const char* s) {checked=c; group=g; subgroup=s;}
+};
+
+std::map<const char*, EffectEntry, cmpCStr> effectsList;
 
 
 bool checkEffectsList()
@@ -40,7 +48,7 @@ bool checkEffectsList()
 					if(it != effectsList.end())
 					{
 						fprintf(stderr, ", which exist on client side (OK)\n");
-						(*it).second.second=true;
+						(*it).second.checked=true;
 					}
 					else
 					{
@@ -64,7 +72,7 @@ bool checkEffectsList()
 	
 	for(auto it=effectsList.begin();it!=effectsList.end();++it)
 	{
-		if(!((*it).second.second)) 
+		if(!((*it).second.checked)) 
 		{
 			gotAllEffects=false;
 			fprintf(stderr, "Effect '%s' not found on server side!!! Program will be closed!\n", (*it).first);
@@ -612,7 +620,7 @@ void Effect::clearAll()
 	getConnections()->clear();
 	busList.clear();
 	controllBusList.clear();
-	sliderList.clear();
+	valueGifterList.clear();
 	effectInstanceList.clear();
 	getControllerInstanceList()->clear();
 	
@@ -699,15 +707,26 @@ void EffectCreator::init()
 	for(auto it=effectsList.begin();it!=effectsList.end();++it)
 	{
 		const char* name=(*it).first;
-		const char* group=(*it).second.first;
+		const char* group=(*it).second.group;
+		const char* subgroup=(*it).second.subgroup;
 		
 		auto mapIt=chosenEffect->submenuEntries->find(group);
 		if(mapIt==chosenEffect->submenuEntries->end())
 		{
 			mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(group, new EffectCreatorMenuEntry(group, chosenEffect, false))).first;
 		}
+		
+		if(subgroup!=NULL)
+		{
+			auto mapIt2=mapIt->second->submenuEntries->find(subgroup);
+			if(mapIt2==mapIt->second->submenuEntries->end())
+			{
+				mapIt2=mapIt->second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(subgroup, new EffectCreatorMenuEntry(subgroup, mapIt->second, false))).first;
+			}
+			mapIt=mapIt2;
+		}
 
-		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+		mapIt->second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
 	}
 	
 	auto mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false))).first;
@@ -716,11 +735,6 @@ void EffectCreator::init()
 	{
 		const char* name=(*it);
 		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
-	}
-	
-	for(auto it=chosenEffect->submenuEntries->begin();it!=chosenEffect->submenuEntries->end();++it)
-	{
-		(*it).second->calculateWidth();
 	}
 	
 	chosenEffect->calculateWidth();
@@ -732,7 +746,6 @@ void EffectCreator::draw(int X, int Y)
 {
 	EffectCreatorMenuEntry* actualEntry=chosenEffect;
 	EffectCreatorMenuEntry* oldEntry=NULL;
-
 	
 	while(1)
 	{	
@@ -782,7 +795,7 @@ void EffectCreator::receiveKeyboardEvent(SDL_Scancode scancode)
 	}
 }
 
-void registerEffect(const char* name, const char* group) 
+void registerEffect(const char* name, const char* group, const char* subgroup) 
 {
-	effectsList.insert(std::pair<const char*, std::pair<const char*, bool> >(name, std::pair<const char*, bool>(group, false)));
+	effectsList.insert(std::pair<const char*, EffectEntry>(name, EffectEntry(false, group, subgroup)));
 }
