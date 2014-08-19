@@ -82,7 +82,11 @@ void getOpenFile(char* filename, int size)
 	while (SDL_PollEvent(&event)) {}
 	#else
 		printf("Enter file to load: ");
-		fgets(stdin, size, filename);
+		fgets(filename, size, stdin);
+        for(int i=strlen(filename)-1;i>=0;--i)
+        {
+            if(filename[i]!='\n' && filename[i]!=' ') {filename[i+1]='\0'; break;}
+        }
 	#endif
 }
 
@@ -107,7 +111,11 @@ void getSaveFile(char* filename, int size)
 	while (SDL_PollEvent(&event)) {}
 	#else
 		printf("Enter file to save: ");
-		fgets(stdin, size, filename);
+		fgets(filename, size, stdin);
+        for(int i=strlen(filename)-1;i>=0;--i)
+        {
+            if(filename[i]!='\n' && filename[i]!=' ') {filename[i+1]='\0'; break;}
+        }
 	#endif
 }
 
