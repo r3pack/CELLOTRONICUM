@@ -9,6 +9,8 @@ SDL_Event event;
 
 TTF_Font *font;
 
+TTF_Font *monoFont;
+
 void initSDL()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -39,6 +41,13 @@ void initSDL()
 	
 	font=TTF_OpenFont("FreeSans.ttf", 12);
 	if(!font)
+	{
+		printf("TTF_OpenFont error: %s\n", TTF_GetError());
+		exit(5);
+	}
+	
+	monoFont=TTF_OpenFont("FreeMonoBold.ttf", 12);
+	if(!monoFont)
 	{
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
 		exit(5);
@@ -126,7 +135,7 @@ SDL_Texture* generateVerticalText(const char* text, SDL_Color color)
 	
 	for(int i=0;text[i]!='\0';++i)
 	{
-		SDL_Surface* text_surface=TTF_RenderGlyph_Blended(font, text[i], color);
+		SDL_Surface* text_surface=TTF_RenderGlyph_Blended(monoFont, text[i], color);
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(render, text_surface);
 		
 		
@@ -144,7 +153,6 @@ SDL_Texture* generateVerticalText(const char* text, SDL_Color color)
 		
 		glyphs.push_back(tex);
 	}
-	h+=5;
 
 	SDL_Texture *tex=SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
 	
@@ -181,6 +189,12 @@ SDL_Texture* generateVerticalText(const char* text, SDL_Color color)
 	
 	SDL_SetRenderTarget(render, NULL);
 	return tex;
+
+}
+
+int getFontHeight()
+{
+	return TTF_FontHeight(font);
 }
 
 SDL_Texture* loadTexture(const char* filename)

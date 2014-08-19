@@ -27,6 +27,8 @@ SDL_Texture* loadTexture(const char* filename);
 
 void setColor(SDL_Color color);
 
+int getFontHeight();
+
 SDL_Texture* generateText(const char* text, SDL_Color color=COLOR_TEXT);
 SDL_Texture* generateVerticalText(const char* text, SDL_Color color=COLOR_TEXT);
 

@@ -2,9 +2,9 @@
 
 void registerEffects()
 {
-	registerEffect(Distecho::name, "Effects", "eff1");
-	registerEffect(RMChorus::name, "Effects", "eff2");
-	registerEffect(FreqShift::name, "Effects", "eff2");
+	registerEffect(Distecho::name, "Effects");
+	registerEffect(RMChorus::name, "Effects");
+	registerEffect(FreqShift::name, "Effects");
 	registerEffect(Harmonizer4::name, "Effects");
 	registerEffect(Playbuf::name, "IO_Effects");
 	registerEffect(Output::name, "IO_Effects");

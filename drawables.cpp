@@ -11,6 +11,9 @@ int ControllBus::lastId=0;
 int ValueGifter::lastClicked=-1;
 int ValueGifter::lastId=0;
 
+int EntryBox::lastClicked=-1;
+int EntryBox::lastId=0;
+
 class Bus;
 
 std::map <int, Bus*> busList;
@@ -372,4 +375,9 @@ GradualSlider::~GradualSlider()
 	removeConnections();
 	SDL_DestroyTexture(valueTex);
 	valueGifterList.erase(id);
+}
+
+void EntryBox::sendValue()
+{
+	effect->setAndSendArgument(argument, value);
 }

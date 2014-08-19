@@ -44,6 +44,7 @@
 		virtual int getHeight() = 0;
 		virtual bool receiveClick(int X, int Y, MouseEvent me) = 0;
 		virtual bool receiveSecondClick(int X, int Y, MouseEvent me) {return false;}
+		virtual bool receiveKeyboardEvent(SDL_Scancode scancode) {return false;}
 		virtual ~Drawable() {}
 	};
 
@@ -553,7 +554,8 @@
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
 			
 			SDL_Rect valueRect;
-			valueRect.y=posY+(level-h>=0?level-h:0);
+			//valueRect.y=posY+(level-h>=0?level-h:0);
+			valueRect.y=posY+height;
 			valueRect.x=posX+width/2-w/2;
 			valueRect.w=w;
 			valueRect.h=h;
@@ -736,8 +738,241 @@
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
 			
 			SDL_Rect valueRect;
-			valueRect.y=posY+(level-h>=0?level-h:0);
+			//valueRect.y=posY+(level-h>=0?level-h:0);
+			valueRect.y=posY+height;
 			valueRect.x=posX+width/2-w/2;
+			valueRect.w=w;
+			valueRect.h=h;
+			
+			SDL_RenderCopy(render, valueTex, NULL, &valueRect);
+		}
+		
+		int getWidth() {return width;}
+		int getHeight() {return height;}
+	};
+	
+	class EntryBox : public Drawable{
+		int width;
+		const int height;
+		int posX;
+		int posY;
+		
+		SDL_Texture* valueTex=NULL;
+		
+		std::string data;
+		
+		float value;
+		
+		static int lastId;
+		int id;
+		static int lastClicked;
+		
+		Effect* effect;
+		int argument;
+		
+		public:
+		
+		EntryBox(int pX, int pY, int w, float v, Effect* e, int a):
+		width(w), posX(pX), posY(pY), height(getFontHeight())
+		{
+			effect=e;
+			argument=a;
+			value=v;
+			std::stringstream ss;
+			ss.setf(std::ios::fixed);
+			ss.precision(2);
+			ss<<v;
+			data=ss.str();
+			id=lastId++;
+			valueTex=generateText(data.c_str());
+		}
+		
+		~EntryBox() {SDL_DestroyTexture(valueTex);}
+		
+		bool receiveClick(int X, int Y, MouseEvent me)
+		{
+			if(me!=ME_PRESS) return false;
+			X-=posX;
+			Y-=posY;
+			if(X>=0 && X<=width && Y>=0 && Y<=height)
+			{
+				if(lastClicked==id)
+				{
+					lastClicked=-1;
+					if(checkValue()) sendValue();
+				}
+				else
+				lastClicked=id;
+				return true;
+			}
+			return false;
+		}
+		
+		bool receiveSecondClick(int X, int Y, MouseEvent me)
+		{
+			if(me!=ME_PRESS) return false;
+			X-=posX; 
+			Y-=posY;
+			if(X>=0 && X<=width && Y>=0 && Y<=height)
+			{
+				lastClicked=-1;
+				std::stringstream ss;
+				ss.setf(std::ios::fixed);
+				ss.precision(2);
+				ss<<value;
+				data=ss.str();
+				updateValue();
+				return true;
+			}
+			return false;
+		}
+		
+		bool receiveKeyboardEvent(SDL_Scancode scancode)
+		{
+			if(id!=lastClicked) return false;
+			
+			switch(scancode)
+			{
+				case SDL_SCANCODE_0:
+				case SDL_SCANCODE_KP_0:
+					data.push_back('0');
+					updateValue();	
+				return true;
+				case SDL_SCANCODE_1:
+				case SDL_SCANCODE_KP_1:
+					data.push_back('1');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_2:
+				case SDL_SCANCODE_KP_2:
+					data.push_back('2');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_3:
+				case SDL_SCANCODE_KP_3:
+					data.push_back('3');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_4:
+				case SDL_SCANCODE_KP_4:
+					data.push_back('4');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_5:
+				case SDL_SCANCODE_KP_5:
+					data.push_back('5');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_6:
+				case SDL_SCANCODE_KP_6:
+					data.push_back('6');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_7:
+				case SDL_SCANCODE_KP_7:
+					data.push_back('7');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_8:
+				case SDL_SCANCODE_KP_8:
+					data.push_back('8');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_9:
+				case SDL_SCANCODE_KP_9:
+					data.push_back('9');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_PERIOD:
+				case SDL_SCANCODE_COMMA:
+					data.push_back('.');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_BACKSPACE:
+					if(data.size()>0)
+					{
+						data.pop_back();
+						updateValue();
+					}
+				return true;
+				case SDL_SCANCODE_RETURN:
+					lastClicked=-1;
+					if(checkValue()) sendValue();
+				return true;
+			}
+			return false;
+		}
+		
+		void sendValue();
+		
+		float getValue()
+		{
+			return value;
+		}
+			
+		void setPos(int X, int Y)
+		{
+			posX=X;
+			posY=Y;
+		}
+		
+		void move(int X, int Y)
+		{
+			posX+=X;
+			posY+=Y;
+		}
+		
+		int getPosX(){return posX;}
+		int getPosY(){return posY;}
+		
+		bool checkValue()
+		{
+			int periodCount=0;
+			for(int i=0;data[i]!='\0';++i)
+			{
+				if(data[i]=='.') ++periodCount;
+			}
+			
+			if(periodCount>=2)
+			{
+				std::stringstream ss;
+				ss.setf(std::ios::fixed);
+				ss.precision(2);
+				ss<<value;
+				data=ss.str();
+				updateValue();
+			}
+			else
+			{
+				value=atof(data.c_str());
+			}
+		}
+		
+		void updateValue()
+		{
+			SDL_DestroyTexture(valueTex);
+			valueTex=generateText(data.c_str());
+		}
+		
+		void draw()
+		{		
+			SDL_Rect rect;
+			rect.x = posX;
+			rect.y = posY;
+			rect.w = width;
+			rect.h = height;
+			
+			setColor(COLOR_ENTRYBOX_BACKGROUND);
+			SDL_RenderFillRect(render, &rect);
+			setColor((id==lastClicked)?COLOR_ENTRYBOX_BORDER_CLICKED:COLOR_ENTRYBOX_BORDER);
+			SDL_RenderDrawRect(render, &rect);
+			
+			int w, h;
+			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
+			
+			SDL_Rect valueRect;
+			valueRect.y=posY;
+			valueRect.x=posX+width-w-2;
 			valueRect.w=w;
 			valueRect.h=h;
 			
