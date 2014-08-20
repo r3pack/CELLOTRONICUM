@@ -65,15 +65,34 @@
         
         ArgVis(VisulalisationType type, float min, float max, int width=0, int height=0)
         {
-            visType=VT_SLIDER;
-            data=malloc(sizeof(float)*2 + sizeof(int)*2);
-			((float*)data)[0]=min;
-			((float*)data)[1]=max;
-			((int*)(((float*)data)+2))[0]=width;
-			((int*)(((float*)data)+2))[1]=height;
+				visType=VT_SLIDER;
+				data=malloc(sizeof(float)*2 + sizeof(int)*2);
+				((float*)data)[0]=min;
+				((float*)data)[1]=max;
+				((int*)(((float*)data)+2))[0]=width;
+				((int*)(((float*)data)+2))[1]=height;
         }
 		
-		 ArgVis(VisulalisationType type, int count, ...)
+		ArgVis(VisulalisationType type, int min, int max)
+        {
+			int count=max-min+1;
+			
+			visType=VT_GRADUALSLIDER;
+            data=malloc(sizeof(int)+count*sizeof(float));
+			
+			*(int*)data=count;
+			
+			float* tab=(float*)(((int*)data)+1);
+			
+
+			for(int i=min;i<=max;++i)
+			{
+				tab[i-min]=float(i);
+			}
+			
+		}
+		
+		ArgVis(VisulalisationType type, int count, ...)
         {
             visType=VT_GRADUALSLIDER;
             data=malloc(sizeof(int)+count*sizeof(float));
@@ -500,7 +519,7 @@
 			
 			for(int i=0;i<argsCount;++i)
 			{
-				if(argvis[i].visType==VT_OUTBUS)
+				if(argvis[i].visType==VT_OUTBUS || argvis[i].visType==VT_FREQ_OUTBUS || argvis[i].visType==VT_AMP_OUTBUS)
 				{
 					visualPositions[i].first=x;
 				}
