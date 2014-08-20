@@ -181,7 +181,7 @@ SynthDef.new(\eff_wsdistortionwetDry, {
 x = Synth.new(\eff_wsdistortionwetDry, [\inbus, 8, \outbus, 0, \gain, 2, \freq, 5, \sin_amp, 1, \noise_amp, 1, \const_amp, 0]);
 */
 
-SynthDef.new(\gramophone, {
+SynthDef.new(\eff_gramophone, {
 	arg inbus=8, outbus=0, noise_amp = 0.2, rq=1, freq=1000, imp_freq=5, blip_freq=3, gain = 2;
 	var input = gain* In.ar(inbus,1);
 	var filtered = BBandPass.ar(WhiteNoise.ar(noise_amp/300),freq,rq);
