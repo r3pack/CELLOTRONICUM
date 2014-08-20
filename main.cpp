@@ -172,6 +172,15 @@ bool checkInputs()
 				}
 			break;
 			case SDL_KEYDOWN:
+				
+				
+				auto it=effectInstanceList->begin();
+				for(;it!=effectInstanceList->end();++it)
+				{
+					if(it->second->receiveKeyboardEvent(event.key.keysym.scancode))break;
+				}
+				
+				if(it==effectInstanceList->end())
 				effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
 				
 				const Uint8 *state = SDL_GetKeyboardState(NULL);

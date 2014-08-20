@@ -47,7 +47,9 @@ struct ParamControllBus
 
 class Controller{
 	friend class ControllBus;
+	friend class ValueGifter;
 	friend class Slider;
+	friend class GradualSlider;
 	friend class Effect;
 
 	int id;
@@ -66,7 +68,7 @@ class Controller{
 	
 	std::vector <ParamControllBus> outBuses;
 	
-	std::list <std::pair<int, Slider*> > controlledSliders;
+	std::list <std::pair<int, ValueGifter*> > controlledValueGifters;
 	
 	int posX, posY;
 	
@@ -99,7 +101,7 @@ class Controller{
 	void step()
 	{
 		if(paused) return;
-		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+		for(auto it=controlledValueGifters.begin();it!=controlledValueGifters.end();++it)
 		{
 			if(valueIsReady(it->first))
 			it->second->setNormalizedValue(getValue(it->first));
@@ -134,7 +136,7 @@ class Controller{
 			controllerByBus.erase(outBuses[i].bus);
 		}
 		
-		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+		for(auto it=controlledValueGifters.begin();it!=controlledValueGifters.end();++it)
 		{
 			it->second->controlledBy=NULL;
 		}
@@ -246,17 +248,17 @@ class Controller{
 			outBuses[i].draw();
 		}
 		
-		for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+		for(auto it=controlledValueGifters.begin();it!=controlledValueGifters.end();++it)
 		{
 			ControllBus* bus=outBuses[it->first].bus;
-			Slider* slider=it->second;
+			ValueGifter* valueGifter=it->second;
 			
-			if(bus->getPosY()+ControllBus::size/2 <= slider->getPosY() + slider->getHeight()/2)
+			if(bus->getPosY()+ControllBus::size/2 <= valueGifter->getPosY() + valueGifter->getHeight()/2)
 			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
-								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY()-Slider::slider_bus_height/2);
+								       valueGifter->getPosX()+valueGifter->getWidth()/2,  valueGifter->getPosY()-Slider::slider_bus_height/2);
 			else
 			SDL_RenderDrawLine(render, bus->getPosX()+ControllBus::size/2, bus->getPosY()+ControllBus::size/2,
-								       slider->getPosX()+slider->getWidth()/2,  slider->getPosY()+slider->getHeight());
+								       valueGifter->getPosX()+valueGifter->getWidth()/2,  valueGifter->getPosY()+valueGifter->getHeight());
 		}
 		
 	}

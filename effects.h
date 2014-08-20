@@ -101,6 +101,7 @@
 			virtual bool receiveClick(int X, int Y, MouseEvent me){}
 			virtual bool receiveSecondClick(int X, int Y, MouseEvent me){}
 			virtual bool receiveThridClick(int X, int Y, MouseEvent me){}
+			virtual bool receiveKeyboardEvent(SDL_Scancode scancode){}
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);
@@ -128,13 +129,19 @@
 		EffectCreatorMenuEntry* parent=NULL;
 		int width=0;
 		
-		int calculateWidth()
+		void calculateWidth()
 		{
+			if(submenuEntries==NULL) return;
 			for(auto it=submenuEntries->begin();it!=submenuEntries->end();++it)
 			{
 				int w;
 				SDL_QueryTexture((*it).second->nameTex, NULL, NULL, &w, NULL);
 				width=std::max(width, w);
+			}
+			
+			for(auto it=submenuEntries->begin();it!=submenuEntries->end();++it)
+			{
+				(*it).second->calculateWidth();
 			}
 		}
 		
@@ -175,6 +182,6 @@
 	
 	std::map <int, Effect*>* getEffectInstanceList();
 	
-	void registerEffect(const char* name, const char* group);
+	void registerEffect(const char* name, const char* group, const char* subgroup=NULL);
 
 #endif

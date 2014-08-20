@@ -6,21 +6,39 @@
 	{
 		Drawable* drawable;
 		SDL_Texture* nameTex=NULL;
-		ParamDrawable(Drawable* d, const char* text): drawable(d) {nameTex=generateText(text);}
+		bool vertical;
+		ParamDrawable(Drawable* d, const char* text, bool v=false): vertical(v), drawable(d) {if(vertical) nameTex=generateVerticalText(text); else nameTex=generateText(text);}
 		
 		void draw() 
 		{
 			drawable->draw();
-			int w, h;
-			SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
-		
-			SDL_Rect nameRect;
-			nameRect.x=drawable->getPosX() + drawable->getWidth()/2 - w/2;
-			nameRect.y=drawable->getPosY() + drawable->getHeight(); 
-			nameRect.w=w;
-			nameRect.h=h;		
 			
-			SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+			if(!vertical)
+			{
+				int w, h;
+				SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
+		
+				SDL_Rect nameRect;
+				nameRect.x=drawable->getPosX() + drawable->getWidth()/2 - w/2;
+				nameRect.y=drawable->getPosY() + drawable->getHeight(); 
+				nameRect.w=w;
+				nameRect.h=h;		
+				
+				SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+			}
+			else
+			{
+				int w, h;
+				SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
+		
+				SDL_Rect nameRect;
+				nameRect.x=drawable->getPosX() - w -2;
+				nameRect.y=drawable->getPosY() + drawable->getHeight() - h; 
+				nameRect.w=w;
+				nameRect.h=h;
+				
+				SDL_RenderCopy(render, nameTex, NULL, &nameRect);
+			}
 		}
 		
 		void free() {delete drawable; SDL_DestroyTexture(nameTex);}
@@ -35,6 +53,8 @@
 			VT_AMP_INBUS,
 			VT_AMP_OUTBUS,
             VT_SLIDER,
+			VT_GRADUALSLIDER,
+			VT_ENTRYBOX,
 			VT_TEXT
     };
 	
@@ -43,13 +63,34 @@
         VisulalisationType visType;
         void* data=NULL;
         
-        ArgVis(VisulalisationType type, float min, float max)
+        ArgVis(VisulalisationType type, float min, float max, int width=0, int height=0)
         {
             visType=VT_SLIDER;
-            data=new float[2];
+            data=malloc(sizeof(float)*2 + sizeof(int)*2);
 			((float*)data)[0]=min;
 			((float*)data)[1]=max;
+			((int*)(((float*)data)+2))[0]=width;
+			((int*)(((float*)data)+2))[1]=height;
         }
+		
+		 ArgVis(VisulalisationType type, int count, ...)
+        {
+            visType=VT_GRADUALSLIDER;
+            data=malloc(sizeof(int)+count*sizeof(float));
+			
+			*(int*)data=count;
+			
+			float* tab=(float*)(((int*)data)+1);
+			
+			va_list vl;
+			va_start(vl,count);
+			for(int i=0;i<count;++i)
+			{
+				tab[i]=va_arg(vl,double);
+			}
+			va_end(vl);
+        }
+		
 		ArgVis(VisulalisationType type, std::string str)
         {
             visType=VT_TEXT;
@@ -62,10 +103,14 @@
         ~ArgVis()
         {
             if(visType==VT_SLIDER)
-            delete [] (float*)data;
+			free(data);
+			else
+			if(visType==VT_GRADUALSLIDER)
+			free(data);
 			else
 			if(visType==VT_TEXT)
 			delete (std::string*)data;
+			
         }
         
     };
@@ -94,8 +139,10 @@
 		
 		public:
 		
-		static const int slider_width=30;
+		static const int slider_width=24;
 		static const int slider_height=160;
+		
+		static const int entrybox_width=35;
 		
 		virtual int_pair* getVisualPositions()=0;
 		
@@ -144,8 +191,22 @@
 					{
 						float min=((float*)argvis[i].data)[0];
 						float max=((float*)argvis[i].data)[1];
-						drawables.push_back(ParamDrawable(new Slider(posX+argpos[i].first, posY+argpos[i].second, slider_width, slider_height, min, max, args[i].getFloatValue(), this, i), args[i].getName()));
+						int width=((int*)(((float*)argvis[i].data)+2))[0];
+						int height=((int*)(((float*)argvis[i].data)+2))[1];
+						
+						drawables.push_back(ParamDrawable(new Slider(posX+argpos[i].first, posY+argpos[i].second, (width<=0)?slider_width:width, (height<=0)?slider_height:height, min, max, args[i].getFloatValue(), this, i), args[i].getName(), true));
 					}
+					break;
+					case VT_GRADUALSLIDER:
+					{
+						int count=*(int*)argvis[i].data;
+			
+						float* tab=(float*)(((int*)argvis[i].data)+1);	
+						drawables.push_back(ParamDrawable(new GradualSlider(posX+argpos[i].first, posY+argpos[i].second, slider_width, slider_height, count, tab, args[i].getFloatValue(), this, i), args[i].getName(), true));
+					}
+					break;
+					case VT_ENTRYBOX:
+					drawables.push_back(ParamDrawable(new EntryBox(posX+argpos[i].first, posY+argpos[i].second, entrybox_width, args[i].getFloatValue(), this, i), args[i].getName()));
 					break;
 					case VT_TEXT:
 						drawables.push_back(ParamDrawable(new Point(posX+argpos[i].first, posY+argpos[i].second), ((std::string*)argvis[i].data)->c_str()));
@@ -216,13 +277,12 @@
 			pauseButton->setSymbol(int(isPaused()));
 			pauseButton->draw();
 			
-			
+			ArgVis* argvis=getArgumentVisuals();
 			
 			for(int i=0;i<drawables.size();++i)
 			{
 				drawables[i].draw();
 			}
-			
 		}
 		
 		bool receiveClick(int X, int Y, MouseEvent me)
@@ -291,6 +351,15 @@
 			else return false;
 		}
 		
+		bool receiveKeyboardEvent(SDL_Scancode scancode)
+		{
+			for(int i=0;i<drawables.size();++i)
+			{
+				if(drawables[i].drawable->receiveKeyboardEvent(scancode)) return true;
+			}
+			return false;
+		}
+		
 		virtual void saveData(FILE* file) 
 		{
 			int argsCount=getArgsCount();
@@ -350,9 +419,11 @@
 		
 		public:
 		
-		static const int slider_period=20;
+		static const int slider_period=15;
 		static const int top_padding=35;
-		static const int bottom_padding=30;
+		static const int bottom_padding=25;
+		static const int left_padding=15;
+		static const int right_padding=15;
 		static const int bus_period=35;
 		
 		std::pair<int, int>* getVisualPositions()
@@ -360,8 +431,9 @@
 			return visualPositions;
 		}
 		
-		void initGUI(int X, int Y)
+		void initGUI(int X, int Y, int left_padding=left_padding, int right_padding=right_padding)
 		{
+			
 			int width=0, height=0;
 		
 			posX=X;
@@ -372,7 +444,7 @@
 			
 			visualPositions= new std::pair<int, int>[argsCount];
 			
-			int x=width=slider_period+Bus::size+slider_period;
+			int x=width=left_padding+Bus::size+left_padding;
 			
 			ArgVis* argvis=getArgumentVisuals();
 			
@@ -380,7 +452,7 @@
 			int slider_y=0;
 			int bus_y2=top_padding;
 			
-			int extra_period=slider_period;
+			int extra_period=right_padding;
 			
 			for(int i=0;i<argsCount;++i)
 			{
@@ -389,7 +461,7 @@
 					case VT_INBUS:
 					case VT_FREQ_INBUS:
 					case VT_AMP_INBUS:
-						visualPositions[i]=int_pair(0+slider_period, bus_y);
+						visualPositions[i]=int_pair(0+left_padding, bus_y);
 						bus_y+=bus_period;
 					break;
 					case VT_OUTBUS:
@@ -399,10 +471,23 @@
 						bus_y2+=bus_period;
 					break;
 					case VT_SLIDER:
-						slider_y=slider_height;
+					case VT_GRADUALSLIDER:
+					{
+						int width=0, height=0;
+						if(argvis[i].visType==VT_SLIDER)
+						{
+							width=((int*)(((float*)argvis[i].data)+2))[0];
+							height=((int*)(((float*)argvis[i].data)+2))[1];
+						}
+						
+						width=(width<=0)?slider_width:width;
+						height=(height<=0)?slider_height:height;
+					
+						slider_y=std::max(slider_y, height);
 						visualPositions[i]=int_pair(x, 0+top_padding);
-						x+=slider_width+slider_period;
-						extra_period=0;
+						x+=width+slider_period;
+						extra_period=right_padding-slider_period;
+					}
 					break;
 				}
 			}
@@ -421,7 +506,7 @@
 				}
 			}
 			
-			width+=Bus::size+slider_period;
+			width+=Bus::size+right_padding;
 			
 			
 			EffectGUI::initGUI(X, Y, width, height);

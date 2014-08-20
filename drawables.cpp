@@ -8,8 +8,11 @@ int Bus::lastId=0;
 int ControllBus::lastClicked=-1;
 int ControllBus::lastId=0;
 
-int Slider::lastClicked=-1;
-int Slider::lastId=0;
+int ValueGifter::lastClicked=-1;
+int ValueGifter::lastId=0;
+
+int EntryBox::lastClicked=-1;
+int EntryBox::lastId=0;
 
 class Bus;
 
@@ -17,7 +20,7 @@ std::map <int, Bus*> busList;
 
 std::map <int, ControllBus*> controllBusList;
 
-std::map <int, Slider*> sliderList;
+std::map <int, ValueGifter*> valueGifterList;
 
 std::set <std::pair <Bus*, Bus*> > connections;
 
@@ -177,15 +180,15 @@ bool Bus::receiveSecondClick(int X, int Y, MouseEvent me)
 	return false;
 }
 
-bool ControllBus::connectControllBusWithSlider()
+bool ControllBus::connectControllBusWithValueGifter()
 {
-	if(Slider::lastClicked != -1 && ControllBus::lastClicked != -1)
+	if(ValueGifter::lastClicked != -1 && ControllBus::lastClicked != -1)
 	{
-		auto it=sliderList.find(Slider::lastClicked);
-		if(it==sliderList.end())
+		auto it=valueGifterList.find(ValueGifter::lastClicked);
+		if(it==valueGifterList.end())
 		{
 			fprintf(stderr, "Error: slider not found\n");
-			Slider::lastClicked=-1;
+			ValueGifter::lastClicked=-1;
 			ControllBus::lastClicked=-1;
 			return false;
 		}
@@ -194,16 +197,16 @@ bool ControllBus::connectControllBusWithSlider()
 		if(it2==controllBusList.end())
 		{
 			fprintf(stderr, "Error: controllbus not found\n");
-			Slider::lastClicked=-1;
+			ValueGifter::lastClicked=-1;
 			ControllBus::lastClicked=-1;
 			return false;
 		}
 		
-		Slider *slider=it->second;
+		ValueGifter *valueGifter=it->second;
 		ControllBus *controllBus=it2->second;
 		Controller* controller=controllBus->controller;
 		
-		if(slider->controlledBy!=NULL)
+		if(valueGifter->controlledBy!=NULL)
 		{
 			bool fromThisController=false;
 			
@@ -215,18 +218,18 @@ bool ControllBus::connectControllBusWithSlider()
 				if(controller->outBuses[whichBus].bus==controllBus) break;
 			}
 			
-			for(auto it=controller->controlledSliders.begin();it!=controller->controlledSliders.end();++it)
+			for(auto it=controller->controlledValueGifters.begin();it!=controller->controlledValueGifters.end();++it)
 			{
-				if(it->second==slider && whichBus==it->first)
+				if(it->second==valueGifter && whichBus==it->first)
 				{
-					controller->controlledSliders.erase(it);
-					slider->controlledBy=NULL;
+					controller->controlledValueGifters.erase(it);
+					valueGifter->controlledBy=NULL;
 					break;
 				}
 			}
 			
-			fprintf(stderr, "Error: slider is already controlled\n");
-			Slider::lastClicked=-1;
+			fprintf(stderr, "Error: value gifter is already controlled\n");
+			ValueGifter::lastClicked=-1;
 			ControllBus::lastClicked=-1;
 			return false;
 		}
@@ -242,16 +245,16 @@ bool ControllBus::connectControllBusWithSlider()
 		if(i==size)
 		{
 			fprintf(stderr, "Error: controllbus not found on controller\n");
-			Slider::lastClicked=-1;
+			ValueGifter::lastClicked=-1;
 			ControllBus::lastClicked=-1;
 			return false;
 		}
 		
-		controller->controlledSliders.push_back(std::pair<int, Slider*>(i, slider));
+		controller->controlledValueGifters.push_back(std::pair<int, ValueGifter*>(i, valueGifter));
 		
 		ControllBus::lastClicked=-1;
-		Slider::lastClicked=-1;
-		slider->controlledBy=controller;
+		ValueGifter::lastClicked=-1;
+		valueGifter->controlledBy=controller;
 		
 		return true;
 	}
@@ -266,7 +269,7 @@ bool ControllBus::setClicked()
 		clicked=true;
 		lastClicked=id;
 		
-		return ControllBus::connectControllBusWithSlider();
+		return ControllBus::connectControllBusWithValueGifter();
 	}
 }
 
@@ -276,12 +279,12 @@ bool ControllBus::receiveSecondClick(int X, int Y, MouseEvent me)
 	Y-=posY;
 	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
 	{
-		for(auto it=controller->controlledSliders.begin();it!=controller->controlledSliders.end();)
+		for(auto it=controller->controlledValueGifters.begin();it!=controller->controlledValueGifters.end();)
 		{
 			if(controller->outBuses[it->first].bus==this)
 			{
 				it->second->controlledBy=NULL;
-				it=controller->controlledSliders.erase(it);
+				it=controller->controlledValueGifters.erase(it);
 			}
 			else
 			++it;
@@ -291,7 +294,7 @@ bool ControllBus::receiveSecondClick(int X, int Y, MouseEvent me)
 	return false;
 }
 
-void Slider::setClicked()
+void ValueGifter::setClicked()
 {
 	if(clicked==true && lastClicked==id) {clicked=false; lastClicked=-1;}
 	else
@@ -299,17 +302,18 @@ void Slider::setClicked()
 		clicked=true;
 		lastClicked=id;
 		
-		ControllBus::connectControllBusWithSlider();
+		ControllBus::connectControllBusWithValueGifter();
 	}
 }
 
-void Slider::removeConnections()
+void ValueGifter::removeConnections()
 {
+	ValueGifter* dis=valueGifterList[id];
 	if(controlledBy!=NULL)
 	{
-		for(auto it=controlledBy->controlledSliders.begin();it!=controlledBy->controlledSliders.end();++it)
+		for(auto it=controlledBy->controlledValueGifters.begin();it!=controlledBy->controlledValueGifters.end();++it)
 		{
-			if(it->second==this) {controlledBy->controlledSliders.erase(it); break;}
+			if(it->second==this) {controlledBy->controlledValueGifters.erase(it); break;}
 		}
 	}
 	controlledBy=NULL;
@@ -319,7 +323,7 @@ Slider::~Slider()
 {
 	removeConnections();
 	SDL_DestroyTexture(valueTex);
-	sliderList.erase(id);
+	valueGifterList.erase(id);
 }
 
 void Slider::setValue(float v)
@@ -331,7 +335,7 @@ void Slider::setValue(float v)
 		effect->setAndSendArgument(argument, value);
 		SDL_DestroyTexture(valueTex);
 		std::ostringstream buff;
-		buff.setf(std::ios::fixed, std:: ios::floatfield);
+		buff.setf(std::ios::fixed, std::ios::floatfield);
 		if(value>=10.0f || value<=-10.0f)
 		buff.precision(1);
 		else
@@ -343,4 +347,37 @@ void Slider::setValue(float v)
 		
 		level=height-int((value-rangeBegin)/(rangeEnd-rangeBegin)*float(height));
 	}
+}
+
+void GradualSlider::setValue(int v)
+{
+	value=v;
+	
+	if(value!=lastValue)
+	{
+		effect->setAndSendArgument(argument, graduals[value]);
+		SDL_DestroyTexture(valueTex);
+		std::ostringstream buff;
+		//buff.setf(std::ios::fixed, std::ios::floatfield);
+		if(graduals[value]>=10.0f || graduals[value]<=-10.0f)
+		buff.precision(1);
+		else
+		buff.precision(2);
+		buff<<graduals[value];
+		
+		valueTex=generateText(buff.str().c_str());
+		lastValue=value;
+	}
+}
+
+GradualSlider::~GradualSlider() 
+{
+	removeConnections();
+	SDL_DestroyTexture(valueTex);
+	valueGifterList.erase(id);
+}
+
+void EntryBox::sendValue()
+{
+	effect->setAndSendArgument(argument, value);
 }

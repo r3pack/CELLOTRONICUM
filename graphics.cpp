@@ -9,6 +9,8 @@ SDL_Event event;
 
 TTF_Font *font;
 
+TTF_Font *monoFont;
+
 void initSDL()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -43,6 +45,13 @@ void initSDL()
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
 		exit(5);
 	}
+	
+	monoFont=TTF_OpenFont("FreeMonoBold.ttf", 12);
+	if(!monoFont)
+	{
+		printf("TTF_OpenFont error: %s\n", TTF_GetError());
+		exit(5);
+	}
 }
 void quitSDL()
 {
@@ -73,7 +82,11 @@ void getOpenFile(char* filename, int size)
 	while (SDL_PollEvent(&event)) {}
 	#else
 		printf("Enter file to load: ");
-		fgets(stdin, size, filename);
+		fgets(filename, size, stdin);
+        for(int i=strlen(filename)-1;i>=0;--i)
+        {
+            if(filename[i]!='\n' && filename[i]!=' ') {filename[i+1]='\0'; break;}
+        }
 	#endif
 }
 
@@ -98,7 +111,11 @@ void getSaveFile(char* filename, int size)
 	while (SDL_PollEvent(&event)) {}
 	#else
 		printf("Enter file to save: ");
-		fgets(stdin, size, filename);
+		fgets(filename, size, stdin);
+        for(int i=strlen(filename)-1;i>=0;--i)
+        {
+            if(filename[i]!='\n' && filename[i]!=' ') {filename[i+1]='\0'; break;}
+        }
 	#endif
 }
 
@@ -117,6 +134,76 @@ SDL_Texture* generateText(const char* text, SDL_Color color)
 	return tex;
 }
 
+SDL_Texture* generateVerticalText(const char* text, SDL_Color color)
+{
+	std::vector <SDL_Texture*> glyphs;
+	
+	int w=0,h=0;
+	
+	
+	for(int i=0;text[i]!='\0';++i)
+	{
+		SDL_Surface* text_surface=TTF_RenderGlyph_Blended(monoFont, text[i], color);
+		SDL_Texture *tex = SDL_CreateTextureFromSurface(render, text_surface);
+		
+		
+		w=std::max(w, text_surface->w);
+		
+		int miny, maxy;
+		if(text[i]=='_')
+		{miny=1; maxy=11;}
+		else
+		TTF_GlyphMetrics(font, text[i], NULL, NULL, &miny, &maxy, NULL);
+		
+		h+=maxy-miny+3;
+		
+		SDL_FreeSurface(text_surface);
+		
+		glyphs.push_back(tex);
+	}
+
+	SDL_Texture *tex=SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+	
+	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND); 
+	SDL_SetRenderTarget(render, tex);
+	
+	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
+	SDL_RenderClear(render);
+	
+	int p=0;
+	for(int i=0;i<glyphs.size();++i)
+	{
+		int texW, texH;
+		SDL_QueryTexture(glyphs[i], NULL, NULL, &texW, &texH);
+		
+		int miny, maxy;
+		if(text[i]=='_')
+		{miny=1; maxy=11;}
+		else
+		TTF_GlyphMetrics(font, text[i], NULL, NULL, &miny, &maxy, NULL);
+		
+		SDL_Rect glyphRect;
+		glyphRect.y=p;
+		glyphRect.x=0;//(w-texW)/2;
+		glyphRect.w=texW;
+		glyphRect.h=texH;
+		p+=maxy-miny+3;
+		
+		if(text[i]!='_')
+		SDL_RenderCopy(render, glyphs[i], NULL, &glyphRect);
+		
+		SDL_DestroyTexture(glyphs[i]);
+	}
+	
+	SDL_SetRenderTarget(render, NULL);
+	return tex;
+
+}
+
+int getFontHeight()
+{
+	return TTF_FontHeight(font);
+}
 
 SDL_Texture* loadTexture(const char* filename)
 {

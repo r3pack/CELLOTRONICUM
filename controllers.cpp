@@ -28,7 +28,7 @@ void Controller::saveData(FILE* file)
 {
 	fprintf(file, "%d %d ", posX, posY);
 	
-	for(auto it=controlledSliders.begin();it!=controlledSliders.end();++it)
+	for(auto it=controlledValueGifters.begin();it!=controlledValueGifters.end();++it)
 	{
 		fprintf(file, "%d %d %d ", it->first, it->second->effect->getId(), it->second->argument);
 	}
@@ -52,7 +52,7 @@ void Controller::loadData(char* str)
 		EffectGUI* effect=(EffectGUI*)(getEffectInstanceList()->find(effectId)->second);
 		Slider* slider=(Slider*)(effect->drawables[argument].drawable);
 		
-		controlledSliders.push_back(std::pair<int, Slider*>(busId, slider));
+		controlledValueGifters.push_back(std::pair<int, Slider*>(busId, slider));
 		slider->controlledBy=this;
 	}
 }
