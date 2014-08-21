@@ -606,11 +606,9 @@
 			
 			id=lastId++;
 			std::ostringstream buff;
-			//buff.setf(std::ios::fixed, std:: ios::floatfield);
-			if(graduals[value]>=10.0f || graduals[value]<=-10.0f)
-			buff.precision(1);
-			else
-			buff.precision(2);
+			
+			buff.unsetf(std::ios::scientific);
+			
 			buff<<graduals[value];
 			
 			valueTex=generateText(buff.str().c_str());
