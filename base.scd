@@ -39,7 +39,7 @@ SynthDef.new(\eff_mix3, {
 SynthDef.new(\eff_amplitude, {
 	arg inbus=8, outbus, attackTime=0.01, releaseTime=0.01;
 	var in = In.ar(inbus);
-	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
+	Out.kr(outbus,Amplitude.kr(in,attackTime, releaseTime));
 }).add;
 
 SynthDef.new(\eff_param_to_bus, {
