@@ -12,6 +12,13 @@ SynthDef.new(\eff_normalizer, {
 	Out.ar(outbus,res);
 }).add;
 
+SynthDef.new(\eff_mul, {
+	arg inbus, outbus, mul=1;
+	var in = In.ar(inbus);
+	var res = in * mul;
+	Out.ar(outbus,res);
+}).add;
+
 SynthDef.new(\eff_mix, {
 	arg inbus1, inbus2, outbus, max_amp1 = 0.5;
 	var i1 = In.ar(inbus1);
@@ -30,7 +37,7 @@ SynthDef.new(\eff_mix3, {
 }).add;
 
 SynthDef.new(\eff_amplitude, {
-	arg inbus=8, outbus, attackTime=0.01, releseTime=0.01;
+	arg inbus=8, outbus, attackTime=0.01, releaseTime=0.01;
 	var in = In.ar(inbus);
 	Out.kr(outbus,Amplitude.kr(in,attackTime, releseTime));
 }).add;

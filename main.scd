@@ -20,4 +20,14 @@ Zwykły sygnał opóźnić o czas potrzebny do pitch detection.
 
 Zrobić pitch shift ze zmianą szybkosci odtwarzania
 
+TODO: Poprawić echa, żeby były efekty w pętli feedbacku
+
+zwiększyć limit busów do 512
+
+nagrywanie do buffora
+
+przy bootowaniu servera ustawić, żeby zawsze wysyłało jakis komunikat do aplikacji, zeby odswieżyć Ugeny!!!
+
+czy da się z poziomu sc-lang robić sprawdzanie, czy działa server super collidera? Jakis ping-pong?
+
 */
