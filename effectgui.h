@@ -298,7 +298,7 @@
 			
 			ArgVis* argvis=getArgumentVisuals();
 			
-			for(int i=0;i<drawables.size();++i)
+			for(int i=drawables.size()-1;i>=0;--i)
 			{
 				drawables[i].draw();
 			}

@@ -27,7 +27,6 @@ void registerEffects()
 	
 
 	registerEffect(Amplitude::name, "Analysis");
-	
 	registerEffect(Pitch::name, "Analysis");
 	registerEffect(TartiniPitch::name, "Analysis");
 	registerEffect(Goetzel::name, "Analysis");
@@ -37,69 +36,52 @@ void registerEffects()
 	registerEffect(ShepardCycleTone::name, "Generators");
 	
 	registerEffect(Playbuf::name, "IO_Effects");
+	registerEffect(Mul::name, "IO_Effects");
+	registerEffect(Normalizer::name, "IO_Effects");
 	registerEffect(Output::name, "IO_Effects");
 	registerEffect(Mix::name, "IO_Effects");
 	registerEffect(Mix3::name, "IO_Effects");
 	registerEffect(Input::name, "IO_Effects");
+	
+	registerEffect(Clipper4::name, "Base");
+	registerEffect(Clipper8::name, "Base");
+	registerEffect(Clipper32::name, "Base");
 };
 
 Effect* getEffect(const char* name, int X, int Y)
 {
 	if(strcmp(name, DistEcho::name)==0) return new DistEcho(X, Y);
-	else
-	if(strcmp(name, ShiftEcho::name)==0) return new ShiftEcho(X, Y);
-	else
-	if(strcmp(name, Brassage::name)==0) return new Brassage(X, Y);
-	else
-	if(strcmp(name, BrassageOSC::name)==0) return new BrassageOSC(X, Y);
-	else
-	if(strcmp(name, BrassagePlus::name)==0) return new BrassagePlus(X, Y);
-	else
-	if(strcmp(name, RMChorus::name)==0) return new RMChorus(X, Y);
-	else
-	if(strcmp(name, RMChorus2::name)==0) return new RMChorus2(X, Y);
-	else
-	if(strcmp(name, RMDelay::name)==0) return new RMDelay(X, Y);
-	else
-	if(strcmp(name, RMDelayRec::name)==0) return new RMDelayRec(X, Y);
-	else
-	if(strcmp(name, WSDistortion::name)==0) return new WSDistortion(X, Y);
-	else
-	if(strcmp(name, MobilePhoneLag3::name)==0) return new MobilePhoneLag3(X, Y);
-	else
-	if(strcmp(name, FreqShift::name)==0) return new FreqShift(X, Y);
-	else
-	if(strcmp(name, BLowPass::name)==0) return new BLowPass(X, Y);
-	else
-	if(strcmp(name, BHiPass::name)==0) return new BHiPass(X, Y);
-	else
-	if(strcmp(name, BBandPass::name)==0) return new BBandPass(X, Y);
-	else
-	if(strcmp(name, Amplitude::name)==0) return new Amplitude(X, Y);
-	else
-	if(strcmp(name, ShepardCycleTone::name)==0) return new ShepardCycleTone(X, Y);
-	else
-	if(strcmp(name, Pitch::name)==0) return new Pitch(X, Y);
-	else
-	if(strcmp(name, TartiniPitch::name)==0) return new TartiniPitch(X, Y);
-	else
-	if(strcmp(name, Goetzel::name)==0) return new Goetzel(X, Y);
-	else
-	if(strcmp(name, Mix::name)==0) return new Mix(X, Y);
-	else
-	if(strcmp(name, Mix3::name)==0) return new Mix3(X, Y);
-	else
-	if(strcmp(name, Playbuf::name)==0) return new Playbuf(X, Y);
-	else
-	if(strcmp(name, Output::name)==0) return new Output(X, Y);
-	else
-	if(strcmp(name, Input::name)==0) return new Input(X, Y);
-	else
-	if(strcmp(name, Harmonizer4::name)==0) return new Harmonizer4(X, Y);
-	else
-	if(strcmp(name, Gramophone::name)==0) return new Gramophone(X, Y);
-	else
-	if(strcmp(name, SampleDecrease::name)==0) return new SampleDecrease(X, Y);
-	else
-	if(strcmp(name, BitCrush::name)==0) return new BitCrush(X, Y);
+	else if(strcmp(name, ShiftEcho::name)==0) return new ShiftEcho(X, Y);
+	else if(strcmp(name, Brassage::name)==0) return new Brassage(X, Y);
+	else if(strcmp(name, BrassageOSC::name)==0) return new BrassageOSC(X, Y);
+	else if(strcmp(name, BrassagePlus::name)==0) return new BrassagePlus(X, Y);
+	else if(strcmp(name, RMChorus::name)==0) return new RMChorus(X, Y);
+	else if(strcmp(name, RMChorus2::name)==0) return new RMChorus2(X, Y);
+	else if(strcmp(name, RMDelay::name)==0) return new RMDelay(X, Y);
+	else if(strcmp(name, RMDelayRec::name)==0) return new RMDelayRec(X, Y);
+	else if(strcmp(name, WSDistortion::name)==0) return new WSDistortion(X, Y);
+	else if(strcmp(name, MobilePhoneLag3::name)==0) return new MobilePhoneLag3(X, Y);
+	else if(strcmp(name, FreqShift::name)==0) return new FreqShift(X, Y);
+	else if(strcmp(name, BLowPass::name)==0) return new BLowPass(X, Y);
+	else if(strcmp(name, BHiPass::name)==0) return new BHiPass(X, Y);
+	else if(strcmp(name, BBandPass::name)==0) return new BBandPass(X, Y);
+	else if(strcmp(name, Amplitude::name)==0) return new Amplitude(X, Y);
+	else if(strcmp(name, ShepardCycleTone::name)==0) return new ShepardCycleTone(X, Y);
+	else if(strcmp(name, Pitch::name)==0) return new Pitch(X, Y);
+	else if(strcmp(name, TartiniPitch::name)==0) return new TartiniPitch(X, Y);
+	else if(strcmp(name, Goetzel::name)==0) return new Goetzel(X, Y);
+	else if(strcmp(name, Mix::name)==0) return new Mix(X, Y);
+	else if(strcmp(name, Mix3::name)==0) return new Mix3(X, Y);
+	else if(strcmp(name, Playbuf::name)==0) return new Playbuf(X, Y);
+	else if(strcmp(name, Mul::name)==0) return new Mul(X, Y);
+	else if(strcmp(name, Normalizer::name)==0) return new Normalizer(X, Y);
+	else if(strcmp(name, Output::name)==0) return new Output(X, Y);
+	else if(strcmp(name, Input::name)==0) return new Input(X, Y);
+	else if(strcmp(name, Harmonizer4::name)==0) return new Harmonizer4(X, Y);
+	else if(strcmp(name, Gramophone::name)==0) return new Gramophone(X, Y);
+	else if(strcmp(name, SampleDecrease::name)==0) return new SampleDecrease(X, Y);
+	else if(strcmp(name, BitCrush::name)==0) return new BitCrush(X, Y);
+	else if(strcmp(name, Clipper4::name)==0) return new Clipper4(X, Y);
+	else if(strcmp(name, Clipper8::name)==0) return new Clipper8(X, Y);
+	else if(strcmp(name, Clipper32::name)==0) return new Clipper32(X, Y);
 }

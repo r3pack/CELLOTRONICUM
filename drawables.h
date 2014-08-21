@@ -373,7 +373,7 @@
 		protected:
 		static int lastId;
 		int id;
-		static int lastClicked;
+		
 		
 		bool clicked=false;
 		
@@ -383,6 +383,9 @@
 		Controller* controlledBy=NULL;
 		
 		public:
+		
+		static int lastClicked;
+		
 		ValueGifter()
 		{
 			id=lastId++;
@@ -396,12 +399,288 @@
 		
 	};
 	
+	class EntryBox : public Drawable{
+		int width;
+		const int height;
+		int posX;
+		int posY;
+		
+		SDL_Texture* valueTex=NULL;
+		
+		std::string data;
+		
+		float value;
+		
+		static int lastId;
+		int id;
+		static int lastClicked;
+		
+		Effect* effect;
+		int argument;
+		
+		bool clicked=false;
+		
+		public:
+		
+		EntryBox(int pX, int pY, int w, float v, Effect* e, int a):
+		width(w), posX(pX), posY(pY), height(getFontHeight())
+		{
+			effect=e;
+			argument=a;
+			value=v;
+			std::stringstream ss;
+			ss.setf(std::ios::fixed);
+			ss.precision(2);
+			ss<<v;
+			data=ss.str();
+			id=lastId++;
+			valueTex=generateText(data.c_str());
+		}
+		
+		~EntryBox() {SDL_DestroyTexture(valueTex);}
+		
+		bool receiveClick(int X, int Y, MouseEvent me)
+		{
+			if(me!=ME_PRESS && me!=ME_REPEAT) return false;
+
+			X-=posX;
+			Y-=posY;
+			if(X>=0 && X<=getWidth() && Y>=0 && Y<=height)
+			{
+				if(me==ME_PRESS) clicked=true;
+				else
+				if(me==ME_REPEAT && clicked) {clicked=true; return true;}
+				else
+				if(me==ME_REPEAT) return false;
+				if(lastClicked==id)
+				{
+					lastClicked=-1;
+					if(checkValue()) sendValue();
+				}
+				else
+				lastClicked=id;
+				return true;
+			}
+			clicked=false;
+			return false;
+		}
+		
+		bool receiveSecondClick(int X, int Y, MouseEvent me)
+		{
+			if(me!=ME_PRESS) return false;
+			
+			X-=posX; 
+			Y-=posY;
+			if(X>=0 && X<=getWidth() && Y>=0 && Y<=height)
+			{
+				lastClicked=-1;
+				std::stringstream ss;
+				ss.setf(std::ios::fixed, std:: ios::floatfield);
+				if(value>=10.0f || value<=-10.0f)
+				ss.precision(1);
+				else
+				ss.precision(2);
+				ss<<value;
+				data=ss.str();
+				updateValue();
+				return true;
+			}
+			return false;
+		}
+		
+		bool receiveKeyboardEvent(SDL_Scancode scancode)
+		{
+			if(id!=lastClicked) return false;
+			
+			switch(scancode)
+			{
+				case SDL_SCANCODE_0:
+				case SDL_SCANCODE_KP_0:
+					data.push_back('0');
+					updateValue();	
+				return true;
+				case SDL_SCANCODE_1:
+				case SDL_SCANCODE_KP_1:
+					data.push_back('1');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_2:
+				case SDL_SCANCODE_KP_2:
+					data.push_back('2');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_3:
+				case SDL_SCANCODE_KP_3:
+					data.push_back('3');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_4:
+				case SDL_SCANCODE_KP_4:
+					data.push_back('4');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_5:
+				case SDL_SCANCODE_KP_5:
+					data.push_back('5');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_6:
+				case SDL_SCANCODE_KP_6:
+					data.push_back('6');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_7:
+				case SDL_SCANCODE_KP_7:
+					data.push_back('7');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_8:
+				case SDL_SCANCODE_KP_8:
+					data.push_back('8');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_9:
+				case SDL_SCANCODE_KP_9:
+					data.push_back('9');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_PERIOD:
+				case SDL_SCANCODE_COMMA:
+					data.push_back('.');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_MINUS:
+				case SDL_SCANCODE_KP_MINUS:
+					data.push_back('-');
+					updateValue();
+				return true;
+				case SDL_SCANCODE_BACKSPACE:
+					if(data.size()>0)
+					{
+						data.pop_back();
+						updateValue();
+					}
+				return true;
+				case SDL_SCANCODE_DELETE:
+					data="";
+					updateValue();
+				return true;
+				case SDL_SCANCODE_RETURN:
+					lastClicked=-1;
+					if(checkValue()) sendValue();
+				return true;
+			}
+			return false;
+		}
+		
+		void sendValue();
+		
+		void setValue(float v)
+		{
+			value=v;
+			std::stringstream ss;
+			ss.setf(std::ios::fixed, std:: ios::floatfield);
+			if(value>=10.0f || value<=-10.0f)
+			ss.precision(1);
+			else
+			ss.precision(2);
+			ss<<value;
+			data=ss.str();
+			updateValue();
+		}
+		
+		float getValue()
+		{
+			return value;
+		}
+			
+		void setPos(int X, int Y)
+		{
+			posX=X;
+			posY=Y;
+		}
+		
+		void move(int X, int Y)
+		{
+			posX+=X;
+			posY+=Y;
+		}
+		
+		int getPosX(){return posX;}
+		int getPosY(){return posY;}
+		
+		bool checkValue()
+		{
+			int periodCount=0;
+			
+			for(int i=(data[0]=='-'?1:0);data[i]!='\0';++i)
+			{
+				if(data[i]=='.') ++periodCount;
+				else
+				if(data[i]=='-') periodCount+=2;
+			}
+			
+			if(periodCount>=2)
+			{
+				std::stringstream ss;
+				ss.setf(std::ios::fixed);
+				ss.precision(2);
+				ss<<value;
+				data=ss.str();
+				updateValue();
+			}
+			else
+			{
+				value=atof(data.c_str());
+			}
+		}
+		
+		void updateValue()
+		{
+			SDL_DestroyTexture(valueTex);
+			valueTex=generateText(data.c_str());
+		}
+		
+		void draw()
+		{		
+			SDL_Rect rect;
+			rect.x = posX;
+			rect.y = posY;
+			rect.w = getWidth();
+			rect.h = height;
+			
+			setColor(COLOR_ENTRYBOX_BACKGROUND);
+			SDL_RenderFillRect(render, &rect);
+			setColor((id==lastClicked)?COLOR_ENTRYBOX_BORDER_CLICKED:COLOR_ENTRYBOX_BORDER);
+			SDL_RenderDrawRect(render, &rect);
+			
+			int w, h;
+			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
+			
+			SDL_Rect valueRect;
+			valueRect.y=posY;
+			valueRect.x=posX+getWidth()-w-2;
+			valueRect.w=w;
+			valueRect.h=h;
+			
+			SDL_RenderCopy(render, valueTex, NULL, &valueRect);
+		}
+		
+		int getWidth() {
+			int w;
+			SDL_QueryTexture(valueTex, NULL, NULL, &w, NULL);
+			w+=4;
+			if(data=="") w=0;
+			if(w>width) return w; else return width;
+		}
+		int getHeight() {return height;}
+		
+	};
+	
 	class Slider : public ValueGifter{
 		friend class ControllBus;
 		friend class Controller;
 		friend class Effect;
-		
-		static const int slider_bus_height=8;
 
 		float rangeBegin;
 		float rangeEnd;
@@ -412,27 +691,22 @@
 		
 		int level;
 		
-		SDL_Texture* valueTex=NULL;
+		EntryBox entryBox;
 		
 		float lastValue;
 		float value;
 		
 		public:
 		
+		static const int slider_bus_height=8;
+		static const int entry_box_width=30;
+		
 		Slider(int pX, int pY, int w, int h, float rB, float rE, float l, Effect* e, int a):
-		rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l)
+		rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l),
+		entryBox(pX+w/2-entry_box_width/2, pY+h, entry_box_width, l, e, a)
 		{
 			effect=e; 
 			argument=a;
-			std::ostringstream buff;
-			buff.setf(std::ios::fixed, std:: ios::floatfield);
-			if(value>=10.0f || value<=-10.0f)
-			buff.precision(1);
-			else
-			buff.precision(2);
-			buff<<value;
-			
-			valueTex=generateText(buff.str().c_str());
 			
 			valueGifterList.insert(std::pair<int, ValueGifter*>(id, this));
 		}
@@ -441,6 +715,7 @@
 		
 		bool receiveClick(int X, int Y, MouseEvent me)
 		{
+			if(entryBox.receiveClick(X, Y, me)) return true;
 			if(me!=ME_PRESS && me!=ME_REPEAT) return false;
 			X-=posX;
 			Y-=posY;
@@ -459,6 +734,8 @@
 				float normalizedLevel=1.0f-(float(Y)/float(height));
 				setValue(rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel);
 				
+				entryBox.setValue(getValue());
+				
 				return true;
 			}
 			return false;
@@ -466,6 +743,7 @@
 		
 		bool receiveSecondClick(int X, int Y, MouseEvent me)
 		{
+			if(entryBox.receiveSecondClick(X, Y, me)) return true;
 			X-=posX; Y-=posY;
 			if(X>=0 && X<=width && Y<0 && Y>=-slider_bus_height && me==ME_PRESS) 
 			{
@@ -479,12 +757,23 @@
 			return false;
 		}
 		
+		bool receiveKeyboardEvent(SDL_Scancode scancode)
+		{
+			if(entryBox.receiveKeyboardEvent(scancode))
+			{
+				setValue(entryBox.getValue(), true);
+				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
+				return true;
+			}
+			return false;
+		}
+		
 		float getValue()
 		{
 			return value;
 		}
 		
-		void setValue(float v);
+		void setValue(float v, bool skipEntryBox=false);
 		
 		void setNormalizedValue(float nv)
 		{
@@ -495,12 +784,14 @@
 		{
 			posX=X;
 			posY=Y;
+			entryBox.setPos(X+width/2-entryBox.getWidth()/2, Y+height);
 		}
 		
 		void move(int X, int Y)
 		{
 			posX+=X;
 			posY+=Y;
+			entryBox.move(X, Y);
 		}
 		
 		int getPosX(){return posX;}
@@ -509,13 +800,17 @@
 		void draw()
 		{
 			if(lastClicked!=id) clicked=false;
-		
+			
 			SDL_Rect rect1;
 			rect1.x = posX;
 			rect1.y = posY;
 			rect1.w = width;
 			rect1.h = height;
 			SDL_Rect rect2=rect1;
+			
+			level=(level>=0)?level:0;
+			level=(level<=height)?level:height;
+			
 			rect2.y+=level;
 			rect2.h-=level;
 			
@@ -550,17 +845,7 @@
 			setColor(COLOR_SLIDER_BORDER);
 			SDL_RenderDrawRect(render, &controllRect);
 			
-			int w, h;
-			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
-			
-			SDL_Rect valueRect;
-			//valueRect.y=posY+(level-h>=0?level-h:0);
-			valueRect.y=posY+height;
-			valueRect.x=posX+width/2-w/2;
-			valueRect.w=w;
-			valueRect.h=h;
-			
-			SDL_RenderCopy(render, valueTex, NULL, &valueRect);
+			entryBox.draw();
 		}
 		
 		int getWidth() {return width;}
@@ -681,6 +966,7 @@
 		{
 			posX+=X;
 			posY+=Y;
+			
 		}
 		
 		int getPosX(){return posX;}
@@ -749,237 +1035,6 @@
 		int getHeight() {return height;}
 	};
 	
-	class EntryBox : public Drawable{
-		int width;
-		const int height;
-		int posX;
-		int posY;
-		
-		SDL_Texture* valueTex=NULL;
-		
-		std::string data;
-		
-		float value;
-		
-		static int lastId;
-		int id;
-		static int lastClicked;
-		
-		Effect* effect;
-		int argument;
-		
-		public:
-		
-		EntryBox(int pX, int pY, int w, float v, Effect* e, int a):
-		width(w), posX(pX), posY(pY), height(getFontHeight())
-		{
-			effect=e;
-			argument=a;
-			value=v;
-			std::stringstream ss;
-			ss.setf(std::ios::fixed);
-			ss.precision(2);
-			ss<<v;
-			data=ss.str();
-			id=lastId++;
-			valueTex=generateText(data.c_str());
-		}
-		
-		~EntryBox() {SDL_DestroyTexture(valueTex);}
-		
-		bool receiveClick(int X, int Y, MouseEvent me)
-		{
-			if(me!=ME_PRESS) return false;
-			X-=posX;
-			Y-=posY;
-			if(X>=0 && X<=width && Y>=0 && Y<=height)
-			{
-				if(lastClicked==id)
-				{
-					lastClicked=-1;
-					if(checkValue()) sendValue();
-				}
-				else
-				lastClicked=id;
-				return true;
-			}
-			return false;
-		}
-		
-		bool receiveSecondClick(int X, int Y, MouseEvent me)
-		{
-			if(me!=ME_PRESS) return false;
-			X-=posX; 
-			Y-=posY;
-			if(X>=0 && X<=width && Y>=0 && Y<=height)
-			{
-				lastClicked=-1;
-				std::stringstream ss;
-				ss.setf(std::ios::fixed);
-				ss.precision(2);
-				ss<<value;
-				data=ss.str();
-				updateValue();
-				return true;
-			}
-			return false;
-		}
-		
-		bool receiveKeyboardEvent(SDL_Scancode scancode)
-		{
-			if(id!=lastClicked) return false;
-			
-			switch(scancode)
-			{
-				case SDL_SCANCODE_0:
-				case SDL_SCANCODE_KP_0:
-					data.push_back('0');
-					updateValue();	
-				return true;
-				case SDL_SCANCODE_1:
-				case SDL_SCANCODE_KP_1:
-					data.push_back('1');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_2:
-				case SDL_SCANCODE_KP_2:
-					data.push_back('2');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_3:
-				case SDL_SCANCODE_KP_3:
-					data.push_back('3');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_4:
-				case SDL_SCANCODE_KP_4:
-					data.push_back('4');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_5:
-				case SDL_SCANCODE_KP_5:
-					data.push_back('5');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_6:
-				case SDL_SCANCODE_KP_6:
-					data.push_back('6');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_7:
-				case SDL_SCANCODE_KP_7:
-					data.push_back('7');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_8:
-				case SDL_SCANCODE_KP_8:
-					data.push_back('8');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_9:
-				case SDL_SCANCODE_KP_9:
-					data.push_back('9');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_PERIOD:
-				case SDL_SCANCODE_COMMA:
-					data.push_back('.');
-					updateValue();
-				return true;
-				case SDL_SCANCODE_BACKSPACE:
-					if(data.size()>0)
-					{
-						data.pop_back();
-						updateValue();
-					}
-				return true;
-				case SDL_SCANCODE_RETURN:
-					lastClicked=-1;
-					if(checkValue()) sendValue();
-				return true;
-			}
-			return false;
-		}
-		
-		void sendValue();
-		
-		float getValue()
-		{
-			return value;
-		}
-			
-		void setPos(int X, int Y)
-		{
-			posX=X;
-			posY=Y;
-		}
-		
-		void move(int X, int Y)
-		{
-			posX+=X;
-			posY+=Y;
-		}
-		
-		int getPosX(){return posX;}
-		int getPosY(){return posY;}
-		
-		bool checkValue()
-		{
-			int periodCount=0;
-			for(int i=0;data[i]!='\0';++i)
-			{
-				if(data[i]=='.') ++periodCount;
-			}
-			
-			if(periodCount>=2)
-			{
-				std::stringstream ss;
-				ss.setf(std::ios::fixed);
-				ss.precision(2);
-				ss<<value;
-				data=ss.str();
-				updateValue();
-			}
-			else
-			{
-				value=atof(data.c_str());
-			}
-		}
-		
-		void updateValue()
-		{
-			SDL_DestroyTexture(valueTex);
-			valueTex=generateText(data.c_str());
-		}
-		
-		void draw()
-		{		
-			SDL_Rect rect;
-			rect.x = posX;
-			rect.y = posY;
-			rect.w = width;
-			rect.h = height;
-			
-			setColor(COLOR_ENTRYBOX_BACKGROUND);
-			SDL_RenderFillRect(render, &rect);
-			setColor((id==lastClicked)?COLOR_ENTRYBOX_BORDER_CLICKED:COLOR_ENTRYBOX_BORDER);
-			SDL_RenderDrawRect(render, &rect);
-			
-			int w, h;
-			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
-			
-			SDL_Rect valueRect;
-			valueRect.y=posY;
-			valueRect.x=posX+width-w-2;
-			valueRect.w=w;
-			valueRect.h=h;
-			
-			SDL_RenderCopy(render, valueTex, NULL, &valueRect);
-		}
-		
-		int getWidth() {return width;}
-		int getHeight() {return height;}
-		
-	};
+	
 	
 #endif
