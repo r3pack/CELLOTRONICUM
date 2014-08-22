@@ -55,13 +55,28 @@ SynthDef.new(\eff_freq_shift, {
 	Out.ar(outbus,res);
 }).add;
 
+//DUBECHO
+SynthDef(\eff_dubecho,{
+	arg inbus, outbus, length = 1, fb = 0.8, sep = 0.012;
+	var input = In.ar(inbus, 1);
+	var feedback = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb + input);
+	output = HPF.ar(output, 400);
+	output = LPF.ar(output, 5000);
+	output = output.tanh;
+	LocalOut.ar(DelayC.ar(output, 1, LFNoise2.ar(12).range(length,length+sep)));
+	ReplaceOut.ar(outbus, output);
+}).add;
+
 ////DIST ECHO
 SynthDef.new(\eff_distecho, {
-	arg inbus=8, outbus=0, amp=0.5, delay=0.5, decay=0.5;
+	arg inbus=8, outbus=0, amp=0.5, delay=0.5, feedback=0.5;
 	var in = In.ar(inbus,1);
-	var pom = in/(in.abs+1);
-	var delayed = CombC.ar(pom,delay,delay,decay,1,in);
-	Out.ar(outbus,delayed);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb + in);
+	output = output/(output.abs+1);
+	LocalOut.ar(DelayC.ar(output, delay, delay));
+	Out.ar(outbus,output*amp);
 }).add;
 
 /*/TESTS
@@ -73,11 +88,13 @@ x.set(\freq,200);
 
 //SHIFT ECHO (działa)
 SynthDef.new(\eff_shiftecho, {
-	arg inbus=8, outbus=0, freq=1, phase=0, delay=0.5, decay=0.5;
+	arg inbus=8, outbus=0, freq=1, phase=0, delay=0.5, feedback=0.5;
 	var in = In.ar(inbus,1);
-	var pom = FreqShift.ar(in,freq,phase);
-	var delayed = CombC.ar(pom,delay,delay,decay,1,in);
-	Out.ar(outbus,delayed);
+	var fb = LocalIn.ar(1);
+	var output = feedback*fb + in;//LeakDC.ar(feedback*fb + input);
+	output = FreqShift.ar(output,freq,phase);
+	LocalOut.ar(DelayC.ar(output, delay, delay));
+	Out.ar(outbus,output);
 }).add;
 
 /*/TESTS
