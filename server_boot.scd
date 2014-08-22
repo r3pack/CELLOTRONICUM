@@ -257,12 +257,12 @@ OSCdef.new(
 );
 
 OSCdef.new(
-	\file_to_record,
+	\record_to_file,
 	{
 		arg msg, time, addr, recvPort;
 		s.prepareForRecord(~p +/+ msg[1]);
 	},
-	'/file_to_record'
+	'/record_to_file'
 );
 
 OSCdef.new(
