@@ -430,6 +430,9 @@
 			value=v;
 			std::stringstream ss;
 			ss.setf(std::ios::fixed);
+			if(value>=10.0f || value<=-10.0f)
+			ss.precision(1);
+			else
 			ss.precision(2);
 			ss<<v;
 			data=ss.str();
@@ -703,10 +706,12 @@
 		
 		Slider(int pX, int pY, int w, int h, float rB, float rE, float l, Effect* e, int a):
 		rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l),
-		entryBox(pX+w/2-entry_box_width/2, pY+h, entry_box_width, l, e, a)
+		entryBox(0, 0, entry_box_width, l, e, a)
 		{
 			effect=e; 
 			argument=a;
+			
+			entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 			
 			valueGifterList.insert(std::pair<int, ValueGifter*>(id, this));
 		}

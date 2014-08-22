@@ -1,5 +1,6 @@
 #include "osc.h"
 #include <chrono>
+#include "graphics.h"
 
 OSCConn conn;
 
@@ -12,6 +13,8 @@ UdpSocket OSCConn::sock;
 std::map <int, std::string> OSCConn::bufferFileById;
 
 std::chrono::time_point<std::chrono::system_clock> operationStart;
+
+bool OSCConn::recordIsStarted=false;
 
 void setOperationStart()
 {
@@ -100,6 +103,52 @@ bool OSCConn::quitServer()
 	fprintf(stderr, "Sending server quit message\n");
 	if(!sendSimpleMessage("/app_quit")) return false;
 	return true;
+}
+
+void OSCConn::startRecord()
+{
+	if(recordIsStarted)
+	{
+		fprintf(stderr, "Error: Record is already started.\n");
+	}
+	recordIsStarted=true;
+	
+	fprintf(stderr, "Record is started - output is recording now.\n");
+	sendSimpleMessage("/start_record");
+}
+
+void OSCConn::stopRecord()
+{
+	if(!recordIsStarted)
+	{
+		fprintf(stderr, "Error: Record is already stopped.\n");
+	}
+	recordIsStarted=false;
+	fprintf(stderr, "Record is stopped.\n");
+	sendSimpleMessage("/stop_record");
+}
+
+void OSCConn::recordToFile()
+{
+	PacketWriter pw;
+	Message msg("/record_to_file"); 
+	
+	char filename[MAX_PATH];
+	
+	getSaveFile(filename, MAX_PATH);
+	
+	msg.pushStr(filename);
+	
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	fprintf(stderr, "Saving record to file: %s\n", filename);
+	
+	if(!sock.sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending a message '/record_to_file'\n");
+		return;
+	}
 }
 
 int OSCConn::getFreeBus()

@@ -6,6 +6,11 @@ void registerEffects()
 	registerEffect(ShiftEcho::name, "Echo");
 	registerEffect(Gramophone::name, "Echo");
 	registerEffect(FreqShift::name, "Echo");
+	registerEffect(PitchShift::name, "Echo");
+	registerEffect(RandomPitchShift::name, "Echo");
+	
+	registerEffect(OctaveUp::name, "SoundSources");
+	registerEffect(OctaveDown::name, "SoundSources");
 	
 	registerEffect(Brassage::name, "Brassage");
 	registerEffect(BrassageOSC::name, "Brassage");
@@ -34,6 +39,8 @@ void registerEffects()
 	
 	registerEffect(Harmonizer4::name, "Generators");
 	registerEffect(ShepardCycleTone::name, "Generators");
+	registerEffect(AYSimple::name, "Generators");
+	registerEffect(YMSimple::name, "Generators");
 	
 	registerEffect(Playbuf::name, "IO_Effects");
 	registerEffect(Mul::name, "IO_Effects");
@@ -42,10 +49,17 @@ void registerEffects()
 	registerEffect(Mix::name, "IO_Effects");
 	registerEffect(Mix3::name, "IO_Effects");
 	registerEffect(Input::name, "IO_Effects");
+	registerEffect(InputExtended::name, "IO_Effects");
+	registerEffect(OutputExtended::name, "IO_Effects");
 	
 	registerEffect(Clipper4::name, "Base");
 	registerEffect(Clipper8::name, "Base");
 	registerEffect(Clipper32::name, "Base");
+	registerEffect(SoftClipAmp::name, "Base");
+	registerEffect(SoftClipAmp4::name, "Base");
+	registerEffect(SoftClipAmp8::name, "Base");
+	registerEffect(SoftClipper4::name, "Base");
+	registerEffect(SoftClipper8::name, "Base");
 };
 
 Effect* getEffect(const char* name, int X, int Y)
@@ -62,11 +76,15 @@ Effect* getEffect(const char* name, int X, int Y)
 	else if(strcmp(name, WSDistortion::name)==0) return new WSDistortion(X, Y);
 	else if(strcmp(name, MobilePhoneLag3::name)==0) return new MobilePhoneLag3(X, Y);
 	else if(strcmp(name, FreqShift::name)==0) return new FreqShift(X, Y);
+	else if(strcmp(name, PitchShift::name)==0) return new PitchShift(X, Y);
+	else if(strcmp(name, RandomPitchShift::name)==0) return new RandomPitchShift(X, Y);
 	else if(strcmp(name, BLowPass::name)==0) return new BLowPass(X, Y);
 	else if(strcmp(name, BHiPass::name)==0) return new BHiPass(X, Y);
 	else if(strcmp(name, BBandPass::name)==0) return new BBandPass(X, Y);
 	else if(strcmp(name, Amplitude::name)==0) return new Amplitude(X, Y);
 	else if(strcmp(name, ShepardCycleTone::name)==0) return new ShepardCycleTone(X, Y);
+	else if(strcmp(name, AYSimple::name)==0) return new AYSimple(X, Y);
+	else if(strcmp(name, YMSimple::name)==0) return new YMSimple(X, Y);
 	else if(strcmp(name, Pitch::name)==0) return new Pitch(X, Y);
 	else if(strcmp(name, TartiniPitch::name)==0) return new TartiniPitch(X, Y);
 	else if(strcmp(name, Goetzel::name)==0) return new Goetzel(X, Y);
@@ -76,7 +94,9 @@ Effect* getEffect(const char* name, int X, int Y)
 	else if(strcmp(name, Mul::name)==0) return new Mul(X, Y);
 	else if(strcmp(name, Normalizer::name)==0) return new Normalizer(X, Y);
 	else if(strcmp(name, Output::name)==0) return new Output(X, Y);
+	else if(strcmp(name, OutputExtended::name)==0) return new OutputExtended(X, Y);
 	else if(strcmp(name, Input::name)==0) return new Input(X, Y);
+	else if(strcmp(name, InputExtended::name)==0) return new InputExtended(X, Y);
 	else if(strcmp(name, Harmonizer4::name)==0) return new Harmonizer4(X, Y);
 	else if(strcmp(name, Gramophone::name)==0) return new Gramophone(X, Y);
 	else if(strcmp(name, SampleDecrease::name)==0) return new SampleDecrease(X, Y);
@@ -84,4 +104,11 @@ Effect* getEffect(const char* name, int X, int Y)
 	else if(strcmp(name, Clipper4::name)==0) return new Clipper4(X, Y);
 	else if(strcmp(name, Clipper8::name)==0) return new Clipper8(X, Y);
 	else if(strcmp(name, Clipper32::name)==0) return new Clipper32(X, Y);
+	else if(strcmp(name, SoftClipAmp::name)==0) return new SoftClipAmp(X, Y);
+	else if(strcmp(name, SoftClipAmp4::name)==0) return new SoftClipAmp4(X, Y);
+	else if(strcmp(name, SoftClipAmp8::name)==0) return new SoftClipAmp8(X, Y);
+	else if(strcmp(name, SoftClipper4::name)==0) return new SoftClipper4(X, Y);
+	else if(strcmp(name, SoftClipper8::name)==0) return new SoftClipper8(X, Y);
+	else if(strcmp(name, OctaveUp::name)==0) return new OctaveUp(X, Y);
+	else if(strcmp(name, OctaveDown::name)==0) return new OctaveDown(X, Y);
 }

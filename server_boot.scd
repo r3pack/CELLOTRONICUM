@@ -260,7 +260,7 @@ OSCdef.new(
 	\record_to_file,
 	{
 		arg msg, time, addr, recvPort;
-		s.prepareForRecord(~p +/+ msg[1]);
+		s.prepareForRecord(msg[1]);
 	},
 	'/record_to_file'
 );

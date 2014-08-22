@@ -173,7 +173,6 @@ bool checkInputs()
 			break;
 			case SDL_KEYDOWN:
 				
-				
 				auto it=effectInstanceList->begin();
 				for(;it!=effectInstanceList->end();++it)
 				{
@@ -189,6 +188,18 @@ bool checkInputs()
 				{
 					getSaveFile(fileStr, MAX_PATH);
 					Effect::saveToFile(fileStr);
+				}
+				else if(state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::recordToFile();
+				}
+				else if(!state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::startRecord();
+				}
+				else if(state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::stopRecord();
 				}
 				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
 				{
