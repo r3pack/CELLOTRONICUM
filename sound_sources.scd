@@ -6,6 +6,26 @@ SynthDef.new(\eff_output,{
 	Out.ar(1,in2);
 }).add;
 
+SynthDef.new(\eff_output_extended,{
+	arg inbus1, inbus2, inbus3, inbus4, inbus5, inbus6, inbus7, inbus8;
+	var in1 = In.ar(inbus1);
+	var in2 = In.ar(inbus2);
+	var in2 = In.ar(inbus3);
+	var in2 = In.ar(inbus4);
+	var in2 = In.ar(inbus5);
+	var in2 = In.ar(inbus6);
+	var in2 = In.ar(inbus7);
+	var in2 = In.ar(inbus8);
+	Out.ar(0,in1);
+	Out.ar(1,in2);
+	Out.ar(2,in3);
+	Out.ar(3,in4);
+	Out.ar(4,in5);
+	Out.ar(5,in6);
+	Out.ar(6,in7);
+	Out.ar(7,in8);
+}).add;
+
 SynthDef.new(\eff_input,{
 	arg outbus;
 	var in = In.ar(8);
