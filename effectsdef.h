@@ -21,7 +21,7 @@
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			DistEcho(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
+			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
 			//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 6, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 			//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_ENTRYBOX), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
@@ -45,7 +45,7 @@
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			
 			ShiftEcho(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("decay", 0.5f), EffectArgument("delay", 0.5f)}),
+			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("feedback", 0.5f), EffectArgument("delay", 0.5f)}),
 			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 			{sendInstance(); initGUI(X, Y);}
 			~ShiftEcho() {quitGUI();}
