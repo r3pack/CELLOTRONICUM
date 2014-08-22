@@ -34,6 +34,40 @@ void drawConnections()
 		SDL_RenderDrawLine(render, (*it).first->getPosX()+Bus::size/2, (*it).first->getPosY()+Bus::size/2,
 								   (*it).second->getPosX()+Bus::size/2, (*it).second->getPosY()+Bus::size/2);
 	}
+	
+	if(Bus::lastClicked!=-1 && (ControllBus::lastClicked!=-1 || ValueGifter::lastClicked!=-1))
+	{
+		Bus::lastClicked=-1;
+		ControllBus::lastClicked=-1;
+		ValueGifter::lastClicked=-1;
+	}
+	
+	if(Bus::lastClicked!=-1)
+	{
+		Bus* bus=busList[Bus::lastClicked];
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		setColor(COLOR_CONNECTION_LINE);
+		SDL_RenderDrawLine(render, bus->getPosX()+Bus::size/2, bus->getPosY()+Bus::size/2, x, y);
+	}
+	
+	if(ControllBus::lastClicked!=-1)
+	{
+		ControllBus* controllBus=controllBusList[ControllBus::lastClicked];
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		setColor(COLOR_CONNECTION_LINE);
+		SDL_RenderDrawLine(render, controllBus->getPosX()+ControllBus::size/2, controllBus->getPosY()+ControllBus::size/2, x, y);
+	}
+	
+	if(ValueGifter::lastClicked!=-1)
+	{
+		ValueGifter* valueGifter=valueGifterList[ValueGifter::lastClicked];
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		setColor(COLOR_CONNECTION_LINE);
+		SDL_RenderDrawLine(render, valueGifter->getPosX()+valueGifter->getWidth()/2, valueGifter->getPosY()-Slider::slider_bus_height/2, x, y);
+	}
 }
 
 void Bus::removeBus()
@@ -322,30 +356,26 @@ void ValueGifter::removeConnections()
 Slider::~Slider() 
 {
 	removeConnections();
-	SDL_DestroyTexture(valueTex);
 	valueGifterList.erase(id);
 }
 
-void Slider::setValue(float v)
+void Slider::setValue(float v, bool skipEntryBox)
 {
 	value=v;
 	
 	if(!(lastValue>=(value-0.001) && lastValue<=(value+0.001)))
 	{
 		effect->setAndSendArgument(argument, value);
-		SDL_DestroyTexture(valueTex);
-		std::ostringstream buff;
-		buff.setf(std::ios::fixed, std::ios::floatfield);
-		if(value>=10.0f || value<=-10.0f)
-		buff.precision(1);
-		else
-		buff.precision(2);
-		buff<<value;
-		
-		valueTex=generateText(buff.str().c_str());
+
 		lastValue=value;
 		
 		level=height-int((value-rangeBegin)/(rangeEnd-rangeBegin)*float(height));
+		
+		if(!skipEntryBox) 
+		{
+			entryBox.setValue(value);
+			entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
+		}
 	}
 }
 
