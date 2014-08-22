@@ -189,18 +189,6 @@ bool checkInputs()
 					getSaveFile(fileStr, MAX_PATH);
 					Effect::saveToFile(fileStr);
 				}
-				else if(state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_R])
-				{
-					OSCConn::recordToFile();
-				}
-				else if(!state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
-				{
-					OSCConn::startRecord();
-				}
-				else if(state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
-				{
-					OSCConn::stopRecord();
-				}
 				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
 				{
 					Effect::saveToFile("session_before_load.cello");
@@ -213,6 +201,19 @@ bool checkInputs()
 					Effect::saveToFile("session_before_erase.cello");
 					Effect::clearAll();
 				}
+				else if(state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::recordToFile();
+				}
+				else if(!state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::startRecord();
+				}
+				else if(state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::stopRecord();
+				}
+				
 			break;
 		}
 	}
@@ -279,10 +280,7 @@ int main (int argc, char** argv)
 	
 	Effect::saveToFile("last_session.cello");
 	
-	for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
-	{
-		delete (*it).second;
-	}
+	Effect::clearAll();
 	
 	quitSDL();
 	

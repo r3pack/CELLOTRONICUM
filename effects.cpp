@@ -786,6 +786,7 @@ void EffectCreator::receiveKeyboardEvent(SDL_Scancode scancode)
 			moveDown();
 		break;
 		case SDL_SCANCODE_RETURN:
+		case SDL_SCANCODE_RIGHT:
 			enter();
 		break;
 		case SDL_SCANCODE_BACKSPACE:

@@ -420,7 +420,7 @@
 			
 			SoftClipAmp(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
 			{sendInstance(); initGUI(X, Y);}
 			~SoftClipAmp() {quitGUI();}
 	};
@@ -442,7 +442,7 @@
 			
 			SoftClipAmp4(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
 			{sendInstance(); initGUI(X, Y);}
 			~SoftClipAmp4() {quitGUI();}
 	};
@@ -464,7 +464,7 @@
 			
 			SoftClipAmp8(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
 			{sendInstance(); initGUI(X, Y);}
 			~SoftClipAmp8() {quitGUI();}
 	};
@@ -486,7 +486,7 @@
 			
 			SoftClipper4(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS)})
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
 			~SoftClipper4() {quitGUI();}
 	};
@@ -508,7 +508,7 @@
 			
 			SoftClipper8(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS)})
+			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
 			{sendInstance(); initGUI(X, Y);}
 			~SoftClipper8() {quitGUI();}
 	};
@@ -531,7 +531,7 @@
 			AYSimple(int X, int Y): 
 			args({EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 1.0f)}),
 			argsVis({ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
-			{sendInstance(); initGUI(X, Y);}
+			{sendInstance(); initGUI(X, Y, 30);}
 			~AYSimple() {quitGUI();}
 	};
 	
@@ -553,7 +553,7 @@
 			YMSimple(int X, int Y): 
 			args({EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 1.0f)}),
 			argsVis({ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
-			{sendInstance(); initGUI(X, Y);}
+			{sendInstance(); initGUI(X, Y, 30);}
 			~YMSimple() {quitGUI();}
 	};
 	

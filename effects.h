@@ -98,10 +98,10 @@
 			virtual const int getArgsCount() = 0;
 			
 			virtual void draw(){}
-			virtual bool receiveClick(int X, int Y, MouseEvent me){}
-			virtual bool receiveSecondClick(int X, int Y, MouseEvent me){}
-			virtual bool receiveThridClick(int X, int Y, MouseEvent me){}
-			virtual bool receiveKeyboardEvent(SDL_Scancode scancode){}
+			virtual bool receiveClick(int X, int Y, MouseEvent me){return false;}
+			virtual bool receiveSecondClick(int X, int Y, MouseEvent me){return false;}
+			virtual bool receiveThridClick(int X, int Y, MouseEvent me){return false;}
+			virtual bool receiveKeyboardEvent(SDL_Scancode scancode){return false;}
 			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);
