@@ -12,6 +12,19 @@ SynthDef.new(\eff_input,{
 	Out.ar(outbus,in);
 }).add;
 
+SynthDef.new(\eff_input_extended,{
+	arg outbus1, outbus2, outbus3, outbus4, outbus5, outbus6, outbus7, outbus8;
+	var in = In.ar(8);
+	var in = In.ar(9);
+	var in = In.ar(10);
+	var in = In.ar(11);
+	var in = In.ar(12);
+	var in = In.ar(13);
+	var in = In.ar(14);
+	var in = In.ar(15);
+	Out.ar(outbus,in);
+}).add;
+
 SynthDef.new(\eff_playbuf, {
 	arg outbus=0, bufnum=0;
 	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)));
