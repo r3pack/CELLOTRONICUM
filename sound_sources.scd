@@ -10,12 +10,12 @@ SynthDef.new(\eff_output_extended,{
 	arg inbus1, inbus2, inbus3, inbus4, inbus5, inbus6, inbus7, inbus8;
 	var in1 = In.ar(inbus1);
 	var in2 = In.ar(inbus2);
-	var in2 = In.ar(inbus3);
-	var in2 = In.ar(inbus4);
-	var in2 = In.ar(inbus5);
-	var in2 = In.ar(inbus6);
-	var in2 = In.ar(inbus7);
-	var in2 = In.ar(inbus8);
+	var in3 = In.ar(inbus3);
+	var in4 = In.ar(inbus4);
+	var in5 = In.ar(inbus5);
+	var in6 = In.ar(inbus6);
+	var in7 = In.ar(inbus7);
+	var in8 = In.ar(inbus8);
 	Out.ar(0,in1);
 	Out.ar(1,in2);
 	Out.ar(2,in3);
@@ -34,15 +34,22 @@ SynthDef.new(\eff_input,{
 
 SynthDef.new(\eff_input_extended,{
 	arg outbus1, outbus2, outbus3, outbus4, outbus5, outbus6, outbus7, outbus8;
-	var in = In.ar(8);
-	var in = In.ar(9);
-	var in = In.ar(10);
-	var in = In.ar(11);
-	var in = In.ar(12);
-	var in = In.ar(13);
-	var in = In.ar(14);
-	var in = In.ar(15);
-	Out.ar(outbus,in);
+	var in1 = In.ar(8);
+	var in2 = In.ar(9);
+	var in3 = In.ar(10);
+	var in4 = In.ar(11);
+	var in5 = In.ar(12);
+	var in6 = In.ar(13);
+	var in7 = In.ar(14);
+	var in8 = In.ar(15);
+	Out.ar(outbus1,in1);
+	Out.ar(outbus2,in2);
+	Out.ar(outbus3,in3);
+	Out.ar(outbus4,in4);
+	Out.ar(outbus5,in5);
+	Out.ar(outbus6,in6);
+	Out.ar(outbus7,in7);
+	Out.ar(outbus8,in8);
 }).add;
 
 SynthDef.new(\eff_playbuf, {
