@@ -374,7 +374,6 @@
 		static int lastId;
 		int id;
 		
-		
 		bool clicked=false;
 		
 		Effect* effect;
@@ -400,6 +399,7 @@
 	};
 	
 	class EntryBox : public Drawable{
+		friend class Slider;
 		int width;
 		const int height;
 		int posX;
@@ -572,6 +572,8 @@
 					lastClicked=-1;
 					if(checkValue()) sendValue();
 				return true;
+				default:
+				return true;
 			}
 			return false;
 		}
@@ -696,8 +698,24 @@
 		
 		EntryBox entryBox;
 		
+		EntryBox rangeBeginBox;
+		EntryBox rangeEndBox;
+		
+		bool editRange=false;
+		
 		float lastValue;
 		float value;
+		
+		void setRangeFromEntryBoxes()
+		{
+			rangeBegin=rangeBeginBox.getValue();
+			rangeEnd=rangeEndBox.getValue();
+			
+			value=std::min(value, std::max(rangeBegin, rangeEnd));
+			value=std::max(value, std::min(rangeBegin, rangeEnd));
+			
+			setValue(value, false, true);
+		}
 		
 		public:
 		
@@ -706,7 +724,7 @@
 		
 		Slider(int pX, int pY, int w, int h, float rB, float rE, float l, Effect* e, int a):
 		rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l),
-		entryBox(0, 0, entry_box_width, l, e, a)
+		entryBox(0, 0, entry_box_width, l, e, a), rangeBeginBox(0, 0, entry_box_width, rB, NULL, 0), rangeEndBox(0, 0, entry_box_width, rE, NULL, 0)
 		{
 			effect=e; 
 			argument=a;
@@ -721,6 +739,19 @@
 		bool receiveClick(int X, int Y, MouseEvent me)
 		{
 			if(entryBox.receiveClick(X, Y, me)) return true;
+			if(editRange)
+			{
+				bool out=false;
+				if(rangeBeginBox.receiveClick(X, Y, me)) out=true;
+				else
+				if(rangeEndBox.receiveClick(X, Y, me)) out=true;
+				
+				if(out)
+				{
+					setRangeFromEntryBoxes();
+					return true;
+				}
+			}
 			if(me!=ME_PRESS && me!=ME_REPEAT) return false;
 			X-=posX;
 			Y-=posY;
@@ -731,7 +762,7 @@
 					setClicked();
 					return true;
 				}
-			
+		
 				if(Y<0) Y=0;
 				else
 				if(Y>height) Y=height;
@@ -759,6 +790,22 @@
 			
 				return true;
 			}
+			else if(X>=0 && X<=width && Y>=0 && Y<=height && me==ME_PRESS) 
+			{
+				editRange=!editRange;
+				if(editRange)
+				{
+					rangeBeginBox.setValue(rangeBegin);
+					rangeEndBox.setValue(rangeEnd);
+					rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
+					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+				}
+				if(!editRange)
+				{
+					EntryBox::lastClicked=-1;
+				}
+				return true;
+			}
 			return false;
 		}
 		
@@ -770,6 +817,27 @@
 				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 				return true;
 			}
+			if(editRange)
+			{
+				bool out=false;
+				if(rangeBeginBox.receiveKeyboardEvent(scancode))
+				{
+					rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
+					out=true;
+				}
+				else if(rangeEndBox.receiveKeyboardEvent(scancode))
+				{
+					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+					out=true;
+				}
+				
+				if(out && scancode==SDL_SCANCODE_RETURN)
+				{
+					setRangeFromEntryBoxes();
+				}
+				
+				return out;
+			}
 			return false;
 		}
 		
@@ -778,7 +846,7 @@
 			return value;
 		}
 		
-		void setValue(float v, bool skipEntryBox=false);
+		void setValue(float v, bool skipEntryBox=false, bool forceSet=false);
 		
 		void setNormalizedValue(float nv)
 		{
@@ -790,6 +858,8 @@
 			posX=X;
 			posY=Y;
 			entryBox.setPos(X+width/2-entryBox.getWidth()/2, Y+height);
+			rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight());
+			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2);
 		}
 		
 		void move(int X, int Y)
@@ -797,6 +867,8 @@
 			posX+=X;
 			posY+=Y;
 			entryBox.move(X, Y);
+			rangeBeginBox.move(X, Y);
+			rangeEndBox.move(X, Y);
 		}
 		
 		int getPosX(){return posX;}
@@ -851,6 +923,12 @@
 			SDL_RenderDrawRect(render, &controllRect);
 			
 			entryBox.draw();
+			
+			if(editRange)
+			{
+				rangeBeginBox.draw();
+				rangeEndBox.draw();
+			}
 		}
 		
 		int getWidth() {return width;}

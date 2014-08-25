@@ -93,6 +93,7 @@
 			int getId() {return id;}
 			
 			virtual const char* getName() = 0;
+			virtual const char* getFullName() = 0;
 			virtual const char* getGroup() {return "";};
 			virtual EffectArgument* getArgs() = 0;
 			virtual const int getArgsCount() = 0;
@@ -150,8 +151,16 @@
 			name=n;
 			parent=p;
 			if(!isElement) submenuEntries=new std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>;
-			nameTex=generateText(name);
-			nameTexRed=generateText(name, COLOR_SELECTED_TEXT);
+			if(isElement)
+			{
+				nameTex=generateText(name, COLOR_ELEMENT_TEXT);
+				nameTexRed=generateText(name, COLOR_SELECTED_ELEMENT_TEXT);
+			}
+			else
+			{
+				nameTex=generateText(name);
+				nameTexRed=generateText(name, COLOR_SELECTED_TEXT);
+			}
 		}
 		
 	};
@@ -182,6 +191,6 @@
 	
 	std::map <int, Effect*>* getEffectInstanceList();
 	
-	void registerEffect(const char* name, const char* group, const char* subgroup=NULL);
+	void registerEffect(const char* name, const char* fullName, const char* group, const char* subgroup=NULL);
 
 #endif

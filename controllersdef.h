@@ -7,7 +7,7 @@ class MousePosController : public Controller
 {
 	public:
 	
-	static constexpr const char* name="ctr_mousepos";
+	static constexpr const char* name="MousePos";
 	static constexpr int busCount=2;
 	const char* busNames[busCount]={"posX", "posY"};
 	

@@ -359,11 +359,11 @@ Slider::~Slider()
 	valueGifterList.erase(id);
 }
 
-void Slider::setValue(float v, bool skipEntryBox)
+void Slider::setValue(float v, bool skipEntryBox, bool forceSet)
 {
 	value=v;
 	
-	if(!(lastValue>=(value-0.001) && lastValue<=(value+0.001)))
+	if((!(lastValue>=(value-0.001) && lastValue<=(value+0.001))) || forceSet)
 	{
 		effect->setAndSendArgument(argument, value);
 
@@ -407,5 +407,6 @@ GradualSlider::~GradualSlider()
 
 void EntryBox::sendValue()
 {
+	if(effect!=NULL)
 	effect->setAndSendArgument(argument, value);
 }

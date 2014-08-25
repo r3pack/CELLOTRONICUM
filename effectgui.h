@@ -233,7 +233,7 @@
 				}
 			}
 			
-			nameTex=generateText(getName());
+			nameTex=generateText(getFullName());
 		}
 		
 		void quitGUI()

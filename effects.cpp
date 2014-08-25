@@ -6,16 +6,16 @@
 
 const int MAX_EFFECTS_COUNT=1000;
 
-
 struct EffectEntry{
-	bool checked;
+	const char* name;
 	const char* group;
 	const char* subgroup;
-	EffectEntry(bool c, const char* g, const char* s) {checked=c; group=g; subgroup=s;}
+	EffectEntry(const char* n, const char* g, const char* s) {name=n; group=g; subgroup=s;}
 };
 
-std::map<const char*, EffectEntry, cmpCStr> effectsList;
+std::vector<EffectEntry> effectsList;
 
+std::map<const char*, bool, cmpCStr> SCEffectsList;
 
 bool checkEffectsList()
 {
@@ -43,12 +43,12 @@ bool checkEffectsList()
 					
 					fprintf(stderr, "Got effect '%s'", name.c_str());
 					
-					auto it = effectsList.find(name.c_str());
+					auto it = SCEffectsList.find(name.c_str());
 					
-					if(it != effectsList.end())
+					if(it != SCEffectsList.end())
 					{
 						fprintf(stderr, ", which exist on client side (OK)\n");
-						(*it).second.checked=true;
+						(*it).second=true;
 					}
 					else
 					{
@@ -70,9 +70,9 @@ bool checkEffectsList()
 	
 	bool gotAllEffects=true;
 	
-	for(auto it=effectsList.begin();it!=effectsList.end();++it)
+	for(auto it=SCEffectsList.begin();it!=SCEffectsList.end();++it)
 	{
-		if(!((*it).second.checked)) 
+		if(!((*it).second)) 
 		{
 			gotAllEffects=false;
 			fprintf(stderr, "Effect '%s' not found on server side!!! Program will be closed!\n", (*it).first);
@@ -683,11 +683,13 @@ void EffectCreator::enter()
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		
-		if(strncmp(chosenEffect->name, "ctr_", 4)==0)
-		getController(chosenEffect->name, x, y);
-		else
-		if(strncmp(chosenEffect->name, "eff_", 4)==0)
-		getEffect(chosenEffect->name, x, y);
+		if(getEffect(chosenEffect->name, x, y)==NULL)
+		{
+			if(getController(chosenEffect->name, x, y)==NULL)
+			{
+				fprintf(stderr, "Error: No Effect or Controller called '%s'\n", chosenEffect->name);
+			}
+		}
 	}
 	else
 	{
@@ -706,9 +708,9 @@ void EffectCreator::init()
 	chosenEffect=new EffectCreatorMenuEntry("", NULL, false);
 	for(auto it=effectsList.begin();it!=effectsList.end();++it)
 	{
-		const char* name=(*it).first;
-		const char* group=(*it).second.group;
-		const char* subgroup=(*it).second.subgroup;
+		const char* name=(*it).name;
+		const char* group=(*it).group;
+		const char* subgroup=(*it).subgroup;
 		
 		auto mapIt=chosenEffect->submenuEntries->find(group);
 		if(mapIt==chosenEffect->submenuEntries->end())
@@ -796,7 +798,8 @@ void EffectCreator::receiveKeyboardEvent(SDL_Scancode scancode)
 	}
 }
 
-void registerEffect(const char* name, const char* group, const char* subgroup) 
+void registerEffect(const char* name, const char* fullName, const char* group, const char* subgroup) 
 {
-	effectsList.insert(std::pair<const char*, EffectEntry>(name, EffectEntry(false, group, subgroup)));
+	SCEffectsList.insert(std::pair<const char*, bool>(name, false));
+	effectsList.push_back(EffectEntry(fullName, group, subgroup));
 }
