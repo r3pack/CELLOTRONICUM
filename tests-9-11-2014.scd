@@ -278,7 +278,7 @@ f = "gramophone.aiff"
 s.prepareForRecord(~p +/+ f);
 s.record;
 
-x = Synth.new(\gramophone, [\inbus, 8, \outbus, 0, \noise_amp, 0.8, \rq, 1, \freq, 1000, \imp_freq, 5, \blip_freq, 3, \gain, 2]);
+x = Synth.new(\eff_gramophone, [\inbus, 8, \outbus, 0, \noise_amp, 0.8, \rq, 1, \freq, 1000, \imp_freq, 5, \blip_freq, 3, \gain, 2]);
 
 s.stopRecording;
 

@@ -53,8 +53,8 @@ SynthDef.new(\eff_input_extended,{
 }).add;
 
 SynthDef.new(\eff_playbuf, {
-	arg outbus=0, bufnum=0;
-	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)));
+	arg outbus=0, bufnum=0, trigger=1, loop=0;
+	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum),trigger,loop:loop));
 }).add;
 
 SynthDef.new(\eff_simple_shepard_tone, {

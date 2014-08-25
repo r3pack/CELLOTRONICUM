@@ -5,11 +5,12 @@ var func_onFailure = {
 };
 
 var func_start = {
-	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 	//INITIALISATION CODE HERE:
-	~e = Dictionary.new(0); //synths on server
+	s.options.numAudioBusChannels=512;
 	~b = Dictionary.new(0); //buffers
-	~bus = Dictionary.new(0); //busses
+	~quitch_buffer = Buffer.read(s, ~quitch_filename);
+	~b.add( ~quitch_buffer.bufnum -> ~quitch_buffer);
+	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 };
 
 OSCdef.new(
@@ -75,9 +76,9 @@ OSCdef.new(
 	{
 		arg msq, time, addr, recvPort;
 		s.reboot;
-		~e=Dictionary.new(0);
-		~b=Dictionary.new(0);
-		~bus=Dictionary.new(0);
+		~e = Dictionary.new(0); //synths on server
+		~bus = Dictionary.new(0); //busses
+		s.waitForBoot(func_start, inf, func_onFailure);
 	},
 	'/app_reboot'
 );

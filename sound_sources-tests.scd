@@ -86,3 +86,14 @@ x = Synth.new(\eff_shepard_cycle_tone_from_input, [\outbus, 0, \inbus, 17]);
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 3]);
 z = Synth.new(\eff_playbuf, [\outbus, 1, \bufnum, 1]);
 s.stopRecording;
+
+
+//NIE DZIAAAAŁAAA!
+SynthDef.new(\eff_xxx, {
+	arg outbus;
+	Out.kr(outbus, MouseX.kr(1,64));
+});
+
+x = Synth.new(\eff_octave_down, [\inbus, 0, \freq_bus, 16, \outbus, 0, \freq_mul_bus, 17]);
+y = Synth.new(\eff_pitch, [\inbus, 0, \outbus, 16]);
+z = Synth.new(\eff_xxx, [\outbus, 17]);

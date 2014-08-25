@@ -56,10 +56,11 @@ SynthDef.new(\eff_freq_shift, {
 }).add;
 
 //DUBECHO
+//http://sccode.org/1-1P8
 SynthDef(\eff_dubecho,{
-	arg inbus, outbus, length = 1, fb = 0.8, sep = 0.012;
+	arg inbus, outbus, length = 1, feedback = 0.8, sep = 0.012;
 	var input = In.ar(inbus, 1);
-	var feedback = LocalIn.ar(1);
+	var fb = LocalIn.ar(1);
 	var output = LeakDC.ar(feedback*fb + input);
 	output = HPF.ar(output, 400);
 	output = LPF.ar(output, 5000);
@@ -80,7 +81,7 @@ SynthDef.new(\eff_distecho, {
 }).add;
 
 /*/TESTS
-x = Synth.new(\eff_distecho, [\inbus, 8, \outbus, 0, \amp, 1.0, \delay, 0.5, \decay, 2]);
+x = Synth.new(\eff_distecho, [\inbus, 8, \outbus, 0, \amp, 1.0, \delay, 0.5, \feedback, 0.5]);
 
 x.set(\delay,0.04);
 x.set(\freq,200);

@@ -1,3 +1,38 @@
+SynthDef.new(\eff_warm_chorus, {
+	//Pierwsza próba - na razie na gotowych pitch shifterach
+	//http://quod.lib.umich.edu/i/icmc/bbp2372.2012.014/--warm-chorus-re-thinking-the-chorus-effect-using/4?view=pdf
+	arg inbus=8, outbus=0,
+        amp_attack=0.02, amp_release=0.5, max_delay=0.2, hadamard_cut=1;
+    var in = In.ar(inbus,1);
+	var amp = Amplitude.ar(in, amp_attack,amp_release);
+	var min_delay = SampleDur.ir*4;
+	var semitones = [0, 0.02, 0.03, 0.05, 0.07, 0.11, 0.13];
+	var delays = [ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay)];
+	var sig  = semitones.collect({|e, i| PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12)));}); //optymalizacja na później - multiple-tap delay line
+	var res = WalshHadamard.ar(Mix.ar(sig)/8, hadamard_cut);
+	delays.poll;
+    Out.ar(outbus,res);
+}).add;
+
+
+/* TESTS
+
+b = Buffer.read(s, ~p +/+ "D-DUR.aiff");
+b = Buffer.read(s, ~p +/+ "zBrody1.wav");
+
+
+s.prepareForRecord(~p +/+ "d-dur-harmonizer.aiff");
+s.record;
+
+x = Synth.new(\eff_warm_chorus,
+	[\inbus, 16, \outbus, 0]);
+Synth.new(\eff_playbuf, [\outbus, 0, \bufnum, 1]);
+
+
+s.stopRecording;
+
+*/
+
 SynthDef.new(\eff_harmonizer_4, {
 	arg inbus=8, outbus=0,
 	    amp_attack=0.02, amp_release=0.5,
@@ -7,7 +42,6 @@ SynthDef.new(\eff_harmonizer_4, {
 	    semitones3, amp3=0, amp_threshold3, ampmax3,
 	    semitones4, amp4=0, amp_threshold4, ampmax4;
 	var in = In.ar(inbus,1);
-	var res = in;
 	var amp = Amplitude.ar(in, amp_attack,amp_release);
 	var w1 = ceil(thresh(amp ,amp_threshold1));
 	var a1 = Clip.ar((amp1*(amp-amp_threshold1))/(ampmax1-amp_threshold1), 0, amp1);
@@ -40,7 +74,6 @@ SynthDef.new(\eff_harmonizer_5, {
 	    semitones4, amp4=0, amp_threshold4, ampmax4,
 	    semitones5, amp5=0, amp_threshold5, ampmax5;
 	var in = In.ar(inbus,1);
-	var res = in;
 	var amp = Amplitude.ar(in, amp_attack,amp_release);
 	var w1 = ceil(thresh(amp ,amp_threshold1));
 	var a1 = Clip.ar((amp1*(amp-amp_threshold1))/(ampmax1-amp_threshold1), 0, amp1);
@@ -78,7 +111,6 @@ SynthDef.new(\eff_harmonizer_6, {
 	    semitones5, amp5=0, amp_threshold5, ampmax5,
 	    semitones6, amp6=0, amp_threshold6, ampmax6;
 	var in = In.ar(inbus,1);
-	var res = in;
 	var amp = Amplitude.ar(in, amp_attack,amp_release);
 	var w1 = ceil(thresh(amp ,amp_threshold1));
 	var a1 = Clip.ar((amp1*(amp-amp_threshold1))/(ampmax1-amp_threshold1), 0, amp1);
@@ -120,7 +152,6 @@ SynthDef.new(\eff_harmonizer_7, {
 	    semitones6, amp6=0, amp_threshold6, ampmax6,
 	    semitones7, amp7=0, amp_threshold7, ampmax7;
 	var in = In.ar(inbus,1);
-	var res = in;
 	var amp = Amplitude.ar(in, amp_attack,amp_release);
 	var w1 = ceil(thresh(amp ,amp_threshold1));
 	var a1 = Clip.ar((amp1*(amp-amp_threshold1))/(ampmax1-amp_threshold1), 0, amp1);
@@ -241,7 +272,6 @@ x = Synth.new(\eff_harmonizer_5,
 Synth.new(\eff_playbuf, [\outbus, 16, \bufnum, 6]);
 
 
-/*
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 
 x = Synth.new(\eff_harmonizer_4, [\inbus, 17, \outbus, 0]);

@@ -5,6 +5,13 @@ SynthDef.new(\eff_limiter, {
 	Out.ar(outbus,res);
 }).add;
 
+SynthDef.new(\eff_compander, {
+	arg inbus, outbus, thresh=0.5, slopeBelow=1, slopeAbove=1, clampTime=0.01, relaxTime=0.1;
+	var in = In.ar(inbus);
+	var res = Compander.ar(in,in,thresh,slopeBelow,slopeAbove,clampTime,relaxTime);
+	Out.ar(outbus,res);
+}).add;
+
 SynthDef.new(\eff_normalizer, {
 	arg inbus, outbus, level=1, dur=0.01;
 	var in = In.ar(inbus);
@@ -36,6 +43,44 @@ SynthDef.new(\eff_mix3, {
 	Out.ar(outbus,res);
 }).add;
 
+SynthDef.new(\eff_select2, {
+	arg inbus1, inbus2, outbus, which=0;
+	var i1 = In.ar(inbus1);
+	var i2 = In.ar(inbus2);
+	var res = Select.ar(which,[i1,i2]);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_select3, {
+	arg inbus1, inbus2, inbus3, outbus, which=0;
+	var i1 = In.ar(inbus1);
+	var i2 = In.ar(inbus2);
+	var i3 = In.ar(inbus3);
+	var res = Select.ar(which,[i1,i2,i3]);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_select4, {
+	arg inbus1, inbus2, inbus3, inbus4, outbus, which=0;
+	var i1 = In.ar(inbus1);
+	var i2 = In.ar(inbus2);
+	var i3 = In.ar(inbus3);
+	var i4 = In.ar(inbus4);
+	var res = Select.ar(which,[i1,i2,i3,i4]);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_select5, {
+	arg inbus1, inbus2, inbus3, inbus4, inbus5, outbus, which=0;
+	var i1 = In.ar(inbus1);
+	var i2 = In.ar(inbus2);
+	var i3 = In.ar(inbus3);
+	var i4 = In.ar(inbus4);
+	var i5 = In.ar(inbus5);
+	var res = Select.ar(which,[i1,i2,i3,i4,i5]);
+	Out.ar(outbus,res);
+}).add;
+
 SynthDef.new(\eff_amplitude, {
 	arg inbus=8, outbus, attackTime=0.01, releaseTime=0.01;
 	var in = In.ar(inbus);
@@ -64,6 +109,15 @@ SynthDef.new(\eff_tartini_pitch, {
 	# freq, hasFreq = Tartini.kr(in);
 	Out.kr(outbus,if((hasFreq>cutoff),freq,0));
 }).add;
+
+SynthDef.new(\eff_qitch_pitch, {
+	arg outbus=0, inbus=8, ampThreshold=0.01, minfreq=0, maxfreq=2500;
+	var in = In.ar(inbus);
+	var freq, hasFreq;
+	# freq, hasFreq = Qitch.kr(in,~quitch_buffer.bufnum, ampThreshold,1,minfreq:minfreq, maxfreq:maxfreq);
+	Out.kr(outbus,freq);
+}).add;
+
 
 SynthDef.new(\eff_goetzel,{
 	arg amp_outbus, freq_outbus, inbus=8, freq=440, overlap=1; //overlap <- (0,1]
