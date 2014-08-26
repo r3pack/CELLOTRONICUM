@@ -57,6 +57,26 @@ SynthDef.new(\eff_playbuf, {
 	Out.ar( outbus, PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum),trigger,loop:loop));
 }).add;
 
+SynthDef.new(\eff_playbuf2, {
+	arg outbus=0, bufnum=0, trigger=1, loop=0;
+	Out.ar( outbus, PlayBuf.ar(2, bufnum, BufRateScale.kr(bufnum),trigger,loop:loop));
+}).add;
+
+SynthDef.new(\eff_sinus, {
+	arg inbus=8, freq=440, amp=1, outbus;
+	Out.ar(outbus, SinOsc.ar(freq,0,amp));
+}).add;
+
+SynthDef.new(\eff_goetzel_sinus,{
+	arg inbus=8, freq=440, outbus;
+	var in = In.ar(inbus);
+	var bufsize = 2048, overlap=1;
+	var real, imag, magnitude;
+	# real, imag = Goertzel.kr(in,bufsize,freq,overlap);
+	magnitude = (real.squared + imag.squared).sqrt*(bufsize/2).reciprocal;
+	Out.ar(outbus, SinOsc.ar(freq,0, magnitude));
+}).add;
+
 SynthDef.new(\eff_simple_shepard_tone, {
 	arg outbus=0, freq=440, amp=0.5;
 	var res=0;

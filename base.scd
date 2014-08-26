@@ -118,7 +118,6 @@ SynthDef.new(\eff_qitch_pitch, {
 	Out.kr(outbus,freq);
 }).add;
 
-
 SynthDef.new(\eff_goetzel,{
 	arg amp_outbus, freq_outbus, inbus=8, freq=440, overlap=1; //overlap <- (0,1]
 	var in = In.ar(inbus);

@@ -10,15 +10,7 @@
 
 
 s.options.numAudioBusChannels=512;
-
 (~p +/+"server_boot.scd").loadPaths;
-(~p +/+"brassage.scd").loadPaths;
-(~p +/+"echo.scd").loadPaths;
-(~p +/+"bit_crush.scd").loadPaths;
-(~p +/+"sound_sources.scd").loadPaths;
-(~p +/+"harmonizer.scd").loadPaths;
-(~p +/+"base.scd").loadPaths;
-(~p +/+"afm.scd").loadPaths;
 
 /*
 s.plotTree;
@@ -28,23 +20,13 @@ s.freqscope;
 
 SynthDef.all;
 
-WAŻNE: Zrobić jeszcze jeden poziom ładowania plików - inicjalizowane po uruchomieniu servera i załadowaniu bufora do quitcha!
-
 Zrobić pitch shift ze zmianą szybkosci odtwarzania
 
 WAŻNE: nagrywanie do buffora
 
-przy bootowaniu servera ustawić, żeby zawsze wysyłało jakis komunikat do aplikacji, zeby odswieżyć Ugeny!!!
-
 czy da się z poziomu sc-lang robić sprawdzanie, czy działa server super collidera? Jakis ping-pong?
 
-TODO: wystawić gain z clippingiem!!!
-
 Quarks.gui
-
-//jeden klocek - gertzel z sinusem: parametry: amp freq
-
-selector - jeden sygnał z 2, 3, 4, 5?
 
 FFT - wycinanie najniższych składowych
 jakies przekształcenie sparametryzowane matematycznie

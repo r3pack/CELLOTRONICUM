@@ -10,6 +10,13 @@ var func_start = {
 	~b = Dictionary.new(0); //buffers
 	~qitch_buffer = Buffer.read(s, ~qitch_filename);
 	~b.add( ~qitch_buffer.bufnum -> ~qitch_buffer);
+	(~p +/+"brassage.scd").loadPaths;
+	(~p +/+"echo.scd").loadPaths;
+	(~p +/+"bit_crush.scd").loadPaths;
+	(~p +/+"sound_sources.scd").loadPaths;
+	(~p +/+"harmonizer.scd").loadPaths;
+	(~p +/+"base.scd").loadPaths;
+	(~p +/+"afm.scd").loadPaths;
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 };
 
