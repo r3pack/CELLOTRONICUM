@@ -5,7 +5,6 @@ SynthDef.new(\eff_hadamard_first, {
 	Out.ar(outbus,res);
 }).add;
 
-/* NIE BEDZIE DZIAŁAC!
 SynthDef.new(\eff_hadamard_last, {
 	arg inbus=8, outbus=0, hadamard_cut=10;
 	var in = In.ar(inbus,1);
@@ -13,7 +12,7 @@ SynthDef.new(\eff_hadamard_last, {
 	Out.ar(outbus,res);
 }).add;
 
-
+/*
 SynthDef.new(\eff_warm_chorus, {
 	//Pierwsza próba - na razie na gotowych pitch shifterach
 	//http://quod.lib.umich.edu/i/icmc/bbp2372.2012.014/--warm-chorus-re-thinking-the-chorus-effect-using/4?view=pdf

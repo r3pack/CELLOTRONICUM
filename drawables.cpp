@@ -70,6 +70,38 @@ void drawConnections()
 	}
 }
 
+void SwitchButton::setStatus(bool s) 
+{
+	status=s;
+	if(status==false)
+	{
+		effect->setAndSendArgument(argument, value1);
+		symbol=symbol1;
+	}
+	else
+	{
+		effect->setAndSendArgument(argument, value2);
+		symbol=symbol2;
+	}
+}
+
+bool SwitchButton::receiveClick(int X, int Y, MouseEvent me)
+{
+	if(isTrigger && status && me==ME_RELEASE)
+	{
+		status=false;
+		effect->setAndSendArgument(argument, value1);
+		symbol=symbol1;
+		return true;
+	}
+	if(Button::receiveClick(X, Y, me))
+	{
+		setStatus(!status);
+		return true;
+	}
+	return false;
+}
+
 void Bus::removeBus()
 {
 	for(auto it=getConnections()->begin();it!=getConnections()->end();)

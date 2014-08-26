@@ -474,7 +474,7 @@ void Effect::saveToFile(const char* filename)
 	for(auto it=effectInstanceList.begin();it!=effectInstanceList.end();++it)
 	{
 		Effect* effect=(*it).second;
-		fprintf(file, "effect %s %d \"", effect->getName(), effect->getId());
+		fprintf(file, "effect %s %d \"", effect->getFullName(), effect->getId());
 		effect->saveData(file);
 		fprintf(file, "\"\n");
 	}
@@ -524,7 +524,7 @@ void Effect::loadFromFile(const char* filename)
 			
 			bool playbuf=false;
 			
-			if(strcmp(buf, "eff_playbuf")==0) playbuf=true;
+			if(strcmp(buf, "Playbuf")==0) playbuf=true;
 			else
 			eff=getEffect(buf);
 			
@@ -541,7 +541,6 @@ void Effect::loadFromFile(const char* filename)
 				if(buf[i]=='\0') 
 				fgets(buf+i, 2048-i, file);
 			}
-			
 			
 			buf[i]='\0';
 			
