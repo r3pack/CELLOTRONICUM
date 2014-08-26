@@ -4,309 +4,192 @@
 #include "effectgui.h"
 #include "graphics.h"
 	
+#define EFFECT_BODY(ARGS_COUNT, FULL_NAME, SC_NAME) \
+	private:\
+		static const int argsCount=ARGS_COUNT;\
+		EffectArgument args[argsCount];\
+		ArgVis argsVis[argsCount];\
+	public:\
+		static constexpr const char* fullName=FULL_NAME;\
+		const char* getFullName() {return fullName;}\
+		static constexpr const char* name=SC_NAME;\
+		const char* getName() {return name;}\
+		EffectArgument* getArgs() {return args;}\
+		const int getArgsCount() {return argsCount;}\
+		ArgVis* getArgumentVisuals() {return argsVis;}
+	
+	
 	
 	class DistEcho : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(5, "DistEcho", "eff_distecho");
 		
-			static const int argsCount=5;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_distecho";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			DistEcho(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
-			//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 6, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_ENTRYBOX), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~DistEcho() {quitGUI();}
+		DistEcho(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
+		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 6, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_ENTRYBOX), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~DistEcho() {quitGUI();}
 	};
 	
 	class ShiftEcho : public EffectAutoGUI
-	{
-		private:
+	{		
+		EFFECT_BODY(6, "ShiftEcho", "eff_shiftecho");
 		
-			static const int argsCount=6;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_shiftecho";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			ShiftEcho(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("decay", 0.5f), EffectArgument("delay", 0.5f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~ShiftEcho() {quitGUI();}
+		ShiftEcho(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("feedback", 0.5f), EffectArgument("delay", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~ShiftEcho() {quitGUI();}
 	};
 	
 	class Brassage : public EffectAutoGUI
-	{
-		private:
+	{	
+		EFFECT_BODY(5, "Brassage", "eff_brassage");
 		
-			static const int argsCount=5;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_brassage";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Brassage(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Brassage() {quitGUI();}
+		Brassage(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Brassage() {quitGUI();}
 	};
 	
 	class BrassageOSC : public EffectAutoGUI
-	{
-		private:
+	{		
+		EFFECT_BODY(5, "BrassageOSC", "eff_brassage_sin");
 		
-			static const int argsCount=5;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_brassage_sin";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BrassageOSC(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~BrassageOSC() {quitGUI();}
+		BrassageOSC(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BrassageOSC() {quitGUI();}
 	};
 	
 	class BrassagePlus : public EffectAutoGUI
-	{
-		private:
+	{			
+		EFFECT_BODY(5, "BrassagePlus", "eff_brassage_plus");
 		
-			static const int argsCount=5;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_brassage_plus";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BrassagePlus(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~BrassagePlus() {quitGUI();}
+		BrassagePlus(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("amp", 0.5f), EffectArgument("delay", 1.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 15.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BrassagePlus() {quitGUI();}
 	};
 	
 	class RMChorus : public EffectAutoGUI
-	{
-		private:
+	{	
+		EFFECT_BODY(4, "RMChorus", "eff_rmchorus");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_rmchorus";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			RMChorus(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 20.0f), EffectArgument("delay", 0.15f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~RMChorus() {quitGUI();}
+		RMChorus(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 20.0f), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~RMChorus() {quitGUI();}
 	};
 	
 	class RMChorus2 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "RMChorus2", "eff_rmchorus2");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_rmchorus2";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			RMChorus2(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~RMChorus2() {quitGUI();}
+		RMChorus2(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~RMChorus2() {quitGUI();}
 	};
 	
 	class RMDelay : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "RMDelay", "eff_rmdelay");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_rmdelay";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			RMDelay(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~RMDelay() {quitGUI();}
+		RMDelay(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~RMDelay() {quitGUI();}
 	};
 	
 	class RMDelayRec : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "RMDelayRec", "eff_rmdelayrec");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_rmdelayrec";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			RMDelayRec(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
-			{sendInstance(); initGUI(X, Y, 17, 17);}
-			~RMDelayRec() {quitGUI();}
+		RMDelayRec(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 2.0f)})
+		{sendInstance(); initGUI(X, Y, 17, 17);}
+		~RMDelayRec() {quitGUI();}
 	};
 	
 	class WSDistortion : public EffectAutoGUI
 	{
-		private:
-		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
+		EFFECT_BODY(3, "WSDistortion", "eff_wsdistortion");
 			
-		public:
-			static constexpr const char* name="eff_wsdistortion";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			WSDistortion(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 2.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
-			{sendInstance(); initGUI(X, Y, 17, 17);}
-			~WSDistortion() {quitGUI();}
+		WSDistortion(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 2.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y, 17, 17);}
+		~WSDistortion() {quitGUI();}
 	};
 	
 	class MobilePhoneLag3 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "MobilePhoneLag3", "eff_mobile_phone_lag3");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_mobile_phone_lag3";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			MobilePhoneLag3(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("width", 0.5f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
-			{sendInstance(); initGUI(X, Y, 20, 20);}
-			~MobilePhoneLag3() {quitGUI();}
+		MobilePhoneLag3(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("width", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~MobilePhoneLag3() {quitGUI();}
 	};
 	
 	class FreqShift : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "FreqShift", "eff_freqshift");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_freqshift";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			FreqShift(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~FreqShift() {quitGUI();}
+		FreqShift(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FreqShift() {quitGUI();}
+	};
+	
+	class PitchShift : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "PitchShift", "eff_pitchshift");
+		
+		PitchShift(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("semitones", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -5.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~PitchShift() {quitGUI();}
+	};
+	
+	class RandomPitchShift : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "RandomPitchShift", "eff_rand_pitchshift");
+		
+		RandomPitchShift(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y, 30, 30);}
+		~RandomPitchShift() {quitGUI();}
 	};
 	
 	class Mul : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "Mul", "eff_mul");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_mul";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Mul(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mul", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Mul() {quitGUI();}
+		Mul(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Mul() {quitGUI();}
 	};
 	
 	class Clipper4 : public EffectAutoGUI
 	{
-		private:
-		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_Clipper4";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
+			EFFECT_BODY(4, "Clipper4", "eff_Clipper4");
 			
 			Clipper4(int X, int Y): 
 			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("lo", 0.0f), EffectArgument("hi", 1.0f)}),
@@ -317,390 +200,324 @@
 	
 	class Clipper8 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "Clipper8", "eff_Clipper8");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_Clipper8";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Clipper8(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("lo", 0.0f), EffectArgument("hi", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Clipper8() {quitGUI();}
+		Clipper8(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("lo", 0.0f), EffectArgument("hi", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Clipper8() {quitGUI();}
 	};
 	
 	class Clipper32 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "Clipper32", "eff_Clipper32");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
+		Clipper32(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("lo", 0.0f), EffectArgument("hi", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Clipper32() {quitGUI();}
+	};
+
+	class SoftClipAmp : public EffectAutoGUI
+	{	
+		EFFECT_BODY(3, "SoftClipAmp", "eff_SoftClipAmp");
+		
+		SoftClipAmp(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~SoftClipAmp() {quitGUI();}
+	};
+	
+	class SoftClipAmp4 : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "SoftClipAmp4", "eff_SoftClipAmp4");
+		
+		SoftClipAmp4(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~SoftClipAmp4() {quitGUI();}
+	};
+	
+	class SoftClipAmp8 : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "SoftClipAmp8", "eff_SoftClipAmp8");
 			
-		public:
-			static constexpr const char* name="eff_Clipper32";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Clipper32(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("lo", 0.0f), EffectArgument("hi", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Clipper32() {quitGUI();}
+		SoftClipAmp8(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("pregain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~SoftClipAmp8() {quitGUI();}
+	};
+	
+	class SoftClipper4 : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "SoftClipper4", "eff_SoftClipper4");
+		
+		SoftClipper4(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~SoftClipper4() {quitGUI();}
+	};
+	
+	class SoftClipper8 : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "SoftClipper8", "eff_SoftClipper8");
+		
+		SoftClipper8(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~SoftClipper8() {quitGUI();}
+	};
+	
+	class AYSimple : public EffectAutoGUI
+	{			
+		EFFECT_BODY(4, "AYSimple", "eff_ay_simple");
+		
+		AYSimple(int X, int Y): 
+		args({EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 1.0f)}),
+		argsVis({ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+		{sendInstance(); initGUI(X, Y, 30);}
+		~AYSimple() {quitGUI();}
+	};
+	
+	class YMSimple : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "YMSimple", "eff_ym_simple");
+		
+		YMSimple(int X, int Y): 
+		args({EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("gain", 1.0f)}),
+		argsVis({ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f)})
+		{sendInstance(); initGUI(X, Y, 30);}
+		~YMSimple() {quitGUI();}
+	};
+	
+	class Limiter : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "Limiter", "eff_limiter");
+		
+		Limiter(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("level", 1.0f), EffectArgument("dur", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.01f, 0.1f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Limiter() {quitGUI();}
 	};
 	
 	class Normalizer : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "Normalizer", "eff_normalizer");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_normalizer";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Normalizer(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("level", 1.0f), EffectArgument("dur", 0.01f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.01f, 0.1f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Normalizer() {quitGUI();}
+		Normalizer(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("level", 1.0f), EffectArgument("dur", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.01f, 0.1f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Normalizer() {quitGUI();}
 	};
 	
 	class BLowPass : public EffectAutoGUI
-	{
-		private:
+	{		
+		EFFECT_BODY(4, "BLowPass", "eff_BLowPass");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_BLowPass";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BLowPass(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f), EffectArgument("rq", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~BLowPass() {quitGUI();}
+		BLowPass(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BLowPass() {quitGUI();}
 	};
 	
 	class BHiPass : public EffectAutoGUI
 	{
-		private:
-		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
+		EFFECT_BODY(4, "BHiPass", "eff_BHiPass");
 			
-		public:
-			static constexpr const char* name="eff_BHiPass";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BHiPass(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rq", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~BHiPass() {quitGUI();}
+		BHiPass(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BHiPass() {quitGUI();}
 	};
 	
 	class BBandPass : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "BBandPass", "eff_BBandPass");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_BBandPass";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BBandPass(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 1000.0f), EffectArgument("bw", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~BBandPass() {quitGUI();}
+		BBandPass(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 1000.0f), EffectArgument("bw", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BBandPass() {quitGUI();}
+	};
+	
+	class OctaveUp : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "OctaveUp", "eff_octave_up");
+		
+		OctaveUp(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y, 20);}
+		~OctaveUp() {quitGUI();}
+	};
+	
+	class OctaveDown : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "OctaveDown", "eff_octave_down");
+		
+		OctaveDown(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y, 20);}
+		~OctaveDown() {quitGUI();}
+	};
+	
+	class FormantFilter : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "FormantFilter", "eff_octave_down");
+		
+		FormantFilter(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("freq_mul", 0.5f), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y, 20);}
+		~FormantFilter() {quitGUI();}
 	};
 	
 	class Amplitude : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "Amplitude", "eff_amplitude");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_amplitude";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Amplitude(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("attackTime", 0.01f), EffectArgument("releaseTime", 0.01f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_AMP_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Amplitude() {quitGUI();}
+		Amplitude(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("attackTime", 0.01f), EffectArgument("releaseTime", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_AMP_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Amplitude() {quitGUI();}
 	};
 	
 	class ShepardCycleTone : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "ShepardCycleTone", "eff_shepard_cycle_tone");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_shepard_cycle_tone";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			ShepardCycleTone(int X, int Y): 
-			args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("amp", 0.5f)}),
-			argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y, 30, 30);}
-			~ShepardCycleTone() {quitGUI();}
+		ShepardCycleTone(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("amp", 0.5f)}),
+		argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y, 30, 30);}
+		~ShepardCycleTone() {quitGUI();}
 	};
 	
 	class Pitch : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(2, "Pitch", "eff_pitch");
 		
-			static const int argsCount=2;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_pitch";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Pitch(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS)})
-			{sendInstance(); initGUI(X, Y);}
-			~Pitch() {quitGUI();}
+		Pitch(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Pitch() {quitGUI();}
 	};
 	
 	class TartiniPitch : public EffectAutoGUI
-	{
-		private:
-		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
+	{		
+		EFFECT_BODY(3, "TartiniPitch", "eff_tartini_pitch");
 			
-		public:
-			static constexpr const char* name="eff_tartini_pitch";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			TartiniPitch(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("cutoff", 0.45f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y, 17, 17);}
-			~TartiniPitch() {quitGUI();}
+		TartiniPitch(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("cutoff", 0.45f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 17, 17);}
+		~TartiniPitch() {quitGUI();}
 	};
 	
 	class Goetzel : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(5, "Goetzel", "eff_goetzel");
 		
-			static const int argsCount=5;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_goetzel";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Goetzel(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("freq_outbus", OSCConn::getFreeBus()), EffectArgument("amp_outbus", OSCConn::getFreeBus()), EffectArgument("freq", 440.0f), EffectArgument("overlap", 1.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_AMP_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 8000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-			{sendInstance(); initGUI(X, Y, EffectAutoGUI::left_padding, 30);}
-			~Goetzel() {quitGUI();}
+		Goetzel(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("freq_outbus", OSCConn::getFreeBus()), EffectArgument("amp_outbus", OSCConn::getFreeBus()), EffectArgument("freq", 440.0f), EffectArgument("overlap", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_AMP_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 8000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, EffectAutoGUI::left_padding, 30);}
+		~Goetzel() {quitGUI();}
 	};
 	
 	class SampleDecrease : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "SampleDecrease", "eff_sample_decrese");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_sample_decrese";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			SampleDecrease(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("samplerate", 20000.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 48000.0f)})
-			{sendInstance(); initGUI(X, Y, 25, 25);}
-			~SampleDecrease() {quitGUI();}
+		SampleDecrease(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("samplerate", 20000.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 48000.0f)})
+		{sendInstance(); initGUI(X, Y, 25, 25);}
+		~SampleDecrease() {quitGUI();}
 	};
 	
 	class BitCrush : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "BitCrush", "eff_bitcrush");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_bitcrush";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			BitCrush(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("bitSize", 16.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 1, 32)})
-			{sendInstance(); initGUI(X, Y);}
-			~BitCrush() {quitGUI();}
+		BitCrush(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("bitSize", 16.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 1, 32)})
+		{sendInstance(); initGUI(X, Y);}
+		~BitCrush() {quitGUI();}
 	};
 	
 	class Mix : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(3, "Mix", "eff_mix");
 		
-			static const int argsCount=3;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_mix";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Mix(int X, int Y): 
-			args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
-			{sendInstance(); initGUI(X, Y);}
-			~Mix() {quitGUI();}
+		Mix(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Mix() {quitGUI();}
 	};
 	
 	class Mix3 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(4, "Mix3", "eff_mix3");
 		
-			static const int argsCount=4;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_mix3";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Mix3(int X, int Y): 
-			args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
-			{sendInstance(); initGUI(X, Y);}
-			~Mix3() {quitGUI();}
+		Mix3(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Mix3() {quitGUI();}
 	};
 	
 	class Gramophone : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(8, "Gramophone", "eff_gramophone");
 		
-			static const int argsCount=8;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_gramophone";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Gramophone(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("noise_amp", 0.2f), EffectArgument("rq", 1.0f),
-			EffectArgument("freq", 1000.0f), EffectArgument("imp_freq", 5.0f), EffectArgument("blip_freq", 3.0f), EffectArgument("gain", 2.0f)}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.1f, 10.0f),
-			ArgVis(VT_SLIDER, 1.0f, 15000.0f), ArgVis(VT_SLIDER, 0.0f, 30.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
-			{sendInstance(); initGUI(X, Y);}
-			~Gramophone() {quitGUI();}
+		Gramophone(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("noise_amp", 0.2f), EffectArgument("rq", 1.0f),
+		EffectArgument("freq", 1000.0f), EffectArgument("imp_freq", 5.0f), EffectArgument("blip_freq", 3.0f), EffectArgument("gain", 2.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.1f, 10.0f),
+		ArgVis(VT_SLIDER, 1.0f, 15000.0f), ArgVis(VT_SLIDER, 0.0f, 30.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Gramophone() {quitGUI();}
 	};
 	
 	class Harmonizer4 : public EffectAutoGUI
 	{
-		private:
+		EFFECT_BODY(20, "Harmonizer4", "eff_harmonizer_4");
 		
-			static const int argsCount=20;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-			
-		public:
-			static constexpr const char* name="eff_harmonizer_4";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Harmonizer4(int X, int Y): 
-			args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
-			EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
-			EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
-			EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
-			EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
-			EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f)
-			}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
-			ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
-			ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
-			ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
-			ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
-			ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
-			})
-			{sendInstance(); initGUI(X, Y);}
-			~Harmonizer4() {quitGUI();}
+		Harmonizer4(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
+		EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
+		EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
+		EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
+		EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
+		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f)
+		}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
+		})
+		{sendInstance(); initGUI(X, Y);}
+		~Harmonizer4() {quitGUI();}
 	};
 	
 	
@@ -764,6 +581,8 @@
 			
 			
 		public:
+			static constexpr const char* fullName="Playbuf";
+			const char* getFullName() {return name;}
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
 			EffectArgument* getArgs() {return args;}
@@ -803,41 +622,45 @@
 	};
 	
 	class Input : public EffectAutoGUI
+	{		
+		EFFECT_BODY(1, "Input", "eff_input");
+		
+		Input(int X, int Y): args({EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Input() {quitGUI();}
+	};
+	
+	class InputExtended : public EffectAutoGUI
 	{
-		private:
-			static const int argsCount=1;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-		public:
-			static constexpr const char* name="eff_input";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Input(int X, int Y): args({EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_OUTBUS)})
-			{sendInstance(); initGUI(X, Y);}
-			~Input() {quitGUI();}
+		EFFECT_BODY(8, "InputExtended", "eff_input_extended");
+		
+		InputExtended(int X, int Y): args({EffectArgument("outbus1", OSCConn::getFreeBus()), EffectArgument("outbus2", OSCConn::getFreeBus()), EffectArgument("outbus3", OSCConn::getFreeBus()), EffectArgument("outbus4", OSCConn::getFreeBus()),
+										   EffectArgument("outbus5", OSCConn::getFreeBus()), EffectArgument("outbus6", OSCConn::getFreeBus()), EffectArgument("outbus7", OSCConn::getFreeBus()), EffectArgument("outbus8", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y, 30, 30);}
+		~InputExtended() {quitGUI();}
 	};
 	
 	class Output : public EffectAutoGUI
-	{
-		private:
-			static const int argsCount=2;
-			EffectArgument args[argsCount];
-			ArgVis argsVis[argsCount];
-		public:
-			static constexpr const char* name="eff_output";
-			const char* getName() {return name;}
-			EffectArgument* getArgs() {return args;}
-			const int getArgsCount() {return argsCount;}
-			ArgVis* getArgumentVisuals() {return argsVis;}
-			
-			Output(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
-			{sendInstance(); initGUI(X, Y);}
-			~Output() {quitGUI();}
+	{		
+		EFFECT_BODY(2, "Output", "eff_output");
+		
+		Output(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Output() {quitGUI();}
+	};
+	
+	class OutputExtended : public EffectAutoGUI
+	{			
+		EFFECT_BODY(8, "OutputExtended", "eff_output_extended");
+		
+		OutputExtended(int X, int Y): args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("inbus4", OSCConn::getFreeBus()),
+											EffectArgument("inbus5", OSCConn::getFreeBus()), EffectArgument("inbus6", OSCConn::getFreeBus()), EffectArgument("inbus7", OSCConn::getFreeBus()), EffectArgument("inbus8", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
+		{sendInstance(); initGUI(X, Y, 30, 30);}
+		~OutputExtended() {quitGUI();}
 	};
 	
 	void registerEffects();

@@ -173,7 +173,6 @@ bool checkInputs()
 			break;
 			case SDL_KEYDOWN:
 				
-				
 				auto it=effectInstanceList->begin();
 				for(;it!=effectInstanceList->end();++it)
 				{
@@ -202,6 +201,19 @@ bool checkInputs()
 					Effect::saveToFile("session_before_erase.cello");
 					Effect::clearAll();
 				}
+				else if(state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::recordToFile();
+				}
+				else if(!state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::startRecord();
+				}
+				else if(state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				{
+					OSCConn::stopRecord();
+				}
+				
 			break;
 		}
 	}
@@ -268,10 +280,7 @@ int main (int argc, char** argv)
 	
 	Effect::saveToFile("last_session.cello");
 	
-	for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
-	{
-		delete (*it).second;
-	}
+	Effect::clearAll();
 	
 	quitSDL();
 	

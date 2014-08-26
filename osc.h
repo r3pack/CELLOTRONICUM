@@ -13,6 +13,8 @@
 	class OSCConn
 	{
 		private:
+			static bool recordIsStarted;
+		
 			static int serverPortNumber;
 
 			static const char* serverAddress;
@@ -56,6 +58,12 @@
 			static void deleteBuffer(int bufnum);
 			
 			static void deleteBus(int bus);
+			
+			static void startRecord();
+			
+			static void stopRecord();
+			
+			static void recordToFile();
 	};
 	
 #endif

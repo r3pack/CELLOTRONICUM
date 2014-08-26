@@ -1,87 +1,131 @@
 #include "effectsdef.h"
 
+
+
+#define REGISTER_EFFECT(a, b) registerEffect(a::name, a::fullName, b);
+#define REGISTER_EFFECT_EX(a, b, c) registerEffect(a::name, a::fullName, b, c);
+
+
+
+
+
 void registerEffects()
 {
-	registerEffect(DistEcho::name, "Echo");
-	registerEffect(ShiftEcho::name, "Echo");
-	registerEffect(Gramophone::name, "Echo");
-	registerEffect(FreqShift::name, "Echo");
+	REGISTER_EFFECT(DistEcho, "Echo");
+	REGISTER_EFFECT(ShiftEcho, "Echo");
+	REGISTER_EFFECT(Gramophone, "Echo");
+	REGISTER_EFFECT(FreqShift, "Echo");
+	REGISTER_EFFECT(PitchShift, "Echo");
+	REGISTER_EFFECT(RandomPitchShift, "Echo");
 	
-	registerEffect(Brassage::name, "Brassage");
-	registerEffect(BrassageOSC::name, "Brassage");
-	registerEffect(BrassagePlus::name, "Brassage");
-	registerEffect(RMChorus::name, "Brassage");
-	registerEffect(RMChorus2::name, "Brassage");
-	registerEffect(RMDelay::name, "Brassage");
-	registerEffect(RMDelayRec::name, "Brassage");
-	registerEffect(WSDistortion::name, "Brassage");
+	REGISTER_EFFECT(OctaveUp, "SoundSources");
+	REGISTER_EFFECT(OctaveDown, "SoundSources");
+	REGISTER_EFFECT(FormantFilter, "SoundSources");
 	
-	registerEffect(SampleDecrease::name, "BitCrush");
-	registerEffect(BitCrush::name, "BitCrush");
-	registerEffect(MobilePhoneLag3::name, "BitCrush");
+	REGISTER_EFFECT(Brassage, "Brassage");
+	REGISTER_EFFECT(BrassageOSC, "Brassage");
+	REGISTER_EFFECT(BrassagePlus, "Brassage");
+	REGISTER_EFFECT(RMChorus, "Brassage");
+	REGISTER_EFFECT(RMChorus2, "Brassage");
+	REGISTER_EFFECT(RMDelay, "Brassage");
+	REGISTER_EFFECT(RMDelayRec, "Brassage");
+	REGISTER_EFFECT(WSDistortion, "Brassage");
 	
+	REGISTER_EFFECT(SampleDecrease, "BitCrush");
+	REGISTER_EFFECT(BitCrush, "BitCrush");
+	REGISTER_EFFECT(MobilePhoneLag3, "BitCrush");
 	
-	registerEffect(BLowPass::name, "Filters");
-	registerEffect(BHiPass::name, "Filters");
-	registerEffect(BBandPass::name, "Filters");
+	REGISTER_EFFECT(BLowPass, "Filters");
+	REGISTER_EFFECT(BHiPass, "Filters");
+	REGISTER_EFFECT(BBandPass, "Filters");
 	
-
-	registerEffect(Amplitude::name, "Analysis");
-	registerEffect(Pitch::name, "Analysis");
-	registerEffect(TartiniPitch::name, "Analysis");
-	registerEffect(Goetzel::name, "Analysis");
+	REGISTER_EFFECT(Amplitude, "Analysis");
+	REGISTER_EFFECT(Pitch, "Analysis");
+	REGISTER_EFFECT(TartiniPitch, "Analysis");
+	REGISTER_EFFECT(Goetzel, "Analysis");
 	
+	REGISTER_EFFECT(Harmonizer4, "Generators");
+	REGISTER_EFFECT(ShepardCycleTone, "Generators");
+	REGISTER_EFFECT(AYSimple, "Generators");
+	REGISTER_EFFECT(YMSimple, "Generators");
 	
-	registerEffect(Harmonizer4::name, "Generators");
-	registerEffect(ShepardCycleTone::name, "Generators");
+	REGISTER_EFFECT(Playbuf, "IO_Effects");
+	REGISTER_EFFECT(Mul, "IO_Effects");
+	REGISTER_EFFECT(Normalizer, "IO_Effects");
+	REGISTER_EFFECT(Limiter, "IO_Effects");
+	REGISTER_EFFECT(Output, "IO_Effects");
+	REGISTER_EFFECT(Mix, "IO_Effects");
+	REGISTER_EFFECT(Mix3, "IO_Effects");
+	REGISTER_EFFECT(Input, "IO_Effects");
+	REGISTER_EFFECT(InputExtended, "IO_Effects");
+	REGISTER_EFFECT(OutputExtended, "IO_Effects");
 	
-	registerEffect(Playbuf::name, "IO_Effects");
-	registerEffect(Mul::name, "IO_Effects");
-	registerEffect(Normalizer::name, "IO_Effects");
-	registerEffect(Output::name, "IO_Effects");
-	registerEffect(Mix::name, "IO_Effects");
-	registerEffect(Mix3::name, "IO_Effects");
-	registerEffect(Input::name, "IO_Effects");
-	
-	registerEffect(Clipper4::name, "Base");
-	registerEffect(Clipper8::name, "Base");
-	registerEffect(Clipper32::name, "Base");
+	REGISTER_EFFECT(Clipper4, "Base");
+	REGISTER_EFFECT(Clipper8, "Base");
+	REGISTER_EFFECT(Clipper32, "Base");
+	REGISTER_EFFECT(SoftClipAmp, "Base");
+	REGISTER_EFFECT(SoftClipAmp4, "Base");
+	REGISTER_EFFECT(SoftClipAmp8, "Base");
+	REGISTER_EFFECT(SoftClipper4, "Base");
+	REGISTER_EFFECT(SoftClipper8, "Base");
 };
+
+#undef REGISTER_EFFECT
+#undef REGISTER_EFFECT2
+
+#define EFFECT_BY_NAME(a) if(strcmp(name, a::fullName)==0) return new a(X, Y);
 
 Effect* getEffect(const char* name, int X, int Y)
 {
-	if(strcmp(name, DistEcho::name)==0) return new DistEcho(X, Y);
-	else if(strcmp(name, ShiftEcho::name)==0) return new ShiftEcho(X, Y);
-	else if(strcmp(name, Brassage::name)==0) return new Brassage(X, Y);
-	else if(strcmp(name, BrassageOSC::name)==0) return new BrassageOSC(X, Y);
-	else if(strcmp(name, BrassagePlus::name)==0) return new BrassagePlus(X, Y);
-	else if(strcmp(name, RMChorus::name)==0) return new RMChorus(X, Y);
-	else if(strcmp(name, RMChorus2::name)==0) return new RMChorus2(X, Y);
-	else if(strcmp(name, RMDelay::name)==0) return new RMDelay(X, Y);
-	else if(strcmp(name, RMDelayRec::name)==0) return new RMDelayRec(X, Y);
-	else if(strcmp(name, WSDistortion::name)==0) return new WSDistortion(X, Y);
-	else if(strcmp(name, MobilePhoneLag3::name)==0) return new MobilePhoneLag3(X, Y);
-	else if(strcmp(name, FreqShift::name)==0) return new FreqShift(X, Y);
-	else if(strcmp(name, BLowPass::name)==0) return new BLowPass(X, Y);
-	else if(strcmp(name, BHiPass::name)==0) return new BHiPass(X, Y);
-	else if(strcmp(name, BBandPass::name)==0) return new BBandPass(X, Y);
-	else if(strcmp(name, Amplitude::name)==0) return new Amplitude(X, Y);
-	else if(strcmp(name, ShepardCycleTone::name)==0) return new ShepardCycleTone(X, Y);
-	else if(strcmp(name, Pitch::name)==0) return new Pitch(X, Y);
-	else if(strcmp(name, TartiniPitch::name)==0) return new TartiniPitch(X, Y);
-	else if(strcmp(name, Goetzel::name)==0) return new Goetzel(X, Y);
-	else if(strcmp(name, Mix::name)==0) return new Mix(X, Y);
-	else if(strcmp(name, Mix3::name)==0) return new Mix3(X, Y);
-	else if(strcmp(name, Playbuf::name)==0) return new Playbuf(X, Y);
-	else if(strcmp(name, Mul::name)==0) return new Mul(X, Y);
-	else if(strcmp(name, Normalizer::name)==0) return new Normalizer(X, Y);
-	else if(strcmp(name, Output::name)==0) return new Output(X, Y);
-	else if(strcmp(name, Input::name)==0) return new Input(X, Y);
-	else if(strcmp(name, Harmonizer4::name)==0) return new Harmonizer4(X, Y);
-	else if(strcmp(name, Gramophone::name)==0) return new Gramophone(X, Y);
-	else if(strcmp(name, SampleDecrease::name)==0) return new SampleDecrease(X, Y);
-	else if(strcmp(name, BitCrush::name)==0) return new BitCrush(X, Y);
-	else if(strcmp(name, Clipper4::name)==0) return new Clipper4(X, Y);
-	else if(strcmp(name, Clipper8::name)==0) return new Clipper8(X, Y);
-	else if(strcmp(name, Clipper32::name)==0) return new Clipper32(X, Y);
+	EFFECT_BY_NAME(DistEcho);
+	EFFECT_BY_NAME(ShiftEcho);
+	EFFECT_BY_NAME(Brassage);
+	EFFECT_BY_NAME(BrassageOSC);
+	EFFECT_BY_NAME(BrassagePlus);
+	EFFECT_BY_NAME(RMChorus);
+	EFFECT_BY_NAME(RMChorus2);
+	EFFECT_BY_NAME(RMDelay);
+	EFFECT_BY_NAME(RMDelayRec);
+	EFFECT_BY_NAME(WSDistortion);
+	EFFECT_BY_NAME(MobilePhoneLag3);
+	EFFECT_BY_NAME(FreqShift);
+	EFFECT_BY_NAME(PitchShift);
+	EFFECT_BY_NAME(RandomPitchShift);
+	EFFECT_BY_NAME(BLowPass);
+	EFFECT_BY_NAME(BHiPass);
+	EFFECT_BY_NAME(Amplitude);
+	EFFECT_BY_NAME(ShepardCycleTone);
+	EFFECT_BY_NAME(AYSimple);
+	EFFECT_BY_NAME(YMSimple);
+	EFFECT_BY_NAME(Pitch);
+	EFFECT_BY_NAME(TartiniPitch);
+	EFFECT_BY_NAME(Goetzel);
+	EFFECT_BY_NAME(Mix);
+	EFFECT_BY_NAME(Mix3);
+	EFFECT_BY_NAME(Playbuf);
+	EFFECT_BY_NAME(Mul);
+	EFFECT_BY_NAME(Normalizer);
+	EFFECT_BY_NAME(Limiter);
+	EFFECT_BY_NAME(Output);
+	EFFECT_BY_NAME(OutputExtended);
+	EFFECT_BY_NAME(Input);
+	EFFECT_BY_NAME(InputExtended);
+	EFFECT_BY_NAME(Harmonizer4);
+	EFFECT_BY_NAME(Gramophone);
+	EFFECT_BY_NAME(SampleDecrease);
+	EFFECT_BY_NAME(BitCrush);
+	EFFECT_BY_NAME(Clipper4);
+	EFFECT_BY_NAME(Clipper8);
+	EFFECT_BY_NAME(Clipper32);
+	EFFECT_BY_NAME(SoftClipAmp);
+	EFFECT_BY_NAME(SoftClipAmp4);
+	EFFECT_BY_NAME(SoftClipAmp8);
+	EFFECT_BY_NAME(SoftClipper4);
+	EFFECT_BY_NAME(SoftClipper8);
+	EFFECT_BY_NAME(OctaveUp);
+	EFFECT_BY_NAME(OctaveDown);
+	EFFECT_BY_NAME(FormantFilter);
+	return NULL;
 }
+
+#undef EFFECT_BY_NAME
