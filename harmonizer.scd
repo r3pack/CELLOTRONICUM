@@ -1,3 +1,19 @@
+SynthDef.new(\eff_hadamard_first, {
+	arg inbus=8, outbus=0, hadamard_cut=10;
+	var in = In.ar(inbus,1);
+	var res = WalshHadamard.ar(in, hadamard_cut);
+	Out.ar(outbus,res);
+}).add;
+
+/* NIE BEDZIE DZIAŁAC!
+SynthDef.new(\eff_hadamard_last, {
+	arg inbus=8, outbus=0, hadamard_cut=10;
+	var in = In.ar(inbus,1);
+	var res = WalshHadamard2.ar(in, hadamard_cut);
+	Out.ar(outbus,res);
+}).add;
+
+
 SynthDef.new(\eff_warm_chorus, {
 	//Pierwsza próba - na razie na gotowych pitch shifterach
 	//http://quod.lib.umich.edu/i/icmc/bbp2372.2012.014/--warm-chorus-re-thinking-the-chorus-effect-using/4?view=pdf
@@ -8,12 +24,12 @@ SynthDef.new(\eff_warm_chorus, {
 	var min_delay = SampleDur.ir*4;
 	var semitones = [0, 0.02, 0.03, 0.05, 0.07, 0.11, 0.13];
 	var delays = [ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay)];
-	var sig  = semitones.collect({|e, i| PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12)));}); //optymalizacja na później - multiple-tap delay line
+	var sig = semitones.collect({|e, i| PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12)));}); //optymalizacja na później - multiple-tap delay line
 	var res = WalshHadamard.ar(Mix.ar(sig)/8, hadamard_cut);
 	delays.poll;
     Out.ar(outbus,res);
 }).add;
-
+*/
 
 /* TESTS
 
@@ -24,9 +40,11 @@ b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 s.prepareForRecord(~p +/+ "d-dur-harmonizer.aiff");
 s.record;
 
-x = Synth.new(\eff_warm_chorus,
+x = Synth.new(\eff_hadamard_first,
 	[\inbus, 16, \outbus, 0]);
-Synth.new(\eff_playbuf, [\outbus, 0, \bufnum, 1]);
+Synth.new(\eff_playbuf, [\outbus, 0, \bufnum, 0]);
+
+x.set(\hadamard_cut, 0);
 
 
 s.stopRecording;

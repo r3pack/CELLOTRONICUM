@@ -15,8 +15,10 @@ s.options.numAudioBusChannels=512;
 /*
 s.plotTree;
 s.meter;
-s.options.numChannels;
 s.freqscope;
+
+s.options.numChannels;
+
 
 SynthDef.all;
 
