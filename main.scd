@@ -1,12 +1,12 @@
 ~p = thisProcess.nowExecutingPath.dirname;
 ~q = "C:\\Users\\praktykant\\AppData\\Local\\SuperCollider\\Extensions\\SC3plugins\\PitchDetection\\extraqitchfiles";
-~quitch_filename = (~q +/+ "QspeckernN4096SR44100.wav");
-// ~quitch_buffer - after server boot contains buffered file for Qitch pitch detector
+~qitch_filename = (~q +/+ "QspeckernN4096SR44100.wav");
+// ~qitch_buffer - after server boot contains buffered file for Qitch pitch detector
 
 //DO TESTÓW - najpierw uruchom server!!!
 ~b = Dictionary.new(0); //buffers
-~quitch_buffer = Buffer.read(s, ~quitch_filename); // może nie zadziałać bez włączonego servera - poprawki jutro!
-~b.add( ~quitch_buffer.bufnum -> ~quitch_buffer);
+~qitch_buffer = Buffer.read(s, ~qitch_filename); // może nie zadziałać bez włączonego servera - poprawki jutro!
+~b.add( ~qitch_buffer.bufnum -> ~qitch_buffer);
 
 
 s.options.numAudioBusChannels=512;
@@ -18,6 +18,7 @@ s.options.numAudioBusChannels=512;
 (~p +/+"sound_sources.scd").loadPaths;
 (~p +/+"harmonizer.scd").loadPaths;
 (~p +/+"base.scd").loadPaths;
+(~p +/+"afm.scd").loadPaths;
 
 /*
 s.plotTree;

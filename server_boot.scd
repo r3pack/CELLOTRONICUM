@@ -8,8 +8,8 @@ var func_start = {
 	//INITIALISATION CODE HERE:
 	s.options.numAudioBusChannels=512;
 	~b = Dictionary.new(0); //buffers
-	~quitch_buffer = Buffer.read(s, ~quitch_filename);
-	~b.add( ~quitch_buffer.bufnum -> ~quitch_buffer);
+	~qitch_buffer = Buffer.read(s, ~qitch_filename);
+	~b.add( ~qitch_buffer.bufnum -> ~qitch_buffer);
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 };
 

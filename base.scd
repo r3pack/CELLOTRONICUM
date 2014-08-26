@@ -114,7 +114,7 @@ SynthDef.new(\eff_qitch_pitch, {
 	arg outbus=0, inbus=8, ampThreshold=0.01, minfreq=0, maxfreq=2500;
 	var in = In.ar(inbus);
 	var freq, hasFreq;
-	# freq, hasFreq = Qitch.kr(in,~quitch_buffer.bufnum, ampThreshold,1,minfreq:minfreq, maxfreq:maxfreq);
+	# freq, hasFreq = Qitch.kr(in,~qitch_buffer.bufnum, ampThreshold,1,minfreq:minfreq, maxfreq:maxfreq);
 	Out.kr(outbus,freq);
 }).add;
 
