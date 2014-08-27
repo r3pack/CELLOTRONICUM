@@ -292,6 +292,15 @@ OSCdef.new(
 );
 
 OSCdef.new(
+	\alloc_buffer,
+	{
+		arg msg, time, addr, recvPort;
+		Buffer.alloc(s,s.sampleRate*msg[1]);
+	},
+	'/alloc_buffer'
+);
+
+OSCdef.new(
 	\load_buffer,
 	{
 		arg msg, time, addr, recvPort;
