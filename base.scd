@@ -19,6 +19,12 @@ SynthDef.new(\eff_normalizer, {
 	Out.ar(outbus,res);
 }).add;
 
+SynthDef.new(\eff_pipe, {
+	arg inbus, outbus;
+	var in = In.ar(inbus);
+	Out.ar(outbus,in);
+}).add;
+
 SynthDef.new(\eff_mul, {
 	arg inbus, outbus, mul=1;
 	var in = In.ar(inbus);
