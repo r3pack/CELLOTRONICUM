@@ -58,8 +58,8 @@ SynthDef.new(\eff_playbuf, {
 }).add;
 
 SynthDef.new(\eff_recordbuf, {
-	arg outbus=0, bufnum=0, trigger=1, loop=0;
-	Out.ar( outbus, RecordBuf.ar(1, bufnum, BufRateScale.kr(bufnum),trigger,loop:loop,  doneAction: 2));
+	arg inbus=0, bufnum=0, trigger=1, loop=0;
+	RecordBuf.ar(inbus, bufnum, BufRateScale.kr(bufnum), trigger, loop:loop,  doneAction:2);
 }).add;
 
 SynthDef.new(\eff_playbuf2, {
