@@ -44,6 +44,7 @@ void registerEffects()
 	REGISTER_EFFECT(ShepardCycleTone, "Generators");
 	REGISTER_EFFECT(AYSimple, "Generators");
 	REGISTER_EFFECT(YMSimple, "Generators");
+	REGISTER_EFFECT(GoetzelSinus, "Generators");
 	
 	REGISTER_EFFECT(Playbuf, "IO_Effects");
 	REGISTER_EFFECT(Mul, "IO_Effects");
@@ -51,10 +52,17 @@ void registerEffects()
 	REGISTER_EFFECT(Limiter, "IO_Effects");
 	REGISTER_EFFECT(Output, "IO_Effects");
 	REGISTER_EFFECT(Mix, "IO_Effects");
+	REGISTER_EFFECT(MixAmp, "IO_Effects");
 	REGISTER_EFFECT(Mix3, "IO_Effects");
+	REGISTER_EFFECT(Mix3Amp, "IO_Effects");
 	REGISTER_EFFECT(Input, "IO_Effects");
 	REGISTER_EFFECT(InputExtended, "IO_Effects");
 	REGISTER_EFFECT(OutputExtended, "IO_Effects");
+	REGISTER_EFFECT(Pipe, "IO_Effects");
+	REGISTER_EFFECT(Select2, "IO_Effects");
+	REGISTER_EFFECT(Select3, "IO_Effects");
+	REGISTER_EFFECT(Select4, "IO_Effects");
+	REGISTER_EFFECT(Select5, "IO_Effects");
 	
 	REGISTER_EFFECT(Clipper4, "Base");
 	REGISTER_EFFECT(Clipper8, "Base");
@@ -97,6 +105,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(RandomPitchShift);
 	EFFECT_BY_NAME(BLowPass);
 	EFFECT_BY_NAME(BHiPass);
+	EFFECT_BY_NAME(BBandPass);
 	EFFECT_BY_NAME(Amplitude);
 	EFFECT_BY_NAME(ShepardCycleTone);
 	EFFECT_BY_NAME(AYSimple);
@@ -105,7 +114,9 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(TartiniPitch);
 	EFFECT_BY_NAME(Goetzel);
 	EFFECT_BY_NAME(Mix);
+	EFFECT_BY_NAME(MixAmp);
 	EFFECT_BY_NAME(Mix3);
+	EFFECT_BY_NAME(Mix3Amp);
 	EFFECT_BY_NAME(Playbuf);
 	EFFECT_BY_NAME(Mul);
 	EFFECT_BY_NAME(Normalizer);
@@ -135,6 +146,12 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(AFM2Env);
 	EFFECT_BY_NAME(Hadamard);
 	EFFECT_BY_NAME(Hadamard2);
+	EFFECT_BY_NAME(Pipe);
+	EFFECT_BY_NAME(GoetzelSinus);
+	EFFECT_BY_NAME(Select2);
+	EFFECT_BY_NAME(Select3);
+	EFFECT_BY_NAME(Select4);
+	EFFECT_BY_NAME(Select5);
 	return NULL;
 }
 

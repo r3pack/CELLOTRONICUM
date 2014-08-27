@@ -473,6 +473,17 @@
 		~Mix() {quitGUI();}
 	};
 	
+	class MixAmp : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "MixAmp", "eff_mix");
+		
+		MixAmp(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("max_amp1", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~MixAmp() {quitGUI();}
+	};
+	
 	class Mix3 : public EffectAutoGUI
 	{
 		EFFECT_BODY(4, "Mix3", "eff_mix3");
@@ -482,6 +493,48 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
 		{sendInstance(); initGUI(X, Y);}
 		~Mix3() {quitGUI();}
+	};
+	
+	class Mix3Amp : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "Mix3Amp", "eff_mix3");
+		
+		float valueSlider1, valueSlider2;
+		
+		Mix3Amp(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), 
+		EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("max_amp1", 0.3333f), EffectArgument("max_amp2", 0.3333f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)}),
+		valueSlider1(0.3333f), valueSlider2(0.3333f)
+		{sendInstance(); initGUI(X, Y, 25);}
+		~Mix3Amp() {quitGUI();}
+		
+		
+		void doSomething()
+		{
+			if(((Slider*)drawables[4].drawable)->getValue()!=valueSlider1)
+			{
+				valueSlider1=((Slider*)drawables[4].drawable)->getValue();
+				valueSlider2=((Slider*)drawables[5].drawable)->getValue();
+				if(valueSlider1+valueSlider2>1.0f)
+				{
+					valueSlider2=1.0f-valueSlider1;
+					((Slider*)drawables[5].drawable)->setValue(valueSlider2);
+				}
+				
+			}
+			else
+			if(((Slider*)drawables[5].drawable)->getValue()!=valueSlider2)
+			{
+				valueSlider1=((Slider*)drawables[4].drawable)->getValue();
+				valueSlider2=((Slider*)drawables[5].drawable)->getValue();
+				if(valueSlider1+valueSlider2>1.0f)
+				{
+					valueSlider1=1.0f-valueSlider2;
+					((Slider*)drawables[4].drawable)->setValue(valueSlider1);
+				}
+			}
+		}
 	};
 	
 	class Gramophone : public EffectAutoGUI
@@ -742,6 +795,76 @@
 		{sendInstance(); initGUI(X, Y);}
 		~Hadamard2() {quitGUI();}
 	};
+	
+	class Pipe : public EffectAutoGUI
+	{		
+		EFFECT_BODY(2, "Pipe", "eff_pipe");
+		
+		Pipe(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~Pipe() {quitGUI();}
+	};
+	
+	class GoetzelSinus : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "GoetzelSinus", "eff_goetzel_sinus");
+		
+		GoetzelSinus(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 440.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 20000.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~GoetzelSinus() {quitGUI();}
+	};
+	
+	class Select2 : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "Select2", "eff_select2");
+		
+		Select2(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("which", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(2, 1.0f, 0.0f))})
+		{sendInstance(); initGUI(X, Y, 25);}
+		~Select2() {quitGUI();}
+	};
+	
+	class Select3 : public EffectAutoGUI
+	{
+		EFFECT_BODY(5, "Select3", "eff_select3");
+		
+		Select3(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("which", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(3, 2.0f, 1.0f, 0.0f))})
+		{sendInstance(); initGUI(X, Y, 25);}
+		~Select3() {quitGUI();}
+	};
+	
+	class Select4 : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "Select4", "eff_select4");
+		
+		Select4(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("inbus4", OSCConn::getFreeBus()),
+		EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("which", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(4, 3.0f, 2.0f, 1.0f, 0.0f))})
+		{sendInstance(); initGUI(X, Y, 25);}
+		~Select4() {quitGUI();}
+	};
+	
+	class Select5 : public EffectAutoGUI
+	{
+		EFFECT_BODY(7, "Select5", "eff_select5");
+		
+		Select5(int X, int Y): 
+		args({EffectArgument("inbus1", OSCConn::getFreeBus()), EffectArgument("inbus2", OSCConn::getFreeBus()), EffectArgument("inbus3", OSCConn::getFreeBus()), EffectArgument("inbus4", OSCConn::getFreeBus()),
+		EffectArgument("inbus5", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("which", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(5, 4.0f, 3.0f, 2.0f, 1.0f, 0.0f))})
+		{sendInstance(); initGUI(X, Y, 25);}
+		~Select5() {quitGUI();}
+	};
+	
+
 	
 	void registerEffects();
 	

@@ -711,31 +711,33 @@ void EffectCreator::init()
 		const char* group=(*it).group;
 		const char* subgroup=(*it).subgroup;
 		
-		auto mapIt=chosenEffect->submenuEntries->find(group);
-		if(mapIt==chosenEffect->submenuEntries->end())
+		
+		if(chosenEffect->submenuEntries->empty() || strcmp(chosenEffect->submenuEntries->back().first, group)!=0)
 		{
-			mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(group, new EffectCreatorMenuEntry(group, chosenEffect, false))).first;
+			chosenEffect->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(group, new EffectCreatorMenuEntry(group, chosenEffect, false)));
 		}
+		auto mapIt=--chosenEffect->submenuEntries->end();
 		
 		if(subgroup!=NULL)
 		{
-			auto mapIt2=mapIt->second->submenuEntries->find(subgroup);
-			if(mapIt2==mapIt->second->submenuEntries->end())
+			
+			if(mapIt->second->submenuEntries->empty() || strcmp(mapIt->second->submenuEntries->back().first, subgroup)!=0)
 			{
-				mapIt2=mapIt->second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(subgroup, new EffectCreatorMenuEntry(subgroup, mapIt->second, false))).first;
+				mapIt->second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(subgroup, new EffectCreatorMenuEntry(subgroup, mapIt->second, false)));
 			}
-			mapIt=mapIt2;
+			mapIt=--mapIt->second->submenuEntries->end();
 		}
 
-		mapIt->second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+		mapIt->second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
 	}
 	
-	auto mapIt=chosenEffect->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false))).first;
+	chosenEffect->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false)));
+	auto mapIt=--chosenEffect->submenuEntries->end();
 	
 	for(auto it=getControllerList()->begin();it!=getControllerList()->end();++it)
 	{
 		const char* name=(*it);
-		(*mapIt).second->submenuEntries->insert(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+		(*mapIt).second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
 	}
 	
 	chosenEffect->calculateWidth();

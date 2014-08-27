@@ -451,6 +451,8 @@
 		
 		bool clicked=false;
 		
+		bool textToRemove=true;
+		
 		public:
 		
 		EntryBox(int pX, int pY, int w, float v, Effect* e, int a):
@@ -481,9 +483,9 @@
 			Y-=posY;
 			if(X>=0 && X<=getWidth() && Y>=0 && Y<=height)
 			{
-				if(me==ME_PRESS) clicked=true;
+				if(me==ME_PRESS) {clicked=true; textToRemove=true;}
 				else
-				if(me==ME_REPEAT && clicked) {clicked=true; return true;}
+				if(me==ME_REPEAT && clicked) {clicked=true; textToRemove=true; return true;}
 				else
 				if(me==ME_REPEAT) return false;
 				if(lastClicked==id)
@@ -524,7 +526,13 @@
 		
 		bool receiveKeyboardEvent(SDL_Scancode scancode)
 		{
-			if(id!=lastClicked) return false;
+			if(id!=lastClicked) {textToRemove=false; return false;}
+			
+			if(textToRemove) 
+			{
+				data.clear();
+				textToRemove=false;
+			}
 			
 			switch(scancode)
 			{
@@ -580,11 +588,14 @@
 				return true;
 				case SDL_SCANCODE_PERIOD:
 				case SDL_SCANCODE_COMMA:
+				case SDL_SCANCODE_KP_COMMA:
+				case SDL_SCANCODE_KP_PERIOD:
 					data.push_back('.');
 					updateValue();
 				return true;
 				case SDL_SCANCODE_MINUS:
 				case SDL_SCANCODE_KP_MINUS:
+				case SDL_SCANCODE_KP_PLUSMINUS:
 					data.push_back('-');
 					updateValue();
 				return true;
@@ -600,6 +611,7 @@
 					updateValue();
 				return true;
 				case SDL_SCANCODE_RETURN:
+				case SDL_SCANCODE_RETURN2:
 					lastClicked=-1;
 					if(checkValue()) sendValue();
 				return true;
@@ -742,6 +754,12 @@
 			rangeBegin=rangeBeginBox.getValue();
 			rangeEnd=rangeEndBox.getValue();
 			
+			rangeBeginBox.setValue(rangeBegin);
+			rangeEndBox.setValue(rangeEnd);
+			
+			rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
+			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+			
 			value=std::min(value, std::max(rangeBegin, rangeEnd));
 			value=std::max(value, std::min(rangeBegin, rangeEnd));
 			
@@ -802,6 +820,7 @@
 				setValue(rangeBegin+(rangeEnd-rangeBegin)*normalizedLevel);
 				
 				entryBox.setValue(getValue());
+				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 				
 				return true;
 			}
@@ -828,6 +847,7 @@
 				{
 					rangeBeginBox.setValue(rangeBegin);
 					rangeEndBox.setValue(rangeEnd);
+					
 					rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
 					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
 				}
@@ -844,7 +864,7 @@
 		{
 			if(entryBox.receiveKeyboardEvent(scancode))
 			{
-				setValue(entryBox.getValue(), true);
+				setValue(entryBox.getValue(), false);
 				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 				return true;
 			}

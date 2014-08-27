@@ -264,6 +264,11 @@ int main (int argc, char** argv)
 		
 		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 		{
+			it->second->doSomething();
+		}
+		
+		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
+		{
 			it->second->draw();
 		}
 		

@@ -104,6 +104,8 @@
 			virtual bool receiveThridClick(int X, int Y, MouseEvent me){return false;}
 			virtual bool receiveKeyboardEvent(SDL_Scancode scancode){return false;}
 			
+			virtual void doSomething() {}
+			
 			void setArgument(int argId, int value);
 			void setArgument(int argId, float value);
 			void setArgument(int argId, std::string value);
@@ -123,7 +125,7 @@
 	
 	struct EffectCreatorMenuEntry
 	{
-		std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>* submenuEntries=NULL;
+		std::vector <std::pair<const char*, EffectCreatorMenuEntry*> >* submenuEntries=NULL;
 		const char* name;
 		SDL_Texture* nameTex;
 		SDL_Texture* nameTexRed;
@@ -150,7 +152,7 @@
 		{
 			name=n;
 			parent=p;
-			if(!isElement) submenuEntries=new std::map <const char*, EffectCreatorMenuEntry*, cmpCStr>;
+			if(!isElement) submenuEntries=new std::vector <std::pair<const char*, EffectCreatorMenuEntry*> >;
 			if(isElement)
 			{
 				nameTex=generateText(name, COLOR_ELEMENT_TEXT);

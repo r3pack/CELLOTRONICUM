@@ -12,7 +12,10 @@
 		void draw() 
 		{
 			drawable->draw();
-			
+		}
+		
+		void drawText()
+		{
 			if(!vertical)
 			{
 				int w, h;
@@ -58,6 +61,28 @@
 			VT_SWITCHBUTTON,
 			VT_TEXT
     };
+	
+	struct FloatArray
+	{
+		int count;
+		float* array;
+		FloatArray(int count, ...)
+		{
+			this->count=count;
+			array=new float[count];
+			va_list vl;
+			va_start(vl,count);
+			for(int i=0;i<count;++i)
+			{
+				array[i]=va_arg(vl,double);
+			}
+			va_end(vl);
+		}
+		~FloatArray()
+		{
+			delete [] array;
+		}
+	};
 	
     struct ArgVis
     {
@@ -120,6 +145,21 @@
 				tab[i]=va_arg(vl,double);
 			}
 			va_end(vl);
+        }
+		
+		ArgVis(VisulalisationType type, FloatArray floatArray)
+        {
+            visType=VT_GRADUALSLIDER;
+            data=malloc(sizeof(int)+floatArray.count*sizeof(float));
+			
+			*(int*)data=floatArray.count;
+			
+			float* tab=(float*)(((int*)data)+1);
+			
+			for(int i=0;i<floatArray.count;++i)
+			{
+				tab[i]=floatArray.array[i];
+			}
         }
 		
 		ArgVis(VisulalisationType type, std::string str)
@@ -320,6 +360,11 @@
 			pauseButton->draw();
 			
 			ArgVis* argvis=getArgumentVisuals();
+			
+			for(int i=drawables.size()-1;i>=0;--i)
+			{
+				drawables[i].drawText();
+			}
 			
 			for(int i=drawables.size()-1;i>=0;--i)
 			{
