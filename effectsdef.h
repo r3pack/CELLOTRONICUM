@@ -525,7 +525,7 @@
 	{
 		private:
 			int bufnum=-1;
-			static const int argsCount=2;
+			static const int argsCount=4;
 			
 			EffectArgument args[argsCount];
 			ArgVis argsVis[argsCount];
@@ -571,18 +571,27 @@
 				int w, h;
 				SDL_QueryTexture(drawables[0].nameTex, NULL, NULL, &w, &h);
 				
+				w=std::max(100, w);
+				
 				visualPositions[0].first=EffectAutoGUI::slider_period + w/2;
 				visualPositions[1].first=EffectAutoGUI::slider_period + w + EffectAutoGUI::slider_period;
 				
 				width=visualPositions[1].first + Bus::size + EffectAutoGUI::slider_period;
-				height=visualPositions[1].second + Bus::size + EffectAutoGUI::bottom_padding+h-10;
+				height=visualPositions[1].second + Bus::size + EffectAutoGUI::bottom_padding+h-10 + EffectAutoGUI::slider_period;
+				
+				visualPositions[2].first=EffectAutoGUI::slider_period*2;
+				visualPositions[2].second=visualPositions[1].second + h - 10 + EffectAutoGUI::slider_period;
+				
+				visualPositions[3].first=visualPositions[2].first+EffectAutoGUI::slider_period*2 + Bus::size;
+				visualPositions[3].second=visualPositions[1].second + h - 10 + EffectAutoGUI::slider_period;
+				
 				updateDrawablePositions();
 			}
 			
 			
 		public:
 			static constexpr const char* fullName="Playbuf";
-			const char* getFullName() {return name;}
+			const char* getFullName() {return fullName;}
 			static constexpr const char* name="eff_playbuf";
 			const char* getName() {return name;}
 			EffectArgument* getArgs() {return args;}
@@ -590,33 +599,36 @@
 			ArgVis* getArgumentVisuals() {return argsVis;}
 			int_pair* getVisualPositions() {return visualPositions;}
 			
-			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)}),
-			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding)})
+			Playbuf(int X, int Y): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("trigger", 1.0f), EffectArgument("loop", 0.0f)}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS), ArgVis(VT_SWITCHBUTTON, 1.0f, -1.0f, 3, 2, true), ArgVis(VT_SWITCHBUTTON, 0.0f, 1.0f, 3, 2, false)}),
+			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding), int_pair(0, 0), int_pair(0, 0)})
 			{
 				getOpenFile(playbufFileName, MAX_PATH);
 				constructor(X, Y);
 			}
 			
-			Playbuf(const char* data): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus())}),
-			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS)}),
-			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding)})
+			Playbuf(const char* data): args({EffectArgument("bufnum", 0), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("trigger", 1.0f), EffectArgument("loop", 0.0f)}),
+			argsVis({ArgVis(VT_TEXT, std::string("")), ArgVis(VT_OUTBUS), ArgVis(VT_SWITCHBUTTON, 1.0f, -1.0f, 3, 2, true), ArgVis(VT_SWITCHBUTTON, 0.0f, 1.0f, 3, 2, false)}),
+			visualPositions({int_pair(0, EffectAutoGUI::top_padding), int_pair(0, EffectAutoGUI::top_padding), int_pair(0, 0), int_pair(0, 0)})
 			{
 				std::stringstream ss;
 				ss<<data;
 				int X, Y;
-				ss>>X>>Y;
+				bool loopStatus;
+				ss>>X>>Y>>loopStatus;
 				
 				ss.ignore(1, ' ');
 				ss.getline(playbufFileName, MAX_PATH);
 				
 				constructor(X, Y);
+				
+				((SwitchButton*)drawables[3].drawable)->setStatus(loopStatus);
 			}
 			
 			
 			void saveData(FILE* file) 
 			{
-				fprintf(file, "%d %d %s ", posX, posY, playbufFileName);
+				fprintf(file, "%d %d %d %s ", posX, posY, int(((SwitchButton*)drawables[3].drawable)->getStatus()), playbufFileName);
 			}
 			~Playbuf() {quitGUI(); OSCConn::deleteBuffer(bufnum);}
 	};
@@ -661,6 +673,74 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS)})
 		{sendInstance(); initGUI(X, Y, 30, 30);}
 		~OutputExtended() {quitGUI();}
+	};
+	
+	class AFM1 : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "AFM1", "eff_afm1");
+		
+		AFM1(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mod_index", 1.0f), EffectArgument("c", 1.0f), EffectArgument("m", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.01f, 10.0f), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_GRADUALSLIDER, 1, 20)})
+		{sendInstance(); initGUI(X, Y);}
+		~AFM1() {quitGUI();}
+	};
+	
+	class AFM1Env : public EffectAutoGUI
+	{		
+		EFFECT_BODY(7, "AFM1Env", "eff_afm1env");
+		
+		AFM1Env(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mod_index_mul", 1.0f), 
+		EffectArgument("c", 1.0f), EffectArgument("m", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.01f, 6.0f), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 20);}
+		~AFM1Env() {quitGUI();}
+	};
+	
+	class AFM2 : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "AFM2", "eff_afm2");
+		
+		AFM2(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mod_index", 1.0f), EffectArgument("c", 1.0f), EffectArgument("m", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.01f, 10.0f), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_GRADUALSLIDER, 1, 20)})
+		{sendInstance(); initGUI(X, Y);}
+		~AFM2() {quitGUI();}
+	};
+	
+	class AFM2Env : public EffectAutoGUI
+	{		
+		EFFECT_BODY(7, "AFM2Env", "eff_afm2env");
+		
+		AFM2Env(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mod_index_mul", 1.0f), 
+		EffectArgument("c", 1.0f), EffectArgument("m", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.01f, 6.0f), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_GRADUALSLIDER, 1, 20), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 20);}
+		~AFM2Env() {quitGUI();}
+	};
+	
+	class Hadamard : public EffectAutoGUI
+	{		
+		EFFECT_BODY(3, "Hadamard", "eff_hadamard_first");
+		
+		Hadamard(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 0, 64)})
+		{sendInstance(); initGUI(X, Y);}
+		~Hadamard() {quitGUI();}
+	};
+	
+	class Hadamard2 : public EffectAutoGUI
+	{		
+		EFFECT_BODY(3, "Hadamard2", "eff_hadamard_last");
+		
+		Hadamard2(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 0, 64)})
+		{sendInstance(); initGUI(X, Y);}
+		~Hadamard2() {quitGUI();}
 	};
 	
 	void registerEffects();

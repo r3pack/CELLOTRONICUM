@@ -79,6 +79,9 @@
 
 	class Button : public Drawable{
 		int posX, posY;
+		
+		protected:
+		
 		int symbol;
 		
 		public:
@@ -124,9 +127,11 @@
 				SDL_RenderDrawLine(render, posX+10, posY+3, posX+10, posY+11);
 				SDL_RenderDrawLine(render, posX+11, posY+3, posX+11, posY+11);
 				break;
+				case 3:
+				break;
 				default:
-				SDL_RenderDrawLine(render, posX, posY, posX+size, posY+size);
-				SDL_RenderDrawLine(render, posX, posY+size, posX+size, posY);
+				SDL_RenderDrawLine(render, posX, posY, posX+size-1, posY+size-1);
+				SDL_RenderDrawLine(render, posX, posY+size-1, posX+size-1, posY);
 				break;
 			}
 		}
@@ -155,6 +160,32 @@
 		
 		int getWidth() {return size;}
 		int getHeight() {return size;}
+	};
+	
+	class SwitchButton : public Button
+	{
+		float value1;
+		float value2;
+		
+		int symbol1;
+		int symbol2;
+		
+		bool isTrigger;
+		
+		Effect* effect;
+		int argument;
+		
+		bool status=false;
+	
+		public:
+		SwitchButton(int X, int Y, float v1, float v2, int s1, int s2, bool iT, Effect* e, int a): 
+		Button(X, Y, s1), value1(v1), value2(v2), symbol1(s1), symbol2(s2), isTrigger(iT), effect(e), argument(a) {}
+		
+		bool getStatus() {return status;}
+		
+		void setStatus(bool s);
+		
+		bool receiveClick(int X, int Y, MouseEvent me);
 	};
 
 
@@ -873,6 +904,12 @@
 		
 		int getPosX(){return posX;}
 		int getPosY(){return posY;}
+		
+		float getRangeBegin() {return rangeBegin;}
+		float getRangeEnd() {return rangeEnd;}
+		
+		void setRangeBegin(float rB) {rangeBegin=rB;}
+		void setRangeEnd(float rE) {rangeEnd=rE;}
 		
 		void draw()
 		{

@@ -55,6 +55,7 @@
             VT_SLIDER,
 			VT_GRADUALSLIDER,
 			VT_ENTRYBOX,
+			VT_SWITCHBUTTON,
 			VT_TEXT
     };
 	
@@ -71,6 +72,17 @@
 				((float*)data)[1]=max;
 				((int*)(((float*)data)+2))[0]=width;
 				((int*)(((float*)data)+2))[1]=height;
+        }
+		
+		 ArgVis(VisulalisationType type, float value1, float value2, int symbol1, int symbol2, bool triger)
+        {
+				visType=VT_SWITCHBUTTON;
+				data=malloc(sizeof(float)*2 + sizeof(int)*2 + sizeof(bool));
+				((float*)data)[0]=value1;
+				((float*)data)[1]=value2;
+				((int*)(((float*)data)+2))[0]=symbol1;
+				((int*)(((float*)data)+2))[1]=symbol2;
+				*((bool*)((int*)(((float*)data)+2)+2))=triger;
         }
 		
 		ArgVis(VisulalisationType type, int min, int max)
@@ -226,6 +238,17 @@
 					break;
 					case VT_ENTRYBOX:
 					drawables.push_back(ParamDrawable(new EntryBox(posX+argpos[i].first, posY+argpos[i].second, entrybox_width, args[i].getFloatValue(), this, i), args[i].getName()));
+					break;
+					case VT_SWITCHBUTTON:
+					{
+						float value1=((float*)argvis[i].data)[0];
+						float value2=((float*)argvis[i].data)[1];
+						int symbol1=((int*)(((float*)argvis[i].data)+2))[0];
+						int symbol2=((int*)(((float*)argvis[i].data)+2))[1];
+						bool triger=*((bool*)((int*)(((float*)argvis[i].data)+2)+2));
+						
+						drawables.push_back(ParamDrawable(new SwitchButton(posX+argpos[i].first, posY+argpos[i].second, value1, value2, symbol1, symbol2, triger, this, i), args[i].getName(), false));
+					}
 					break;
 					case VT_TEXT:
 						drawables.push_back(ParamDrawable(new Point(posX+argpos[i].first, posY+argpos[i].second), ((std::string*)argvis[i].data)->c_str()));
@@ -391,7 +414,7 @@
 			{
 				if(argumentVisuals[i].visType==VT_SLIDER)
 				{
-					fprintf(file, "%d %f ", i, args[i].getFloatValue());
+					fprintf(file, "%d %f %f %f ", i, args[i].getFloatValue(), ((Slider*)drawables[i].drawable)->getRangeBegin(), ((Slider*)drawables[i].drawable)->getRangeEnd());
 				}
 			}
 			
@@ -413,13 +436,17 @@
 			setPos(X, Y);
 			
 			int id;
-			float value;
+			float value, rangeBegin, rangeEnd;
 			
-			while(ss>>id>>value)
+			printf("dupa\n");
+			
+			while(ss>>id>>value>>rangeBegin>>rangeEnd)
 			{					
 				args[id].set(value);
 				
 				((Slider*)drawables[id].drawable)->setValue(value);
+				((Slider*)drawables[id].drawable)->setRangeBegin(rangeBegin);
+				((Slider*)drawables[id].drawable)->setRangeEnd(rangeEnd);
 			}
 		}
 		
@@ -441,7 +468,7 @@
 		static const int slider_period=15;
 		static const int top_padding=35;
 		static const int bottom_padding=25;
-		static const int left_padding=15;
+		static const int left_padding=20;
 		static const int right_padding=15;
 		static const int bus_period=35;
 		

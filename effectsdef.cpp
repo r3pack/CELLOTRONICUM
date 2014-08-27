@@ -5,10 +5,6 @@
 #define REGISTER_EFFECT(a, b) registerEffect(a::name, a::fullName, b);
 #define REGISTER_EFFECT_EX(a, b, c) registerEffect(a::name, a::fullName, b, c);
 
-
-
-
-
 void registerEffects()
 {
 	REGISTER_EFFECT(DistEcho, "Echo");
@@ -68,6 +64,14 @@ void registerEffects()
 	REGISTER_EFFECT(SoftClipAmp8, "Base");
 	REGISTER_EFFECT(SoftClipper4, "Base");
 	REGISTER_EFFECT(SoftClipper8, "Base");
+	
+	REGISTER_EFFECT(AFM1, "FM Synthesis");
+	REGISTER_EFFECT(AFM1Env, "FM Synthesis");
+	REGISTER_EFFECT(AFM2, "FM Synthesis");
+	REGISTER_EFFECT(AFM2Env, "FM Synthesis");
+	
+	REGISTER_EFFECT(Hadamard, "Transforms");
+	REGISTER_EFFECT(Hadamard2, "Transforms");
 };
 
 #undef REGISTER_EFFECT
@@ -125,6 +129,12 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(OctaveUp);
 	EFFECT_BY_NAME(OctaveDown);
 	EFFECT_BY_NAME(FormantFilter);
+	EFFECT_BY_NAME(AFM1);
+	EFFECT_BY_NAME(AFM1Env);
+	EFFECT_BY_NAME(AFM2);
+	EFFECT_BY_NAME(AFM2Env);
+	EFFECT_BY_NAME(Hadamard);
+	EFFECT_BY_NAME(Hadamard2);
 	return NULL;
 }
 
