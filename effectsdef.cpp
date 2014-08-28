@@ -14,7 +14,7 @@ void registerEffects()
 	REGISTER_EFFECT(OctaveDown, "Spectral");
 	REGISTER_EFFECT(FormantFilter, "Spectral");
 	REGISTER_EFFECT(Hadamard, "Spectral");
-	REGISTER_EFFECT(Hadamard2, "Spectral");
+	//REGISTER_EFFECT(Hadamard2, "Spectral");
 	
 	REGISTER_EFFECT_EX(DistEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(ShiftEcho, "Time-based", "Echo");
@@ -156,7 +156,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(AFM2);
 	EFFECT_BY_NAME(AFM2Env);
 	EFFECT_BY_NAME(Hadamard);
-	EFFECT_BY_NAME(Hadamard2);
+	//EFFECT_BY_NAME(Hadamard2);
 	EFFECT_BY_NAME(Pipe);
 	EFFECT_BY_NAME(GoetzelSinus);
 	EFFECT_BY_NAME(Select2);
