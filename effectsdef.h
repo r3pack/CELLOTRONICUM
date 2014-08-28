@@ -429,6 +429,18 @@
 		~TartiniPitch() {quitGUI();}
 	};
 	
+	class QitchPitch : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "QitchPitch", "eff_qitch_pitch");
+			
+		QitchPitch(int X, int Y): 
+		
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("ampThreshold", 0.01f), EffectArgument("minfreq", 0.0f), EffectArgument("maxfreq", 2500.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2500.0f), ArgVis(VT_SLIDER, 0.0f, 2500.0f)})
+		{sendInstance(); initGUI(X, Y, 17, 17);}
+		~QitchPitch() {quitGUI();}
+	};
+	
 	class Goetzel : public EffectAutoGUI
 	{
 		EFFECT_BODY(5, "Goetzel", "eff_goetzel");
@@ -563,7 +575,7 @@
 		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f)
 		}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
-		ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f),
 		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
 		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
 		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
@@ -571,6 +583,118 @@
 		})
 		{sendInstance(); initGUI(X, Y);}
 		~Harmonizer4() {quitGUI();}
+	};
+	
+	class Harmonizer5 : public EffectAutoGUI
+	{
+		EFFECT_BODY(24, "Harmonizer5", "eff_harmonizer_5");
+		
+		Harmonizer5(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
+		EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
+		EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
+		EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
+		EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
+		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f),
+		EffectArgument("semitones5", 0.0f), EffectArgument("amp5", 0.0f), EffectArgument("amp_threshold5", 0.02f), EffectArgument("ampmax5", 0.06f)
+		}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
+		})
+		{sendInstance(); initGUI(X, Y);}
+		~Harmonizer5() {quitGUI();}
+	};
+	
+	class Harmonizer6 : public EffectAutoGUI
+	{
+		EFFECT_BODY(28, "Harmonizer6", "eff_harmonizer_6");
+		
+		Harmonizer6(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
+		EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
+		EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
+		EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
+		EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
+		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f),
+		EffectArgument("semitones5", 0.0f), EffectArgument("amp5", 0.0f), EffectArgument("amp_threshold5", 0.02f), EffectArgument("ampmax5", 0.06f),
+		EffectArgument("semitones6", 0.0f), EffectArgument("amp6", 0.0f), EffectArgument("amp_threshold6", 0.02f), EffectArgument("ampmax6", 0.06f)
+		}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
+		})
+		{sendInstance(); initGUI(X, Y);}
+		~Harmonizer6() {quitGUI();}
+	};
+	
+	class Harmonizer7 : public EffectAutoGUI
+	{
+		EFFECT_BODY(32, "Harmonizer7", "eff_harmonizer_7");
+		
+		Harmonizer7(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
+		EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
+		EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
+		EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
+		EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
+		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f),
+		EffectArgument("semitones5", 0.0f), EffectArgument("amp5", 0.0f), EffectArgument("amp_threshold5", 0.02f), EffectArgument("ampmax5", 0.06f),
+		EffectArgument("semitones6", 0.0f), EffectArgument("amp6", 0.0f), EffectArgument("amp_threshold6", 0.02f), EffectArgument("ampmax6", 0.06f),
+		EffectArgument("semitones7", 0.0f), EffectArgument("amp7", 0.0f), EffectArgument("amp_threshold7", 0.02f), EffectArgument("ampmax7", 0.06f)
+		}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
+		})
+		{sendInstance(); initGUI(X, Y);}
+		~Harmonizer7() {quitGUI();}
+	};
+	
+	class Harmonizer8 : public EffectAutoGUI
+	{
+		EFFECT_BODY(36, "Harmonizer8", "eff_harmonizer_8");
+		
+		Harmonizer8(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), 
+		EffectArgument("amp_attack", 0.02f), EffectArgument("amp_release", 0.5f),
+		EffectArgument("semitones1", 0.0f), EffectArgument("amp1", 0.0f), EffectArgument("amp_threshold1", 0.02f), EffectArgument("ampmax1", 0.06f),
+		EffectArgument("semitones2", 0.0f), EffectArgument("amp2", 0.0f), EffectArgument("amp_threshold2", 0.02f), EffectArgument("ampmax2", 0.06f),
+		EffectArgument("semitones3", 0.0f), EffectArgument("amp3", 0.0f), EffectArgument("amp_threshold3", 0.02f), EffectArgument("ampmax3", 0.06f),
+		EffectArgument("semitones4", 0.0f), EffectArgument("amp4", 0.0f), EffectArgument("amp_threshold4", 0.02f), EffectArgument("ampmax4", 0.06f),
+		EffectArgument("semitones5", 0.0f), EffectArgument("amp5", 0.0f), EffectArgument("amp_threshold5", 0.02f), EffectArgument("ampmax5", 0.06f),
+		EffectArgument("semitones6", 0.0f), EffectArgument("amp6", 0.0f), EffectArgument("amp_threshold6", 0.02f), EffectArgument("ampmax6", 0.06f),
+		EffectArgument("semitones7", 0.0f), EffectArgument("amp7", 0.0f), EffectArgument("amp_threshold7", 0.02f), EffectArgument("ampmax7", 0.06f),
+		EffectArgument("semitones8", 0.0f), EffectArgument("amp8", 0.0f), EffectArgument("amp_threshold8", 0.02f), EffectArgument("ampmax8", 0.06f)
+		}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS),
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15),
+		ArgVis(VT_SLIDER, -12.0f, 12.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15), ArgVis(VT_SLIDER, 0.0f, 1.0f, 15)
+		})
+		{sendInstance(); initGUI(X, Y);}
+		~Harmonizer8() {quitGUI();}
 	};
 	
 	
@@ -862,6 +986,18 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(5, 4.0f, 3.0f, 2.0f, 1.0f, 0.0f))})
 		{sendInstance(); initGUI(X, Y, 25);}
 		~Select5() {quitGUI();}
+	};
+	
+	class Compander : public EffectAutoGUI
+	{
+		EFFECT_BODY(7, "Compander", "eff_compander");
+		
+		Compander(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("thresh", 0.5f), 
+		EffectArgument("slopeBelow", 1.0f), EffectArgument("slopeAbove", 1.0f), EffectArgument("clampTime", 0.01f), EffectArgument("relaxTime", 0.1f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 3.0f), ArgVis(VT_SLIDER, 0.0f, 3.0f), ArgVis(VT_SLIDER, 0.0f, 0.1f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Compander() {quitGUI();}
 	};
 	
 

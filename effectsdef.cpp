@@ -7,29 +7,24 @@
 
 void registerEffects()
 {
-	REGISTER_EFFECT(DistEcho, "Echo");
-	REGISTER_EFFECT(ShiftEcho, "Echo");
-	REGISTER_EFFECT(Gramophone, "Echo");
-	REGISTER_EFFECT(FreqShift, "Echo");
-	REGISTER_EFFECT(PitchShift, "Echo");
-	REGISTER_EFFECT(RandomPitchShift, "Echo");
+	REGISTER_EFFECT(FreqShift, "Spectral");
+	REGISTER_EFFECT(PitchShift, "Spectral");
+	REGISTER_EFFECT(RandomPitchShift, "Spectral");
+	REGISTER_EFFECT(OctaveUp, "Spectral");
+	REGISTER_EFFECT(OctaveDown, "Spectral");
+	REGISTER_EFFECT(FormantFilter, "Spectral");
+	REGISTER_EFFECT(Hadamard, "Spectral");
+	REGISTER_EFFECT(Hadamard2, "Spectral");
 	
-	REGISTER_EFFECT(OctaveUp, "SoundSources");
-	REGISTER_EFFECT(OctaveDown, "SoundSources");
-	REGISTER_EFFECT(FormantFilter, "SoundSources");
-	
-	REGISTER_EFFECT(Brassage, "Brassage");
-	REGISTER_EFFECT(BrassageOSC, "Brassage");
-	REGISTER_EFFECT(BrassagePlus, "Brassage");
-	REGISTER_EFFECT(RMChorus, "Brassage");
-	REGISTER_EFFECT(RMChorus2, "Brassage");
-	REGISTER_EFFECT(RMDelay, "Brassage");
-	REGISTER_EFFECT(RMDelayRec, "Brassage");
-	REGISTER_EFFECT(WSDistortion, "Brassage");
-	
-	REGISTER_EFFECT(SampleDecrease, "BitCrush");
-	REGISTER_EFFECT(BitCrush, "BitCrush");
-	REGISTER_EFFECT(MobilePhoneLag3, "BitCrush");
+	REGISTER_EFFECT_EX(DistEcho, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(ShiftEcho, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(Brassage, "Time-based", "Brassage");
+	REGISTER_EFFECT_EX(BrassageOSC, "Time-based", "Brassage");
+	REGISTER_EFFECT_EX(BrassagePlus, "Time-based", "Brassage");
+	REGISTER_EFFECT_EX(RMChorus, "Time-based", "RM-based");
+	REGISTER_EFFECT_EX(RMChorus2, "Time-based", "RM-based");
+	REGISTER_EFFECT_EX(RMDelay, "Time-based", "RM-based");
+	REGISTER_EFFECT_EX(RMDelayRec, "Time-based", "RM-based");
 	
 	REGISTER_EFFECT(BLowPass, "Filters");
 	REGISTER_EFFECT(BHiPass, "Filters");
@@ -38,48 +33,58 @@ void registerEffects()
 	REGISTER_EFFECT(Amplitude, "Analysis");
 	REGISTER_EFFECT(Pitch, "Analysis");
 	REGISTER_EFFECT(TartiniPitch, "Analysis");
+	REGISTER_EFFECT(QitchPitch, "Analysis");
 	REGISTER_EFFECT(Goetzel, "Analysis");
 	
-	REGISTER_EFFECT(Harmonizer4, "Generators");
-	REGISTER_EFFECT(ShepardCycleTone, "Generators");
-	REGISTER_EFFECT(AYSimple, "Generators");
-	REGISTER_EFFECT(YMSimple, "Generators");
-	REGISTER_EFFECT(GoetzelSinus, "Generators");
+	REGISTER_EFFECT_EX(Harmonizer4, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(Harmonizer5, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(Harmonizer6, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(Harmonizer7, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(Harmonizer8, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(GoetzelSinus, "Generators", "Harmonic");
+	REGISTER_EFFECT_EX(ShepardCycleTone, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(AYSimple, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(YMSimple, "Generators", "Synthesizers");
 	
-	REGISTER_EFFECT(Playbuf, "IO_Effects");
-	REGISTER_EFFECT(Mul, "IO_Effects");
-	REGISTER_EFFECT(Normalizer, "IO_Effects");
-	REGISTER_EFFECT(Limiter, "IO_Effects");
-	REGISTER_EFFECT(Output, "IO_Effects");
-	REGISTER_EFFECT(Mix, "IO_Effects");
-	REGISTER_EFFECT(MixAmp, "IO_Effects");
-	REGISTER_EFFECT(Mix3, "IO_Effects");
-	REGISTER_EFFECT(Mix3Amp, "IO_Effects");
-	REGISTER_EFFECT(Input, "IO_Effects");
-	REGISTER_EFFECT(InputExtended, "IO_Effects");
-	REGISTER_EFFECT(OutputExtended, "IO_Effects");
-	REGISTER_EFFECT(Pipe, "IO_Effects");
-	REGISTER_EFFECT(Select2, "IO_Effects");
-	REGISTER_EFFECT(Select3, "IO_Effects");
-	REGISTER_EFFECT(Select4, "IO_Effects");
-	REGISTER_EFFECT(Select5, "IO_Effects");
+	REGISTER_EFFECT_EX(Playbuf, "Basics", "Buffers");
+	REGISTER_EFFECT_EX(Mul, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Normalizer, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Limiter, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Compander, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Mix, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(MixAmp, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Mix3, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Mix3Amp, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Input, "Basics", "IO");
+	REGISTER_EFFECT_EX(Output, "Basics", "IO");
+	REGISTER_EFFECT_EX(InputExtended, "Basics", "IO");
+	REGISTER_EFFECT_EX(OutputExtended, "Basics", "IO");
+	REGISTER_EFFECT_EX(Pipe, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Select2, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Select3, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Select4, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Select5, "Basics", "Mixers");
 	
-	REGISTER_EFFECT(Clipper4, "Base");
-	REGISTER_EFFECT(Clipper8, "Base");
-	REGISTER_EFFECT(Clipper32, "Base");
-	REGISTER_EFFECT(SoftClipAmp, "Base");
-	REGISTER_EFFECT(SoftClipAmp4, "Base");
-	REGISTER_EFFECT(SoftClipAmp8, "Base");
-	REGISTER_EFFECT(SoftClipper4, "Base");
-	REGISTER_EFFECT(SoftClipper8, "Base");
+	REGISTER_EFFECT_EX(Clipper4, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(Clipper8, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(Clipper32, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(SoftClipAmp, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(SoftClipAmp4, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(SoftClipAmp8, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(SoftClipper4, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(SoftClipper8, "Distortions", "Clippers");
+	REGISTER_EFFECT_EX(WSDistortion, "Distortions", "Waveshapers");
+	REGISTER_EFFECT_EX(SampleDecrease, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(BitCrush, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(MobilePhoneLag3, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(Gramophone, "Distortions", "Sound Damage");
 	
-	REGISTER_EFFECT(AFM1, "FM Synthesis");
-	REGISTER_EFFECT(AFM1Env, "FM Synthesis");
-	REGISTER_EFFECT(AFM2, "FM Synthesis");
-	REGISTER_EFFECT(AFM2Env, "FM Synthesis");
+	REGISTER_EFFECT(AFM1, "Natural-Synthetic");
+	REGISTER_EFFECT(AFM1Env, "Natural-Synthetic");
+	REGISTER_EFFECT(AFM2, "Natural-Synthetic");
+	REGISTER_EFFECT(AFM2Env, "Natural-Synthetic");
 	
-	REGISTER_EFFECT(Hadamard, "Transforms");
-	REGISTER_EFFECT(Hadamard2, "Transforms");
+	
 };
 
 #undef REGISTER_EFFECT
@@ -112,6 +117,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(YMSimple);
 	EFFECT_BY_NAME(Pitch);
 	EFFECT_BY_NAME(TartiniPitch);
+	EFFECT_BY_NAME(QitchPitch);
 	EFFECT_BY_NAME(Goetzel);
 	EFFECT_BY_NAME(Mix);
 	EFFECT_BY_NAME(MixAmp);
@@ -126,6 +132,10 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(Input);
 	EFFECT_BY_NAME(InputExtended);
 	EFFECT_BY_NAME(Harmonizer4);
+	EFFECT_BY_NAME(Harmonizer5);
+	EFFECT_BY_NAME(Harmonizer6);
+	EFFECT_BY_NAME(Harmonizer7);
+	EFFECT_BY_NAME(Harmonizer8);
 	EFFECT_BY_NAME(Gramophone);
 	EFFECT_BY_NAME(SampleDecrease);
 	EFFECT_BY_NAME(BitCrush);
@@ -152,6 +162,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(Select3);
 	EFFECT_BY_NAME(Select4);
 	EFFECT_BY_NAME(Select5);
+	EFFECT_BY_NAME(Compander);
 	return NULL;
 }
 
