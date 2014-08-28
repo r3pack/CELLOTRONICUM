@@ -51,19 +51,20 @@ void registerEffects()
 	REGISTER_EFFECT_EX(Normalizer, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Limiter, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Compander, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Pipe, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Mix, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(MixAmp, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Mix3, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Mix3Amp, "Basics", "Mixers");
-	REGISTER_EFFECT_EX(Input, "Basics", "IO");
-	REGISTER_EFFECT_EX(Output, "Basics", "IO");
-	REGISTER_EFFECT_EX(InputExtended, "Basics", "IO");
-	REGISTER_EFFECT_EX(OutputExtended, "Basics", "IO");
-	REGISTER_EFFECT_EX(Pipe, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select2, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select3, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select4, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select5, "Basics", "Mixers");
+	REGISTER_EFFECT_EX(Input, "Basics", "IO");
+	REGISTER_EFFECT_EX(Output, "Basics", "IO");
+	REGISTER_EFFECT_EX(InputExtended, "Basics", "IO");
+	REGISTER_EFFECT_EX(OutputExtended, "Basics", "IO");
+
 	
 	REGISTER_EFFECT_EX(Clipper4, "Distortions", "Clippers");
 	REGISTER_EFFECT_EX(Clipper8, "Distortions", "Clippers");
