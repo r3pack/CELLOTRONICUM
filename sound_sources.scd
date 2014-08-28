@@ -34,14 +34,14 @@ SynthDef.new(\eff_input,{
 
 SynthDef.new(\eff_input_extended,{
 	arg outbus1, outbus2, outbus3, outbus4, outbus5, outbus6, outbus7, outbus8;
-	var in1 = In.ar(8);
-	var in2 = In.ar(9);
-	var in3 = In.ar(10);
-	var in4 = In.ar(11);
-	var in5 = In.ar(12);
-	var in6 = In.ar(13);
-	var in7 = In.ar(14);
-	var in8 = In.ar(15);
+	var in1 = SoundIn.ar(0);
+	var in2 = SoundIn.ar(1);
+	var in3 = SoundIn.ar(2);
+	var in4 = SoundIn.ar(3);
+	var in5 = SoundIn.ar(4);
+	var in6 = SoundIn.ar(5);
+	var in7 = SoundIn.ar(6);
+	var in8 = SoundIn.ar(7);
 	Out.ar(outbus1,in1);
 	Out.ar(outbus2,in2);
 	Out.ar(outbus3,in3);
