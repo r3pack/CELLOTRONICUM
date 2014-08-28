@@ -27,8 +27,8 @@ SynthDef.new(\eff_output_extended,{
 }).add;
 
 SynthDef.new(\eff_input,{
-	arg outbus;
-	var in = In.ar(8);
+	arg outbus, input_nr=0;
+	var in = SoundIn.ar(input_nr=0);//In.ar(8);
 	Out.ar(outbus,in);
 }).add;
 
