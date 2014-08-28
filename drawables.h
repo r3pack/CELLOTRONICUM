@@ -230,6 +230,8 @@
 			busList.insert(std::pair<int, Bus*>(id, this));
 		}
 		
+		void removeConnections();
+		
 		void removeBus();
 		
 		~Bus()
@@ -697,10 +699,21 @@
 			rect.w = getWidth();
 			rect.h = height;
 			
-			setColor(COLOR_ENTRYBOX_BACKGROUND);
+			setColor((id==lastClicked)?COLOR_ENTRYBOX_BACKGROUND_CLICKED:COLOR_ENTRYBOX_BACKGROUND);
 			SDL_RenderFillRect(render, &rect);
 			setColor((id==lastClicked)?COLOR_ENTRYBOX_BORDER_CLICKED:COLOR_ENTRYBOX_BORDER);
 			SDL_RenderDrawRect(render, &rect);
+			
+			if(id==lastClicked)
+			{
+				SDL_Rect rect2=rect;
+				rect2.x-=1;
+				rect2.y-=1;
+				rect2.w+=2;
+				rect2.h+=2;
+				
+				SDL_RenderDrawRect(render, &rect2);
+			}
 			
 			int w, h;
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
@@ -758,7 +771,7 @@
 			rangeEndBox.setValue(rangeEnd);
 			
 			rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
-			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-3-rangeBeginBox.getHeight()+1);
 			
 			value=std::min(value, std::max(rangeBegin, rangeEnd));
 			value=std::max(value, std::min(rangeBegin, rangeEnd));
@@ -806,6 +819,7 @@
 			Y-=posY;
 			if(X>=0 && X<=width && Y>=-15 && Y<=height+15)
 			{
+				editRange=false;
 				if(Y<0 && Y>=-slider_bus_height && me==ME_PRESS) 
 				{
 					setClicked();
@@ -849,7 +863,7 @@
 					rangeEndBox.setValue(rangeEnd);
 					
 					rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
-					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-3-rangeBeginBox.getHeight()+1);
 				}
 				if(!editRange)
 				{
@@ -878,7 +892,7 @@
 				}
 				else if(rangeEndBox.receiveKeyboardEvent(scancode))
 				{
-					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight()+1);
+					rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-3-rangeBeginBox.getHeight()+1);
 					out=true;
 				}
 				
@@ -909,8 +923,8 @@
 			posX=X;
 			posY=Y;
 			entryBox.setPos(X+width/2-entryBox.getWidth()/2, Y+height);
-			rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2-rangeBeginBox.getHeight());
-			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2);
+			rangeBeginBox.setPos(posX+width/2-rangeBeginBox.getWidth()/2, posY+height/2);
+			rangeEndBox.setPos(posX+width/2-rangeEndBox.getWidth()/2, posY+height/2-3-rangeBeginBox.getHeight()+1);
 		}
 		
 		void move(int X, int Y)

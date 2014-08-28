@@ -161,18 +161,41 @@ class Controller{
 	
 	bool receiveClick(int X, int Y, MouseEvent me)
 	{
-		if(!(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)) return false;
-
 		if(pauseButton->receiveClick(X, Y, me)) 
 		{
 			paused=!paused;
+			return true;
+		}
+		
+		if(me==ME_PRESS)
+		{
+			if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+Button::size)
+			{
+				handlePosX=X-posX;
+				handlePosY=Y-posY;
+				focus=true;
+				return true;
+			}
+			else
+			focus=false;
+		}
+		else if(me==ME_REPEAT && focus)
+		{
+			setPos(X-handlePosX, Y-handlePosY);
+			return true;
+		}
+		else if(me==ME_RELEASE)
+		{
+			focus=false;
+			return true;
 		}
 		
 		for(int i=0;i<outBuses.size();++i)
 		{
-			outBuses[i].bus->receiveClick(X, Y, me);
+			if(outBuses[i].bus->receiveClick(X, Y, me)) return true;
 		}
-		return true;
+		
+		return false;
 	}
 	
 	bool receiveSecondClick(int X, int Y, MouseEvent me)
