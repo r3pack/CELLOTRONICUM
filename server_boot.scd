@@ -17,6 +17,7 @@ var func_start = {
 	(~p +/+"harmonizer.scd").loadPaths;
 	(~p +/+"base.scd").loadPaths;
 	(~p +/+"afm.scd").loadPaths;
+	(~p +/+"buffollow.scd").loadPaths;
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 };
 

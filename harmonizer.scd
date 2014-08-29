@@ -8,7 +8,7 @@ SynthDef.new(\eff_hadamard_first, {
 SynthDef.new(\eff_hadamard_last, {
 	arg inbus=8, outbus=0, hadamard_cut=10;
 	var in = In.ar(inbus,1);
-	var res = WalshHadamard2.ar(in, hadamard_cut);
+	var res = in - WalshHadamard.ar(in, hadamard_cut);
 	Out.ar(outbus,res);
 }).add;
 

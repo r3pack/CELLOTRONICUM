@@ -1,5 +1,5 @@
 ~p = thisProcess.nowExecutingPath.dirname;
-~q = "C:\\Users\\praktykant\\AppData\\Local\\SuperCollider\\Extensions\\SC3plugins\\PitchDetection\\extraqitchfiles";
+~q = Platform.userExtensionDir +/+ "SC3plugins\\PitchDetection\\extraqitchfiles";
 ~qitch_filename = (~q +/+ "QspeckernN4096SR44100.wav");
 // ~qitch_buffer - after server boot contains buffered file for Qitch pitch detector
 
@@ -35,6 +35,8 @@ jakies przekształcenie sparametryzowane matematycznie
 pomysł - ograniczanie iloci skłądowych
 
 IFWT - hadamard w jedną stronę
+
+TODO: http://chrisjeffs.com/blog/?p=750
 
 */
 
