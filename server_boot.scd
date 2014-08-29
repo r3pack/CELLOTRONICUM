@@ -26,7 +26,7 @@ OSCdef.new(
 		arg msg, time, addr, recvPort;
 		[msg, time, addr, recvPort].postln;
 		~app_netaddr = addr;
-		s.quit;
+		s.killAll;
 		~e.do({
 			arg item, i;
 			item.postln;

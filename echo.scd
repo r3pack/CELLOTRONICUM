@@ -76,14 +76,14 @@ SynthDef.new(\eff_distecho, {
 	var fb = LocalIn.ar(1);
 	var output = LeakDC.ar(feedback*fb + in);
 	output = output/(output.abs+1);
-	LocalOut.ar(DelayC.ar(output, delay, delay));
+	LocalOut.ar(DelayC.ar(output, 5, asFloat(delay)));
 	Out.ar(outbus,output*amp);
 }).add;
 
 /*/TESTS
 x = Synth.new(\eff_distecho, [\inbus, 8, \outbus, 0, \amp, 1.0, \delay, 0.5, \feedback, 0.5]);
 
-x.set(\delay,0.04);
+x.set(\delay,2);
 x.set(\freq,200);
 */
 
