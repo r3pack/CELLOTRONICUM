@@ -70,6 +70,21 @@ void drawConnections()
 	}
 }
 
+void setOptimalPrecision(float value, std::stringstream& ss)
+{
+	ss.setf(std::ios::fixed);
+	if(value>=1000.0f || value<=-1000.0f)
+	ss.precision(0);
+	else
+	if(value>=10.0f || value<=-10.0f)
+	ss.precision(1);
+	else
+	if(value>=1.0f || value<=-1.0f)
+	ss.precision(2);
+	else
+	ss.precision(3);
+}
+
 void SwitchButton::setStatus(bool s) 
 {
 	status=s;

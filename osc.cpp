@@ -83,10 +83,10 @@ bool OSCConn::startServer()
 				}
 			}
 		}
-		if(checkIfTimeout(15.0f))
+		if(checkIfTimeout(1.0f))
 		{
-			printf("Fail to start the server (Timeout)\n");
-			return 0;
+			fprintf(stderr, "Waiting for server to boot...\n");
+			return startServer();
 		}
 	}
 	

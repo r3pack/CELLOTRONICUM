@@ -25,10 +25,10 @@
 		EFFECT_BODY(5, "DistEcho", "eff_distecho");
 		
 		DistEcho(int X, int Y): 
-		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 2.0f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
 		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 6, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_ENTRYBOX), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~DistEcho() {quitGUI();}
 	};
@@ -38,8 +38,8 @@
 		EFFECT_BODY(6, "ShiftEcho", "eff_shiftecho");
 		
 		ShiftEcho(int X, int Y): 
-		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("feedback", 0.5f), EffectArgument("delay", 0.5f)}),
-		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 0.0f), EffectArgument("phase", 0.0f), EffectArgument("feedback", 0.1f), EffectArgument("delay", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~ShiftEcho() {quitGUI();}
 	};
@@ -176,15 +176,15 @@
 		~RandomPitchShift() {quitGUI();}
 	};
 	
-	class Mul : public EffectAutoGUI
+	class Gain : public EffectAutoGUI
 	{
-		EFFECT_BODY(3, "Mul", "eff_mul");
+		EFFECT_BODY(3, "Gain", "eff_mul");
 		
-		Mul(int X, int Y): 
+		Gain(int X, int Y): 
 		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("mul", 1.0f)}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
 		{sendInstance(); initGUI(X, Y);}
-		~Mul() {quitGUI();}
+		~Gain() {quitGUI();}
 	};
 	
 	class Clipper4 : public EffectAutoGUI

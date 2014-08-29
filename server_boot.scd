@@ -74,6 +74,7 @@ OSCdef.new(
 		~bus = Dictionary.new(0);
 		s.quit;
 		'Server killed.'.postln;
+		0.exit;
 	},
 	'/app_quit'
 );

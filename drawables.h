@@ -32,6 +32,8 @@
 	};
 
 	void drawConnections();
+	
+	void setOptimalPrecision(float value, std::stringstream& ss);
 
 	class Drawable{
 		public:
@@ -464,11 +466,7 @@
 			argument=a;
 			value=v;
 			std::stringstream ss;
-			ss.setf(std::ios::fixed);
-			if(value>=10.0f || value<=-10.0f)
-			ss.precision(1);
-			else
-			ss.precision(2);
+			setOptimalPrecision(value, ss);
 			ss<<v;
 			data=ss.str();
 			id=lastId++;
@@ -513,11 +511,7 @@
 			{
 				lastClicked=-1;
 				std::stringstream ss;
-				ss.setf(std::ios::fixed, std:: ios::floatfield);
-				if(value>=10.0f || value<=-10.0f)
-				ss.precision(1);
-				else
-				ss.precision(2);
+				setOptimalPrecision(value, ss);
 				ss<<value;
 				data=ss.str();
 				updateValue();
@@ -530,10 +524,16 @@
 		{
 			if(id!=lastClicked) {textToRemove=false; return false;}
 			
+			if(scancode==SDL_SCANCODE_BACKSPACE)
+			{
+				textToRemove=false;
+			}
+			else
 			if(textToRemove) 
 			{
 				data.clear();
 				textToRemove=false;
+				updateValue();
 			}
 			
 			switch(scancode)
@@ -629,11 +629,7 @@
 		{
 			value=v;
 			std::stringstream ss;
-			ss.setf(std::ios::fixed, std:: ios::floatfield);
-			if(value>=10.0f || value<=-10.0f)
-			ss.precision(1);
-			else
-			ss.precision(2);
+			setOptimalPrecision(value, ss);
 			ss<<value;
 			data=ss.str();
 			updateValue();
