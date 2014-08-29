@@ -166,7 +166,11 @@ bool Bus::setClicked()
 		}
 		else
 		{
-			if(bus2->used==true) return false;
+			if(bus2->used==true) 
+			{	
+				bus2->removeConnections();
+				printf("Bus is already used - removing existing connections\n");
+			}
 			connIt=connections.insert(std::pair<Bus*, Bus*>(bus1, bus2));
 			bus2->used=true;
 			
@@ -203,44 +207,50 @@ bool Bus::receiveClick(int X, int Y, MouseEvent me)
 	return false;
 }
 
+void Bus::removeConnections()
+{
+	used=false;
+	if(getType()%2==1)
+	{
+		used=false;
+		for(auto it=connections.begin();it!=connections.end();)
+		{
+			if((*it).first==this)
+			{	
+				(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
+		
+				(*it).second->used=false;
+				it=connections.erase(it);
+			}
+			else ++it;
+		}
+	}
+		
+	if(getType()%2==0)
+	{
+		used=false;
+		for(auto it=connections.begin();it!=connections.end();++it)
+		{
+			if((*it).second==this)
+			{
+				(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
+			
+				(*it).first->used=false;
+				connections.erase(it);
+				break;
+			}
+		}
+	}
+}
+
 bool Bus::receiveSecondClick(int X, int Y, MouseEvent me)
 {
+	lastClicked=-1;
 	X-=posX;
 	Y-=posY;
 	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)
 	{
-		used=false;
-		if(getType()%2==1)
-		{
-			used=false;
-			for(auto it=connections.begin();it!=connections.end();)
-			{
-				if((*it).first==this)
-				{	
-					(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
-			
-					(*it).second->used=false;
-					it=connections.erase(it);
-				}
-				else ++it;
-			}
-		}
-			
-		if(getType()%2==0)
-		{
-			used=false;
-			for(auto it=connections.begin();it!=connections.end();++it)
-			{
-				if((*it).second==this)
-				{
-					(*it).second->getEffect()->setAndSendArgument((*it).second->getArg(), OSCConn::getFreeBus());
-				
-					(*it).first->used=false;
-					connections.erase(it);
-					break;
-				}
-			}
-		}
+		removeConnections();
 		return true;
 	}
 	return false;
@@ -286,7 +296,7 @@ bool ControllBus::connectControllBusWithValueGifter()
 			
 			for(auto it=controller->controlledValueGifters.begin();it!=controller->controlledValueGifters.end();++it)
 			{
-				if(it->second==valueGifter && whichBus==it->first)
+				if(it->second==valueGifter)
 				{
 					controller->controlledValueGifters.erase(it);
 					valueGifter->controlledBy=NULL;
@@ -294,10 +304,7 @@ bool ControllBus::connectControllBusWithValueGifter()
 				}
 			}
 			
-			fprintf(stderr, "Error: value gifter is already controlled\n");
-			ValueGifter::lastClicked=-1;
-			ControllBus::lastClicked=-1;
-			return false;
+			fprintf(stderr, "Error: value gifter is already controlled - removing existing controller\n");
 		}
 		
 		int size=controller->outBuses.size();
@@ -341,6 +348,7 @@ bool ControllBus::setClicked()
 
 bool ControllBus::receiveSecondClick(int X, int Y, MouseEvent me)
 {
+	lastClicked=-1;
 	X-=posX;
 	Y-=posY;
 	if(X>=0 && X<=size && Y>=0 && Y<=size && me==ME_PRESS)

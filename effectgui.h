@@ -374,7 +374,6 @@
 		
 		bool receiveClick(int X, int Y, MouseEvent me)
 		{
-			if(!(posX<=X && X<=posX+width && posY<=Y && Y<=posY+height)) return false;
 			if(pauseButton->receiveClick(X, Y, me)) 
 			{
 				paused=!paused;
@@ -386,12 +385,35 @@
 			
 			ArgVis* argumentVisuals=getArgumentVisuals();
 			
-			for(int i=0;i<drawables.size();++i)
+			if(me==ME_PRESS)
 			{
-				if(drawables[i].drawable->receiveClick(X, Y, me)) break;
+				if(posX<=X && X<=posX+width && posY<=Y && Y<=posY+Button::size)
+				{
+					handlePosX=X-posX;
+					handlePosY=Y-posY;
+					focus=true;
+					return true;
+				}
+				else
+				focus=false;
+			}
+			else if(me==ME_REPEAT && focus)
+			{
+				setPos(X-handlePosX, Y-handlePosY);
+				return true;
+			}
+			else if(me==ME_RELEASE)
+			{
+				focus=false;
+				return true;
 			}
 			
-			return true;
+			for(int i=0;i<drawables.size();++i)
+			{
+				if(drawables[i].drawable->receiveClick(X, Y, me)) return true;
+			}
+			
+			return false;
 		}
 		
 		bool receiveSecondClick(int X, int Y, MouseEvent me)
