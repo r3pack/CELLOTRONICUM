@@ -76,7 +76,7 @@ void getOpenFile(char* filename, int size)
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir=NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_READONLY;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_READONLY|OFN_EXPLORER;
 	GetOpenFileName(&ofn);
 	
 	while (SDL_PollEvent(&event)) {}
@@ -105,7 +105,7 @@ void getSaveFile(char* filename, int size)
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir=NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT|OFN_EXPLORER;
 	GetSaveFileName(&ofn);
 	
 	while (SDL_PollEvent(&event)) {}

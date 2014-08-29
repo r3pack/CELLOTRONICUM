@@ -220,11 +220,20 @@ bool checkInputs()
 	
 	return quit;
 }
+//"C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
+
+void launchSuperCollider()
+{
+	const char *tab= "-d \"C:\\Program Files (x86)\\SuperCollider-3.6.6\" \"C:\\Users\\praktykant\\CELLOTRONICUM\\main.scd\"";
+	
+	ShellExecute(NULL, "open", "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe", tab ,NULL ,SW_SHOWDEFAULT);
+}
 
 
 #undef main
 int main (int argc, char** argv)
 {
+	launchSuperCollider();
 	if(argc>1)
 	{
 		OSCConn::setServer(argv[1]);

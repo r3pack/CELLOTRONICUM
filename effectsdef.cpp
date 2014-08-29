@@ -47,7 +47,7 @@ void registerEffects()
 	REGISTER_EFFECT_EX(YMSimple, "Generators", "Synthesizers");
 	
 	REGISTER_EFFECT_EX(Playbuf, "Basics", "Buffers");
-	REGISTER_EFFECT_EX(Mul, "Basics", "Loudness");
+	REGISTER_EFFECT_EX(Gain, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Normalizer, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Limiter, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Compander, "Basics", "Loudness");
@@ -125,7 +125,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(Mix3);
 	EFFECT_BY_NAME(Mix3Amp);
 	EFFECT_BY_NAME(Playbuf);
-	EFFECT_BY_NAME(Mul);
+	EFFECT_BY_NAME(Gain);
 	EFFECT_BY_NAME(Normalizer);
 	EFFECT_BY_NAME(Limiter);
 	EFFECT_BY_NAME(Output);

@@ -402,7 +402,7 @@
 				setPos(X-handlePosX, Y-handlePosY);
 				return true;
 			}
-			else if(me==ME_RELEASE)
+			else if(me==ME_RELEASE && focus)
 			{
 				focus=false;
 				return true;
