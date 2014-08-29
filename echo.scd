@@ -94,7 +94,7 @@ SynthDef.new(\eff_shiftecho, {
 	var fb = LocalIn.ar(1);
 	var output = feedback*fb + in;//LeakDC.ar(feedback*fb + input);
 	output = FreqShift.ar(output,freq,phase);
-	LocalOut.ar(DelayC.ar(output, delay, delay));
+	LocalOut.ar(DelayC.ar(output, asFloat(delay), asFloat(delay)));
 	Out.ar(outbus,output);
 }).add;
 
@@ -106,7 +106,7 @@ x = Synth.new(\eff_shiftecho, [\inbus, 8, \outbus, 0, \delay, 0.5, \decay, 0.9, 
 SynthDef.new(\eff_rmdelay, {
 	arg inbus=8, outbus=0, delay=0.5;
 	var in = In.ar(inbus,1);
-	var delayed = in*DelayC.ar(in,delay,delay,1,in);
+	var delayed = in*DelayC.ar(in,asFloat(delay),asFloat(delay),1,in);
 	Out.ar(outbus,delayed);
 }).add;
 
@@ -117,7 +117,7 @@ x = Synth.new(\eff_rmdelay, [\inbus, 8, \outbus, 0, \delay, 0.0, \freq, 10]);
 SynthDef.new(\eff_rmdelayrec, {
 	arg inbus=8, outbus=0, delay=0.5;
 	var in = In.ar(inbus,1);
-	var del = ((in+1)/2)*delay;
+	var del = ((in+1)/2)*asFloat(delay);
 	var delayed = in*DelayC.ar(in,del,del,1,in);
 	Out.ar(outbus,delayed);
 }).add;
@@ -130,7 +130,7 @@ x = Synth.new(\eff_rmdelayrec, [\inbus, 8, \outbus, 0, \delay, 0.5]);
 SynthDef.new(\eff_rmchorus, {
 	arg inbus=8, outbus=0, freq=1, delay=0.5;
 	var in = In.ar(inbus,1);
-	var os = (SinOsc.kr(freq)+1)*delay;
+	var os = (SinOsc.kr(freq)+1)*asFloat(delay);
 	var delayed = in*DelayC.ar(in,os,os,1,in);
 	Out.ar(outbus,delayed);
 }).add;
@@ -142,7 +142,7 @@ x = Synth.new(\eff_rmchorus, [\inbus, 8, \outbus, 0, \delay, 0.0, \freq, 10]);
 SynthDef.new(\eff_rmchorus2, {
 	arg inbus=8, outbus=0, delay=0.5;
 	var in = In.ar(inbus,1);
-	var os = (SinOsc.kr(Tartini.kr(in))+1)*delay/2;
+	var os = (SinOsc.kr(Tartini.kr(in))+1)*asFloat(delay)/2;
 	var delayed = in*DelayC.ar(in,os,os,1,in);
 	Out.ar(outbus,delayed);
 }).add;
@@ -155,7 +155,7 @@ x = Synth.new(\eff_rmchorus2, [\inbus, 8, \outbus, 0, \delay, 0.5]);
 SynthDef.new(\eff_genecho, {
 	arg inbus=8, outbus=0, feedback_input=99, feedback_output=99, delay=0, decay=0; //.zobaczyć, czy ten feedback output jest potrzebny!
 	var input = In.ar(inbus,1)+InFeedback.ar(feedback_input);
-	OffsetOut.ar(feedback_output, DelayC.ar(decay*input, delay, delay - ControlRate.ir.reciprocal)); // subtract block size
+	OffsetOut.ar(feedback_output, DelayC.ar(decay*input, asFloat(delay), asFloat(delay) - ControlRate.ir.reciprocal)); // subtract block size
 	Out.ar(outbus,input);
 }).add;
 
