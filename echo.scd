@@ -76,9 +76,29 @@ SynthDef.new(\eff_distecho, {
 	var fb = LocalIn.ar(1);
 	var output = LeakDC.ar(feedback*fb + in);
 	output = output/(output.abs+1);
-	LocalOut.ar(DelayC.ar(output, 5, asFloat(delay)));
+	LocalOut.ar(DelayC.ar(output, asFloat(delay), asFloat(delay)));
 	Out.ar(outbus,output*amp);
 }).add;
+
+SynthDef.new(\eff_fbamfx, {
+	arg inbus=8, outbus=0, feedback=0.2, amp=1;
+	var in = In.ar(inbus,1);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb + in);
+	LocalOut.ar(Delay1.ar(output));
+	Out.ar(outbus,output*amp);
+}).add;
+
+SynthDef.new(\eff_fbamfx_variable_delay, {
+	arg inbus=8, outbus=0, amp=0.5, delay=0.5, feedback=0.5;
+	var in = In.ar(inbus,1);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb + in);
+	LocalOut.ar(DelayC.ar(output, asFloat(delay), max(SampleDur.ir * 4,asFloat(delay))));
+	Out.ar(outbus,output*amp);
+}).add;
+
+
 
 /*/TESTS
 x = Synth.new(\eff_distecho, [\inbus, 8, \outbus, 0, \amp, 1.0, \delay, 0.5, \feedback, 0.5]);

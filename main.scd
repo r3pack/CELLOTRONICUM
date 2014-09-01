@@ -37,6 +37,8 @@ pomysł - ograniczanie iloci skłądowych
 IFWT - hadamard w jedną stronę
 
 TODO: http://chrisjeffs.com/blog/?p=750
+http://permalink.gmane.org/gmane.comp.audio.supercollider.user/87244
+http://danielnouri.org/docs/SuperColliderHelp/Collections/Wavetable.html
 
 */
 

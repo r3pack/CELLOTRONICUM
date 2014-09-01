@@ -230,6 +230,51 @@ SynthDef.new(\eff_shepard_cycle_tone_from_input, {
 	Out.ar(outbus, res);
 }).add;
 
+SynthDef.new(\eff_fbam, {
+	arg freq=440, outbus=0, feedback=0.2, amp=1;
+	var osc = SinOsc.ar(freq);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb + osc);
+	LocalOut.ar(Delay1.ar(output));
+	Out.ar(outbus,output*amp);
+}).add;
+
+SynthDef.new(\eff_fbam_env, {
+	arg inbus, freq=440, outbus=0, feedback=0.2, amp=1, amp_attackTime=0.01, amp_releaseTime=0.01;
+	var in = In.ar(inbus,1);
+	var ampitude = Amplitude.ar(in, amp_attackTime, amp_releaseTime);
+	var osc = SinOsc.ar(freq);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb*ampitude + osc);
+	LocalOut.ar(Delay1.ar(output));
+	Out.ar(outbus,output*amp);
+}).add;
+
+SynthDef.new(\eff_fbam_env1, {
+	arg inbus, freq_bus, outbus=0, feedback=0.2, amp=1, amp_attackTime=0.01, amp_releaseTime=0.01;
+	var in = In.ar(inbus,1);
+	var freq = In.kr(freq_bus,1);
+	var ampitude = Amplitude.ar(in, amp_attackTime, amp_releaseTime);
+	var osc = SinOsc.ar(freq);
+	var fb = LocalIn.ar(1);
+	var output = LeakDC.ar(feedback*fb*ampitude + osc);
+	LocalOut.ar(Delay1.ar(output));
+	Out.ar(outbus,output*amp);
+}).add;
+
+SynthDef.new(\eff_fbam_fiddle, {
+	arg inbus, outbus=0, feedback=0.2, amp=1, amp_attackTime=0.01, amp_releaseTime=0.01;
+	var in = In.ar(inbus,1);
+	var fb = LocalIn.ar(1);
+	var ampitude = Amplitude.ar(in, amp_attackTime, amp_releaseTime);
+	var freq, hasFreq, osc, output;
+	# freq, hasFreq = Qitch.kr(in,~qitch_buffer.bufnum);
+	osc = SinOsc.ar(freq);
+	output = LeakDC.ar(feedback*fb*ampitude + osc);
+	LocalOut.ar(Delay1.ar(output));
+	Out.ar(outbus,output*amp);
+}).add;
+
 // Effect based on example in documentation :)
 SynthDef.new(\eff_pila_po_przejsciach, {
 	arg outbus=0, freq_bus, amp_bus;

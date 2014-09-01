@@ -19,7 +19,7 @@ SynthDef(\eff_buffollow_freq,{
 	var freq = In.kr(freq_bus, 1);
 	var amp = In.kr(amp_bus, 1);
 	var out, play, play_freq, play_hasFreq, res_freq, res_hasFreq, shift, has_output;
-	play = PlayBuf.ar(1, bufnum, BufRateScale.kr(~a), loop: 1);
+	play = PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum), loop: 1);
 	# play_freq, play_hasFreq = Qitch.kr(play, ~qitch_buffer.bufnum);
 	play_freq = LPF.kr(play_freq, cutoff_freq);
 	shift = Clip.kr(freq/play_freq, 0, 4);
