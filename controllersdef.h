@@ -23,7 +23,9 @@ class MousePosController : public Controller
 	{
 		int x, y;
 		SDL_GetMouseState(&x, &y);
-		float value[2]={float(x)/float(SCREEN_WIDTH-1), 1.0f-float(y)/float(SCREEN_HEIGHT-1)};
+		int width, height;
+		SDL_GetWindowSize(window, &width, &height);
+		float value[2]={float(x)/float(width-1), 1.0f-float(y)/float(height-1)};
 		return value[id];
 	}
 };

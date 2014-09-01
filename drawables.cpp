@@ -82,7 +82,10 @@ void setOptimalPrecision(float value, std::stringstream& ss)
 	if(value>=1.0f || value<=-1.0f)
 	ss.precision(2);
 	else
+	if(int(value*1000.0)%10!=0)
 	ss.precision(3);
+	else
+	ss.precision(2);
 }
 
 void SwitchButton::setStatus(bool s) 
