@@ -17,7 +17,7 @@ var func_start = {
 	(~p +/+"harmonizer.scd").loadPaths;
 	(~p +/+"base.scd").loadPaths;
 	(~p +/+"afm.scd").loadPaths;
-	(~p +/+"buffollow.scd").loadPaths;
+	//(~p +/+"buffollow.scd").loadPaths;
 	~app_netaddr.sendMsg('\status_ok', s.pid.asInteger);
 };
 
@@ -27,7 +27,7 @@ OSCdef.new(
 		arg msg, time, addr, recvPort;
 		[msg, time, addr, recvPort].postln;
 		~app_netaddr = addr;
-		Server.killAll;
+		//Server.killAll;
 		~e.do({
 			arg item, i;
 			item.postln;
