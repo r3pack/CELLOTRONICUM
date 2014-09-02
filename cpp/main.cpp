@@ -232,9 +232,9 @@ inline bool existsTest(const char* name)
     return false;
 }
 
-
-
 const char* SC_PATH_FILE="scpath.txt";
+
+const char* SC_MAIN_FILE="sc\\main.scd";
 
 char sclangPath[MAX_PATH];
 
@@ -257,7 +257,7 @@ bool launchSuperCollider()
 	}
 	
 	char tab[MAX_PATH*2+10];
-	sprintf(tab, "-d \"%s\" \"%s\\main.scd\"", sclangPathDirectory, currentDir);
+	sprintf(tab, "-d \"%s\" \"%s\\%s\"", sclangPathDirectory, currentDir, SC_MAIN_FILE);
 	
 	//przykładowe polecenie: "C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
 	

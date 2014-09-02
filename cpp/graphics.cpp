@@ -39,14 +39,14 @@ void initSDL()
 		exit(4);
 	}
 	
-	font=TTF_OpenFont("FreeSans.ttf", 12);
+	font=TTF_OpenFont("fonts/FreeSans.ttf", 12);
 	if(!font)
 	{
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
 		exit(5);
 	}
 	
-	monoFont=TTF_OpenFont("FreeMonoBold.ttf", 12);
+	monoFont=TTF_OpenFont("fonts/FreeMonoBold.ttf", 12);
 	if(!monoFont)
 	{
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
