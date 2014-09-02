@@ -6,6 +6,8 @@
 #include <vector>
 #include <cstring>
 
+
+///Komparator porównujący 2 cstringi
 struct cmpCStr2
 {
    bool operator()(char const *a, char const *b)
@@ -20,13 +22,16 @@ std::map <int, Controller*>* getControllerInstanceList();
 
 std::set<const char*, cmpCStr2>* getControllerList();
 
+
+///Struktura zawierająca ControllBus i taksturę z wyrenderowaną nazwą
 struct ParamControllBus
 {
-	ControllBus* bus;
-	int param;
-	SDL_Texture* nameTex=NULL;
-	ParamControllBus(ControllBus* b, int p, const char* text): bus(b), param(p) {nameTex=generateText(text);}
+	ControllBus* bus; ///wskaźnik na bus kontrolujący
+
+	SDL_Texture* nameTex=NULL; ///tekstura z nazwą
+	ParamControllBus(ControllBus* b, const char* text): bus(b) {nameTex=generateText(text);}
 	
+	///rysuje bus kontrolujący i jego nazwę
 	void draw() 
 	{
 		bus->draw();
@@ -42,6 +47,7 @@ struct ParamControllBus
 		SDL_RenderCopy(render, nameTex, NULL, &nameRect);
 	}
 	
+	///zwalnia pamięc 
 	void free() {delete bus; SDL_DestroyTexture(nameTex);}
 };
 
@@ -52,44 +58,50 @@ class Controller{
 	friend class GradualSlider;
 	friend class Effect;
 
-	int id;
-	static int lastId;
+	int id; /// numer identyfikacyjny kontrolera
+	static int lastId; /// ostatnio przydzielone id
 	
-	SDL_Texture* nameTex;
+	SDL_Texture* nameTex; /// tekstura z nazwą okna
 	
-	int handlePosX, handlePosY;
+	int handlePosX, handlePosY; ///miejsce ciągnięcia okna myszą
 	
-	bool focus=false;
-	bool paused=false;
+	bool focus=false; ///czy okno jest ciągnięte
+	bool paused=false; ///czy kontroler jest zpauzowany
 	
-	Button* pauseButton;
+	Button* pauseButton; ///przycisk od pauzowania efektu
 	
 	protected:
 	
-	std::vector <ParamControllBus> outBuses;
+	std::vector <ParamControllBus> outBuses; ///busy wyjściowe
 	
-	std::list <std::pair<int, ValueGifter*> > controlledValueGifters;
+	std::list <std::pair<int, ValueGifter*> > controlledValueGifters; ///wektor z informacjami które busy kontrolują które obiekty rysowalne kontrolujące parametry (suwaki)
 	
-	int posX, posY;
+	int posX, posY; ///pozycja okna (lewy górny róg)
 	
-	int width=0;
+	int width=0; ///szerokość okna
 	
 	public:
-	static const int bus_period=35;
-	static const int top_padding=35;
-	static const int bottom_padding=30;
+	static const int bus_period=35; ///odległość pozioma między busami oraz jednocześnie lewy i prawy margines
+	static const int top_padding=35; ///górny margines
+	static const int bottom_padding=30; ///dolny margines
 	
-	
+	///zwraca wartość busa o zadanym id (do implementacji przez kontroler)
 	virtual float getValue(int id) = 0;
+	///zwraca czy bus jest gotowy do zwrócenia wartości (do implementacji przez kontroler - domyślnie jest zawsze dostępny)
 	virtual bool valueIsReady(int id) {return true;}
+	///zwraca nazwę kontrolera (do implementacji przez kontroler)
 	virtual const char* getName() = 0;
+	///zwraca ilość busów (do implementacji przez kontroler)
 	virtual int getBusCount() = 0;
+	///zwraca nazwy kolejnych busów (do implementacji przez kontroler)
 	virtual const char* const* getBusNames() = 0;
 	
-	static constexpr int height=top_padding+bottom_padding+ControllBus::size;
+	static constexpr int height=top_padding+bottom_padding+ControllBus::size; ///domyślna wysokość kontrolera
 	
+	///zwraca unikalne id kontrolera
 	int getId() {return id;}
 	
+	///zwraca czy kontroler jest zpauzowany
 	bool isPaused() {return paused;}
 	
 	Controller()
@@ -98,6 +110,7 @@ class Controller{
 		getControllerInstanceList()->insert(std::pair<int, Controller*>(id, this));
 	}
 	
+	///ustawia odpowiednie wartości kontrolowanym obiektom rysowalnym
 	void step()
 	{
 		if(paused) return;
@@ -108,6 +121,7 @@ class Controller{
 		}
 	}
 	
+	///inicializuje GUIs
 	void initGUI(int X, int Y)
 	{
 		posX=X;
@@ -122,7 +136,7 @@ class Controller{
 		for(int i=0;i<busCount;++i)
 		{
 			ControllBus* bus=new ControllBus(posX+x, posY+top_padding, BT_OUTBUS, this);
-			outBuses.push_back(ParamControllBus(bus, i, getBusNames()[i]));
+			outBuses.push_back(ParamControllBus(bus, getBusNames()[i]));
 			controllerByBus.insert(std::pair<ControllBus*, Controller*>(bus, this));
 			x+=bus_period+ControllBus::size;
 		}
@@ -148,6 +162,7 @@ class Controller{
 		delete pauseButton;
 	}
 	
+	///ustawia pozycję okna (lewy górny róg)
 	void setPos(int X, int Y)
 	{
 		for(int i=0;i<outBuses.size();++i)
@@ -244,10 +259,13 @@ class Controller{
 		else return false;
 	}
 	
+	///zapisuje wszystkie dane do strumienia pliku
 	void saveData(FILE* file);
 	
+	///wczytuje wszystkie dane z cstringa
 	void loadData(char* str);
 	
+	///rysuje okno
 	void draw()
 	{
 		drawWindow(posX, posY, width, height);
@@ -288,6 +306,7 @@ class Controller{
 	
 };
 
+///rejestruje kontroler o podanej nazwie
 void registerController(const char* name);
 
 #endif

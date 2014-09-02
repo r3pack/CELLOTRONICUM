@@ -642,7 +642,7 @@ void EffectCreator::moveUp()
 	auto it=parent->submenuEntries->begin();
 	for(;it!=parent->submenuEntries->end();++it)
 	{
-		if((*it).second==chosenEffect) break;
+		if((*it)==chosenEffect) break;
 	}
 	
 	if(it==parent->submenuEntries->begin())
@@ -651,7 +651,7 @@ void EffectCreator::moveUp()
 	}
 	else --it;
 	
-	chosenEffect=(*it).second;
+	chosenEffect=(*it);
 }
 
 void EffectCreator::moveDown()
@@ -662,7 +662,7 @@ void EffectCreator::moveDown()
 	auto it=parent->submenuEntries->begin();
 	for(;it!=parent->submenuEntries->end();++it)
 	{
-		if((*it).second==chosenEffect) break;
+		if((*it)==chosenEffect) break;
 	}
 	
 	++it;
@@ -672,7 +672,7 @@ void EffectCreator::moveDown()
 		it=parent->submenuEntries->begin();
 	}
 	
-	chosenEffect=(*it).second;
+	chosenEffect=(*it);
 }
 
 void EffectCreator::enter()
@@ -692,7 +692,7 @@ void EffectCreator::enter()
 	}
 	else
 	{
-		chosenEffect=chosenEffect->submenuEntries->begin()->second;
+		chosenEffect=*chosenEffect->submenuEntries->begin();
 	}
 }
 
@@ -712,37 +712,37 @@ void EffectCreator::init()
 		const char* subgroup=(*it).subgroup;
 		
 		
-		if(chosenEffect->submenuEntries->empty() || strcmp(chosenEffect->submenuEntries->back().first, group)!=0)
+		if(chosenEffect->submenuEntries->empty() || strcmp(chosenEffect->submenuEntries->back()->name, group)!=0)
 		{
-			chosenEffect->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(group, new EffectCreatorMenuEntry(group, chosenEffect, false)));
+			chosenEffect->submenuEntries->push_back(new EffectCreatorMenuEntry(group, chosenEffect, false));
 		}
 		auto mapIt=--chosenEffect->submenuEntries->end();
 		
 		if(subgroup!=NULL)
 		{
 			
-			if(mapIt->second->submenuEntries->empty() || strcmp(mapIt->second->submenuEntries->back().first, subgroup)!=0)
+			if((*mapIt)->submenuEntries->empty() || strcmp((*mapIt)->submenuEntries->back()->name, subgroup)!=0)
 			{
-				mapIt->second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(subgroup, new EffectCreatorMenuEntry(subgroup, mapIt->second, false)));
+				(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry(subgroup, (*mapIt), false));
 			}
-			mapIt=--mapIt->second->submenuEntries->end();
+			mapIt=--(*mapIt)->submenuEntries->end();
 		}
 
-		mapIt->second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+		(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry(name, (*mapIt), true));
 	}
 	
-	chosenEffect->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>("Controllers", new EffectCreatorMenuEntry("Controllers", chosenEffect, false)));
+	chosenEffect->submenuEntries->push_back(new EffectCreatorMenuEntry("Controllers", chosenEffect, false));
 	auto mapIt=--chosenEffect->submenuEntries->end();
 	
 	for(auto it=getControllerList()->begin();it!=getControllerList()->end();++it)
 	{
 		const char* name=(*it);
-		(*mapIt).second->submenuEntries->push_back(std::pair<const char*, EffectCreatorMenuEntry*>(name, new EffectCreatorMenuEntry(name, (*mapIt).second, true)));
+		(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry(name, (*mapIt), true));
 	}
 	
 	chosenEffect->calculateWidth();
 	
-	chosenEffect=chosenEffect->submenuEntries->begin()->second;
+	chosenEffect=*chosenEffect->submenuEntries->begin();
 }
 
 void EffectCreator::draw(int X, int Y)
@@ -762,7 +762,7 @@ void EffectCreator::draw(int X, int Y)
 		X-=actualEntry->width+menu_period;
 		for(auto it=actualEntry->submenuEntries->begin();it!=actualEntry->submenuEntries->end();++it)
 		{
-			SDL_Texture* nameTex=(((*it).second==oldEntry)?(*it).second->nameTexRed:(*it).second->nameTex);
+			SDL_Texture* nameTex=(((*it)==oldEntry)?(*it)->nameTexRed:(*it)->nameTex);
 			int w, h;
 			SDL_QueryTexture(nameTex, NULL, NULL, &w, &h);
 			SDL_Rect nameRect;

@@ -373,7 +373,7 @@ int main (int argc, char** argv)
 		int screen_width;
 		SDL_GetWindowSize(window, &screen_width, NULL);
 
-		effectCreator.draw(screen_width-20, 0);
+		effectCreator.draw(screen_width-EffectCreator::menu_period, 0);
 		
 		SDL_RenderPresent(render);
 	}

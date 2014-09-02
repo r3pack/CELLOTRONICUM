@@ -2,18 +2,21 @@
 #define EFFECTGUI_H
 #include "drawables.h"
 
+	///Struktura zawierająca obiekt rysowalny obsługujący paramert (suwak, suwak stopniowy lub bus) i teksturę z nazwą parametru
 	struct ParamDrawable
 	{
-		Drawable* drawable;
-		SDL_Texture* nameTex=NULL;
-		bool vertical;
+		Drawable* drawable; ///obiekt rysowalny
+		SDL_Texture* nameTex=NULL; ///tekstura z nazwą
+		bool vertical; ///czy tekst ma być pionowy
 		ParamDrawable(Drawable* d, const char* text, bool v=false): vertical(v), drawable(d) {if(vertical) nameTex=generateVerticalText(text); else nameTex=generateText(text);}
 		
+		///rysuje obiekt rysowalny (tylko)
 		void draw() 
 		{
 			drawable->draw();
 		}
 		
+		///rysuje tekst pod/obok obiektu rysowalnego
 		void drawText()
 		{
 			if(!vertical)
@@ -44,9 +47,11 @@
 			}
 		}
 		
+		///zwalnia pamięć tekstury
 		void free() {delete drawable; SDL_DestroyTexture(nameTex);}
 	};
 	
+	///Enum na wszystkie obiekty rysowalne 
 	enum VisulalisationType{
 			VT_NONE,
             VT_INBUS,
@@ -62,10 +67,11 @@
 			VT_TEXT
     };
 	
+	///Struktura na tablicę floutów - używana przy suwaku stopniowym (GradualSlider)
 	struct FloatArray
 	{
-		int count;
-		float* array;
+		int count; ///ilość elementów
+		float* array; ///tablica
 		FloatArray(int count, ...)
 		{
 			this->count=count;
@@ -84,11 +90,14 @@
 		}
 	};
 	
+	///Struktura z opisem wizualizacji danego efektu
+	///W niej zapisana jest informacja o  tym czy argument ma być np. suwakiem czy busem
     struct ArgVis
     {
-        VisulalisationType visType;
-        void* data=NULL;
+        VisulalisationType visType; ///typ obiektu
+        void* data=NULL; ///dodatkowo zhardkodowane dane
         
+		///Konstruktor dla visType=VT_SLIDER parametry to początek i koniec przedziału, oraz wysokość i szerokość suwaka
         ArgVis(VisulalisationType type, float min, float max, int width=0, int height=0)
         {
 				visType=VT_SLIDER;
@@ -99,7 +108,8 @@
 				((int*)(((float*)data)+2))[1]=height;
         }
 		
-		 ArgVis(VisulalisationType type, float value1, float value2, int symbol1, int symbol2, bool triger)
+		///Konstruktor dla visType=VT_SWITCHBUTTON parametry to 2 wartości przełącznika, wymbole odpowiadające wartością oraz czy przełącznik ma być trigerem
+		ArgVis(VisulalisationType type, float value1, float value2, int symbol1, int symbol2, bool triger)
         {
 				visType=VT_SWITCHBUTTON;
 				data=malloc(sizeof(float)*2 + sizeof(int)*2 + sizeof(bool));
@@ -110,6 +120,7 @@
 				*((bool*)((int*)(((float*)data)+2)+2))=triger;
         }
 		
+		///Konstruktor dla visType=VT_GRADUALSLIDER generuje tablicę z liczb całkowitych o podanym przedziale
 		ArgVis(VisulalisationType type, int min, int max)
         {
 			int count=max-min+1;
@@ -129,24 +140,7 @@
 			
 		}
 		
-		ArgVis(VisulalisationType type, int count, ...)
-        {
-            visType=VT_GRADUALSLIDER;
-            data=malloc(sizeof(int)+count*sizeof(float));
-			
-			*(int*)data=count;
-			
-			float* tab=(float*)(((int*)data)+1);
-			
-			va_list vl;
-			va_start(vl,count);
-			for(int i=0;i<count;++i)
-			{
-				tab[i]=va_arg(vl,double);
-			}
-			va_end(vl);
-        }
-		
+		///Konstruktor dla visType=VT_GRADUALSLIDER, tablica podawana jest w parametrze
 		ArgVis(VisulalisationType type, FloatArray floatArray)
         {
             visType=VT_GRADUALSLIDER;
@@ -162,11 +156,14 @@
 			}
         }
 		
+		///Konstruktor dla visType=VT_TEXT, jedynym parametrem jest tekst do wyświetlenia
 		ArgVis(VisulalisationType type, std::string str)
         {
             visType=VT_TEXT;
             data=new std::string(str);
         }
+		
+		///Konstruktor dla visType które nie mają dodatkowych parametrów
         ArgVis(VisulalisationType type)
         {
             visType=type;
@@ -192,33 +189,34 @@
 	{	
 		friend class Controller;
 	
-		Button* pauseButton;
+		Button* pauseButton; ///przycisk od pauzowania efektu
 		
-		int handlePosX, handlePosY;
+		int handlePosX, handlePosY; ///miejsce ciągnięcia okna myszą
 		
-		bool focus=false;
+		bool focus=false; ///czy okno jest ciągnięte
 		
-		SDL_Texture* nameTex;
+		SDL_Texture* nameTex; ///tekstura z tytułem okna
 		
 		protected:
 		
-		std::vector <ParamDrawable> drawables;
+		std::vector <ParamDrawable> drawables; ///obiekty rysowalne parametrów
 		
-		int posX, posY;
+		int posX, posY; ///pozycja okna (lewy górny róg)
 		
-		int width, height;
+		int width, height; ///szerokość i wysokość okna
 		
 		public:
 		
-		static const int slider_width=24;
-		static const int slider_height=160;
+		static const int slider_width=24; ///domyślna szerokość suwaka
+		static const int slider_height=160; ///domyślna wysokość suwaka
 		
-		static const int entrybox_width=35;
+		static const int entrybox_width=35; ///domyślna szerokość pola do wpisywania
 		
-		virtual int_pair* getVisualPositions()=0;
+		virtual int_pair* getVisualPositions()=0; ///pozycje obiektów rysowalnych (do implementacji przez konkretne efekty lub AutoEfectGUI)
 		
-		virtual ArgVis* getArgumentVisuals()=0;
+		virtual ArgVis* getArgumentVisuals()=0; ///opisy wizualizacji argumentów (do implementacji przez konkretne efekty)
 		
+		///inicializuje GUI (do wrzucenia w konstruktor efektu)
 		void initGUI(int X, int Y, int W=0, int H=0)
 		{
 			posX=X;
@@ -299,6 +297,7 @@
 			nameTex=generateText(getFullName());
 		}
 		
+		///deinicializuje GUI (do wrzucenia w destruktor efektu)
 		void quitGUI()
 		{
 			for(int i=0;i<drawables.size();++i)
@@ -316,6 +315,7 @@
 			}
 		}
 		
+		///aktualizuje pozycje obiektów rysowalnych z tablicy zwracanej przez getVisualPositions()
 		int updateDrawablePositions()
 		{
 			EffectArgument* args=getArgs();
@@ -329,7 +329,7 @@
 			}
 		}
 		
-		
+		///ustawia pozycję okna (lewy górny róg)
 		void setPos(int X, int Y)
 		{
 			pauseButton->move(X-posX, Y-posY);
@@ -341,6 +341,7 @@
 			posX=X; posY=Y;
 		}
 		
+		//rysuje okno efektu
 		void draw()
 		{		
 			drawWindow(posX, posY, width, height);
@@ -469,6 +470,7 @@
 			return false;
 		}
 		
+		///zapisuje wszystkie wartości argumentów i ich przedziały do strumienia
 		virtual void saveData(FILE* file) 
 		{
 			int argsCount=getArgsCount();
@@ -487,6 +489,7 @@
 			
 		}
 		
+		///zapisuje wszystkie wartości argumentów i ich przedziały ze strumienia
 		virtual void loadData(char* str) 
 		{
 			int argsCount=getArgsCount();
@@ -525,25 +528,27 @@
 		
 	};
 	
-    
+    ///Klasa która w przeciwieństwie do EfectGUI nie wymaga implementacji getVisualPositions() - sama ustawia obiekty rysowalne
 	class EffectAutoGUI : public EffectGUI
 	{
-		std::pair<int, int>* visualPositions=NULL;
+		std::pair<int, int>* visualPositions=NULL; ///współżedne obiektów rysowalnych
 		
 		public:
 		
-		static const int slider_period=15;
-		static const int top_padding=35;
-		static const int bottom_padding=25;
-		static const int left_padding=20;
-		static const int right_padding=15;
-		static const int bus_period=35;
+		static const int slider_period=15; ///odległości pomiędzy suwakami
+		static const int top_padding=35; ///górny margines
+		static const int bottom_padding=25; ///dolny margines
+		static const int left_padding=20; ///lewy margines i odległość od busów wejściowych
+		static const int right_padding=15; ///prawy margines i odległość od busów wyjściowych
+		static const int bus_period=35; ///odległość pionowa między busami
 		
+		///Zwraca pozycje obiektów rysowalnych
 		std::pair<int, int>* getVisualPositions()
 		{
 			return visualPositions;
 		}
 		
+		///inicializacja GUI
 		void initGUI(int X, int Y, int left_padding=left_padding, int right_padding=right_padding)
 		{
 			
