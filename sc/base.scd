@@ -135,6 +135,40 @@ SynthDef.new(\eff_goetzel,{
 	Out.kr(freq_outbus,freq);
 }).add;
 
+SynthDef.new(\eff_freq_bucketing, {
+	arg outbus=0, freq_bus=8, halftones = 1; //outbus - frequency in kr!!!
+	var freq = In.kr(freq_bus);
+	var polton = ((log2(880)-log2(440))/(12))*halftones;
+	var cwiercton = ((log2(880)-log2(440))/(12*2))*halftones;
+	var zero = log2(13.75);
+	var poltony = round(((log2(freq) - (cwiercton/2)) - zero + cwiercton) / polton);
+	var freq_out = pow(2,((poltony * polton) + zero));
+	Out.kr(outbus, freq_out);
+}).add;
+
+SynthDef.new(\eff_freq_bucketing_halftone, {
+	arg outbus=0, freq_bus=8; //outbus - frequency in kr!!!
+	var freq = In.kr(freq_bus);
+	var polton = ((log2(880)-log2(440))/(12));
+	var cwiercton = ((log2(880)-log2(440))/(12*2));
+	var zero = log2(13.75);
+	var poltony = round(((log2(freq) - (cwiercton/2)) - zero + cwiercton) / polton);
+	var freq_out = pow(2,((poltony * polton) + zero));
+	Out.kr(outbus, freq_out);
+}).add;
+
+SynthDef.new(\eff_freq_bucketing_quater_tone, {
+	arg outbus=0, freq_bus=8; //outbus - frequency in kr!!!
+	var freq = In.kr(freq_bus);
+	var polton = ((log2(880)-log2(440))/(12));
+	var cwiercton = ((log2(880)-log2(440))/(12*2));
+	var zero = log2(13.75);
+	var poltony = round(((log2(freq) - (cwiercton/2)) - zero + cwiercton) / polton);
+	var freq_out = pow(2,((poltony * polton) + zero));
+	Out.kr(outbus, freq_out);
+}).add;
+
+
 //CLIPPERS
 SynthDef.new(\eff_Clipper32, {
 	arg inbus, outbus,  lo=(-0.8), hi=0.8;
