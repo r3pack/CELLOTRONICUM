@@ -291,3 +291,39 @@ SynthDef.new(\eff_BAllPass,{
 	var res = BAllPass.ar(in,freq,rq);
 	Out.ar(outbus,res);
 }).add;
+
+SynthDef.new(\eff_LPF,{
+	arg inbus, outbus, freq=440;
+	var in = In.ar(inbus);
+	var res = LPF.ar(in,freq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_HPF,{
+	arg inbus, outbus, freq=440;
+	var in = In.ar(inbus);
+	var res = HPF.ar(in,freq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BRF,{
+	arg inbus, outbus, freq=440, rq=1;
+	var in = In.ar(inbus);
+	var res = BRF.ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_BPF,{
+	arg inbus, outbus, freq=440, rq=1;
+	var in = In.ar(inbus);
+	var res = BPF.ar(in,freq,rq);
+	Out.ar(outbus,res);
+}).add;
+
+SynthDef.new(\eff_RLPFD,{
+	arg inbus, outbus, cutoff_freq=440, resonance=0, distortion=0;
+	var in = In.ar(inbus);
+	var res = RLPFD.ar(in,cutoff_freq,resonance,distortion);
+	Out.ar(outbus,res);
+}).add;
+
