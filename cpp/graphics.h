@@ -13,12 +13,19 @@ extern SDL_Window *window;
 extern SDL_Renderer *render;
 extern SDL_Event event;
 
-const int SCREEN_WIDTH=1824;
-const int SCREEN_HEIGHT=1024;
+const int SCREEN_WIDTH=1440;
+const int SCREEN_HEIGHT=900;
+
+#ifndef MAX_PATH
+	#define MAX_PATH 1024
+#endif
 
 void initSDL();
 
 void quitSDL();
+
+void ShowAlert(const wchar_t* title, const wchar_t* text);
+void getCurrentDir(char* filename, int size);
 
 void getOpenFile(char* filename, int size);
 void getSaveFile(char* filename, int size);

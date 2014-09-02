@@ -8,27 +8,37 @@
 void registerEffects()
 {
 	REGISTER_EFFECT(FreqShift, "Spectral");
+	REGISTER_EFFECT(FreqShiftFromBus, "Spectral");
 	REGISTER_EFFECT(PitchShift, "Spectral");
 	REGISTER_EFFECT(RandomPitchShift, "Spectral");
 	REGISTER_EFFECT(OctaveUp, "Spectral");
 	REGISTER_EFFECT(OctaveDown, "Spectral");
 	REGISTER_EFFECT(FormantFilter, "Spectral");
 	REGISTER_EFFECT(Hadamard, "Spectral");
-	//REGISTER_EFFECT(Hadamard2, "Spectral");
 	
 	REGISTER_EFFECT_EX(DistEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(ShiftEcho, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(FBamFX, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(FBamFXVD, "Time-based", "Echo");
+	
 	REGISTER_EFFECT_EX(Brassage, "Time-based", "Brassage");
 	REGISTER_EFFECT_EX(BrassageOSC, "Time-based", "Brassage");
 	REGISTER_EFFECT_EX(BrassagePlus, "Time-based", "Brassage");
+	
 	REGISTER_EFFECT_EX(RMChorus, "Time-based", "RM-based");
 	REGISTER_EFFECT_EX(RMChorus2, "Time-based", "RM-based");
 	REGISTER_EFFECT_EX(RMDelay, "Time-based", "RM-based");
 	REGISTER_EFFECT_EX(RMDelayRec, "Time-based", "RM-based");
 	
 	REGISTER_EFFECT(BLowPass, "Filters");
+	REGISTER_EFFECT(BLowPass4, "Filters");
+	REGISTER_EFFECT(BLowShelf, "Filters");
 	REGISTER_EFFECT(BHiPass, "Filters");
+	REGISTER_EFFECT(BHiPass4, "Filters");
+	REGISTER_EFFECT(BHiShelf, "Filters");
 	REGISTER_EFFECT(BBandPass, "Filters");
+	REGISTER_EFFECT(BPeakEQ, "Filters");
+	REGISTER_EFFECT(BAllPass, "Filters");
 	
 	REGISTER_EFFECT(Amplitude, "Analysis");
 	REGISTER_EFFECT(Pitch, "Analysis");
@@ -42,15 +52,18 @@ void registerEffects()
 	REGISTER_EFFECT_EX(Harmonizer7, "Generators", "Harmonic");
 	REGISTER_EFFECT_EX(Harmonizer8, "Generators", "Harmonic");
 	REGISTER_EFFECT_EX(GoetzelSinus, "Generators", "Harmonic");
+	
 	REGISTER_EFFECT_EX(ShepardCycleTone, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(AYSimple, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(YMSimple, "Generators", "Synthesizers");
 	
 	REGISTER_EFFECT_EX(Playbuf, "Basics", "Buffers");
+	
 	REGISTER_EFFECT_EX(Gain, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Normalizer, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Limiter, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Compander, "Basics", "Loudness");
+	
 	REGISTER_EFFECT_EX(Pipe, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Mix, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(MixAmp, "Basics", "Mixers");
@@ -60,6 +73,7 @@ void registerEffects()
 	REGISTER_EFFECT_EX(Select3, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select4, "Basics", "Mixers");
 	REGISTER_EFFECT_EX(Select5, "Basics", "Mixers");
+	
 	REGISTER_EFFECT_EX(Input, "Basics", "IO");
 	REGISTER_EFFECT_EX(Output, "Basics", "IO");
 	REGISTER_EFFECT_EX(InputExtended, "Basics", "IO");
@@ -77,8 +91,12 @@ void registerEffects()
 	REGISTER_EFFECT_EX(WSDistortion, "Distortions", "Waveshapers");
 	REGISTER_EFFECT_EX(SampleDecrease, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(BitCrush, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(MixWithSquare, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(MobilePhoneLag, "Distortions", "Sound Damage");
+	REGISTER_EFFECT_EX(MobilePhoneLag2, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(MobilePhoneLag3, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(Gramophone, "Distortions", "Sound Damage");
+	
 	
 	REGISTER_EFFECT(AFM1, "Natural-Synthetic");
 	REGISTER_EFFECT(AFM1Env, "Natural-Synthetic");
@@ -105,12 +123,22 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(RMDelay);
 	EFFECT_BY_NAME(RMDelayRec);
 	EFFECT_BY_NAME(WSDistortion);
+	EFFECT_BY_NAME(MixWithSquare);
+	EFFECT_BY_NAME(MobilePhoneLag);
+	EFFECT_BY_NAME(MobilePhoneLag2);
 	EFFECT_BY_NAME(MobilePhoneLag3);
 	EFFECT_BY_NAME(FreqShift);
+	EFFECT_BY_NAME(FreqShiftFromBus);
 	EFFECT_BY_NAME(PitchShift);
 	EFFECT_BY_NAME(RandomPitchShift);
 	EFFECT_BY_NAME(BLowPass);
+	EFFECT_BY_NAME(BLowPass4);
+	EFFECT_BY_NAME(BLowShelf);
 	EFFECT_BY_NAME(BHiPass);
+	EFFECT_BY_NAME(BHiPass4);
+	EFFECT_BY_NAME(BHiShelf);
+	EFFECT_BY_NAME(BAllPass);
+	EFFECT_BY_NAME(BPeakEQ);
 	EFFECT_BY_NAME(BBandPass);
 	EFFECT_BY_NAME(Amplitude);
 	EFFECT_BY_NAME(ShepardCycleTone);
@@ -156,7 +184,6 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(AFM2);
 	EFFECT_BY_NAME(AFM2Env);
 	EFFECT_BY_NAME(Hadamard);
-	//EFFECT_BY_NAME(Hadamard2);
 	EFFECT_BY_NAME(Pipe);
 	EFFECT_BY_NAME(GoetzelSinus);
 	EFFECT_BY_NAME(Select2);
@@ -164,6 +191,8 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(Select4);
 	EFFECT_BY_NAME(Select5);
 	EFFECT_BY_NAME(Compander);
+	EFFECT_BY_NAME(FBamFX);
+	EFFECT_BY_NAME(FBamFXVD);
 	return NULL;
 }
 

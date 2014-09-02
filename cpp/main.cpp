@@ -220,20 +220,100 @@ bool checkInputs()
 	
 	return quit;
 }
-//"C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
 
-void launchSuperCollider()
+inline bool existsTest(const char* name) 
 {
-	const char *tab= "-d \"C:\\Program Files (x86)\\SuperCollider-3.6.6\" \"C:\\Users\\praktykant\\CELLOTRONICUM\\main.scd\"";
-	
-	ShellExecute(NULL, "open", "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe", tab ,NULL ,SW_SHOWDEFAULT);
+    if(FILE *file = fopen(name, "r")) 
+	{
+        fclose(file);
+        return true;
+    } 
+	else
+    return false;
 }
 
+const char* SC_PATH_FILE="scpath.txt";
+
+const char* SC_MAIN_FILE="sc\\main.scd";
+
+char sclangPath[MAX_PATH];
+
+bool launchSuperCollider()
+{
+	char currentDir[MAX_PATH];
+	getCurrentDir(currentDir, MAX_PATH);
+	
+	char sclangPathDirectory[MAX_PATH];
+	
+	for(int i=strlen(sclangPath)-1;i>=1;--i)
+	{
+		if((sclangPath[i]=='/' || sclangPath[i]=='\\') && sclangPath[i-1]!='\\')
+		{
+			strncpy(sclangPathDirectory, sclangPath, i);
+			sclangPathDirectory[i]='\0';
+			break;
+		}
+		if(i==1) return false;
+	}
+	
+	char tab[MAX_PATH*2+10];
+	sprintf(tab, "-d \"%s\" \"%s\\%s\"", sclangPathDirectory, currentDir, SC_MAIN_FILE);
+	
+	//przykładowe polecenie: "C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
+	
+	printf("Executing: %s %s...\n", sclangPath, tab);
+	
+	ShellExecute(NULL, "open", sclangPath, tab, NULL, SW_SHOWDEFAULT);
+	
+	return true;
+}
+
+void saveSCPath()
+{
+	FILE* pathFile=fopen(SC_PATH_FILE, "w");
+	fprintf(pathFile, "%s", sclangPath);
+	fclose(pathFile);
+}
+
+bool getSCPath()
+{
+	FILE* pathFile=fopen(SC_PATH_FILE, "r");
+	if(pathFile!=NULL)
+	{
+		fgets(sclangPath, MAX_PATH, pathFile);
+		if(existsTest(sclangPath))
+		{
+			return true;
+		}
+	}
+	fclose(pathFile);
+	
+	ShowAlert(L"SuperCollider Path", L"To launch program you must provide path to sclang in SuperCollider folder.");
+	getOpenFile(sclangPath, MAX_PATH);
+	
+	printf("Selected path: %s\n", sclangPath);
+	
+	if(existsTest(sclangPath))
+	{
+		return true;
+	}
+	else
+	{
+		ShowAlert(L"SuperCollider Path", L"Patch to sclang is incorrect!");
+		return false;
+	}
+}
 
 #undef main
 int main (int argc, char** argv)
 {
-	launchSuperCollider();
+	if(getSCPath() && launchSuperCollider());
+	else
+	{
+		fprintf(stderr, "Cant get sclang patch - exiting\n");
+		exit(0);
+	}
+	
 	if(argc>1)
 	{
 		OSCConn::setServer(argv[1]);
@@ -251,6 +331,8 @@ int main (int argc, char** argv)
 	if(!OSCConn::startServer()) exit(2);
 	
 	if(!checkEffectsList()) {OSCConn::quitServer(); exit(3);}
+	
+	saveSCPath();
 	
 	initSDL();
 	
@@ -287,7 +369,11 @@ int main (int argc, char** argv)
 		}
 
 		drawConnections();
-		effectCreator.draw(SCREEN_WIDTH-20, 0);
+		
+		int screen_width;
+		SDL_GetWindowSize(window, &screen_width, NULL);
+
+		effectCreator.draw(screen_width-20, 0);
 		
 		SDL_RenderPresent(render);
 	}

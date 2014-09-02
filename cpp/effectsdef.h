@@ -26,8 +26,6 @@
 		
 		DistEcho(int X, int Y): 
 		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
-		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 6, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-		//argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_ENTRYBOX), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~DistEcho() {quitGUI();}
@@ -42,6 +40,29 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~ShiftEcho() {quitGUI();}
+	};
+	
+	
+	class FBamFX : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "FBamFX", "eff_fbamfx");
+		
+		FBamFX(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FBamFX() {quitGUI();}
+	};
+	
+	class FBamFXVD : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "FBamFXVD", "eff_fbamfx_variable_delay");
+		
+		FBamFXVD(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FBamFXVD() {quitGUI();}
 	};
 	
 	class Brassage : public EffectAutoGUI
@@ -132,6 +153,39 @@
 		~WSDistortion() {quitGUI();}
 	};
 	
+	class MixWithSquare : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "MixWithSquare", "eff_mix_with_square");
+		
+		MixWithSquare(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("width", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~MixWithSquare() {quitGUI();}
+	};
+	
+	class MobilePhoneLag : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "MobilePhoneLag", "eff_mobile_phone_lag");
+		
+		MobilePhoneLag(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("width", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~MobilePhoneLag() {quitGUI();}
+	};
+	
+	class MobilePhoneLag2 : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "MobilePhoneLag2", "eff_mobile_phone_lag2");
+		
+		MobilePhoneLag2(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5.0f), EffectArgument("width", 0.5f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 25.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~MobilePhoneLag2() {quitGUI();}
+	};
+	
 	class MobilePhoneLag3 : public EffectAutoGUI
 	{
 		EFFECT_BODY(4, "MobilePhoneLag3", "eff_mobile_phone_lag3");
@@ -152,6 +206,17 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~FreqShift() {quitGUI();}
+	};
+	
+	class FreqShiftFromBus : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "FreqShift", "eff_freq_shift");
+		
+		FreqShiftFromBus(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS)})
+		{sendInstance(); initGUI(X, Y);}
+		~FreqShiftFromBus() {quitGUI();}
 	};
 	
 	class PitchShift : public EffectAutoGUI
@@ -330,6 +395,17 @@
 		~BLowPass() {quitGUI();}
 	};
 	
+	class BLowPass4 : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "BLowPass4", "eff_BLowPass4");
+		
+		BLowPass4(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BLowPass4() {quitGUI();}
+	};
+	
 	class BHiPass : public EffectAutoGUI
 	{
 		EFFECT_BODY(4, "BHiPass", "eff_BHiPass");
@@ -339,6 +415,61 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~BHiPass() {quitGUI();}
+	};
+	
+	class BHiPass4 : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "BHiPass4", "eff_BHiPass4");
+			
+		BHiPass4(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BHiPass4() {quitGUI();}
+	};
+	
+	class BPeakEQ : public EffectAutoGUI
+	{
+		EFFECT_BODY(5, "BPeakEQ", "eff_BPeakEQ");
+			
+		BPeakEQ(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rq", 1.0f), EffectArgument("gain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BPeakEQ() {quitGUI();}
+	};
+	
+	class BHiShelf : public EffectAutoGUI
+	{
+		EFFECT_BODY(5, "BHiShelf", "eff_BHiShelf");
+			
+		BHiShelf(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rs", 1.0f), EffectArgument("gain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BHiShelf() {quitGUI();}
+	};
+	
+	class BLowShelf : public EffectAutoGUI
+	{
+		EFFECT_BODY(5, "BLowShelf", "eff_BLowShelf");
+			
+		BLowShelf(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rs", 1.0f), EffectArgument("gain", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BLowShelf() {quitGUI();}
+	};
+	
+	class BAllPass : public EffectAutoGUI
+	{
+		EFFECT_BODY(4, "BAllPass", "eff_BAllPass");
+			
+		BAllPass(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 5000.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~BAllPass() {quitGUI();}
 	};
 	
 	class BBandPass : public EffectAutoGUI

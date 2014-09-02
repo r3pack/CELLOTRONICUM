@@ -19,7 +19,7 @@ void initSDL()
 		exit(1);
 	}
 
-	if (!(window=SDL_CreateWindow("CELLOTRONICUM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN)))
+	if (!(window=SDL_CreateWindow("CELLOTRONICUM", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE)))
 	{
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(2);
@@ -39,14 +39,14 @@ void initSDL()
 		exit(4);
 	}
 	
-	font=TTF_OpenFont("FreeSans.ttf", 12);
+	font=TTF_OpenFont("fonts/FreeSans.ttf", 12);
 	if(!font)
 	{
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
 		exit(5);
 	}
 	
-	monoFont=TTF_OpenFont("FreeMonoBold.ttf", 12);
+	monoFont=TTF_OpenFont("fonts/FreeMonoBold.ttf", 12);
 	if(!monoFont)
 	{
 		printf("TTF_OpenFont error: %s\n", TTF_GetError());
@@ -59,6 +59,16 @@ void quitSDL()
 	SDL_DestroyWindow(window);
 	TTF_Quit();
 	SDL_Quit();
+}
+
+void ShowAlert(const wchar_t* title, const wchar_t* text)
+{
+	 MessageBoxW(NULL, text, title, MB_OK);
+}
+
+void getCurrentDir(char* filename, int size)
+{
+	GetCurrentDirectory(size, filename);
 }
 
 void getOpenFile(char* filename, int size)
