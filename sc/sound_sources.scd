@@ -452,3 +452,17 @@ SynthDef.new(\eff_StkVoicForm,{
 	var res = StkVoicForm.ar(freq, vuvmix, vowelphon, vibfreq, vibgain, loudness, trig, amp);
 	Out.ar(outbus,res);
 }).add;
+
+SynthDef.new(\eff_concat,{
+	arg outbus, control_bus, source_bus, storesize=20, seektime=10, seekdur=10, matchlength=0.03, freezestore=0, zcr=1, lms=1, sc=1, st=1, mul=1;
+	var control = In.ar(control_bus);
+	var source = In.ar(source_bus);
+    Out.ar(outbus,Concat2.ar(control,source,storesize,seektime,seekdur,matchlength,freezestore,zcr,lms,sc,st, mul:mul));
+}).add;
+
+SynthDef.new(\eff_concat_sinus,{
+	arg outbus, freq=440, amp=0, source_bus, storesize=20, seektime=10, seekdur=10, matchlength=0.03, freezestore=0, zcr=1, lms=1, sc=1, st=1, mul=1;
+	var control = SinOsc.ar(freq,0,amp);
+	var source = In.ar(source_bus);
+    Out.ar(outbus,Concat2.ar(control,source,storesize,seektime,seekdur,matchlength,freezestore,zcr,lms,sc,st, mul:mul));
+}).add;

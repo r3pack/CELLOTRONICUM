@@ -33,7 +33,7 @@ x.set(\freq,150);
 
 //PIŁA PO PRZEJŚCIACH
 // RECORDING
-b = Buffer.read(s, ~p +/+ "G-DUR.aiff");
+b = Buffer.read(s, ~p +/+ "D-DUR.aiff");
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
 b.bufnum.postln;
 
@@ -97,3 +97,13 @@ SynthDef.new(\eff_xxx, {
 x = Synth.new(\eff_octave_down, [\inbus, 0, \freq_bus, 16, \outbus, 0, \freq_mul_bus, 17]);
 y = Synth.new(\eff_pitch, [\inbus, 0, \outbus, 16]);
 z = Synth.new(\eff_xxx, [\outbus, 17]);
+
+
+// CONCAT2
+x = Synth.new(\eff_concat, [\outbus, 0, \control_bus, 17, \source_bus, 18]);
+y = Synth.new(\eff_playbuf, [\outbus, 18, \bufnum, 1]); //control
+z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 2]); //source
+
+// 0-zbrody 4
+// 1-sarabanda g
+// 2 - d
