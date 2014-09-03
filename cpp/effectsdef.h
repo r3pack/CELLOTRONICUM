@@ -4,7 +4,11 @@
 #include "effectgui.h"
 #include "graphics.h"
 
-
+///Definicje efektów
+///Zeby efekt działał wystarczy zrobić 3 rzeczy:
+///1. Napisać klase z definicją efektów bazując na EffectGUI (tu patrz PlayBuf) lub EffectAutoGUI. Zalecane jest użycie makra EFFECT_BODY (patrz poniższe implementacje)
+///2. dodać linijkę 'REGISTER_EFFECT(<tu nazwa efektu>, <nazwa grupy>);' lub 'REGISTER_EFFECT_EX(<tu nazwa efektu>, <nazwa grupy>, <nazwa podgrupy>);' (w przypadku podgrupy) do funkcji registerEffects()
+///3. dodać linijkę 'EFFECT_BY_NAME(<tu nazwa efektu>);' do funkcji getEffect()
 
 	
 #define EFFECT_BODY(ARGS_COUNT, FULL_NAME, SC_NAME) \

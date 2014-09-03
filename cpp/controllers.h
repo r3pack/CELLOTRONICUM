@@ -135,7 +135,7 @@ class Controller{
 		int busCount=getBusCount();
 		for(int i=0;i<busCount;++i)
 		{
-			ControllBus* bus=new ControllBus(posX+x, posY+top_padding, BT_OUTBUS, this);
+			ControllBus* bus=new ControllBus(posX+x, posY+top_padding, this);
 			outBuses.push_back(ParamControllBus(bus, getBusNames()[i]));
 			controllerByBus.insert(std::pair<ControllBus*, Controller*>(bus, this));
 			x+=bus_period+ControllBus::size;

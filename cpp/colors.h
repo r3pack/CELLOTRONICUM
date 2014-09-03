@@ -2,6 +2,8 @@
 #define COLORS_H
 #include <SDL2/SDL.h>
 
+//Plik ze stałymi które są kolorami w GUI
+
 const SDL_Color COLOR_AUDIO_BUS={0xF5, 0xF7, 0xF6};
 const SDL_Color COLOR_FREQ_BUS={0xC6, 0xFF, 0xA9};
 const SDL_Color COLOR_AMP_BUS={0xFF, 0xC9, 0xC8};
