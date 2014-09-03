@@ -3,6 +3,9 @@
 #include "effects.h"
 #include "effectgui.h"
 #include "graphics.h"
+
+
+
 	
 #define EFFECT_BODY(ARGS_COUNT, FULL_NAME, SC_NAME) \
 	private:\

@@ -16,6 +16,7 @@
 
 	std::set <std::pair <Bus*, Bus*> >* getConnections();
 
+	///Typ busa - wejściowy lub wyjściowy + rodzaj
 	enum BusType{
 		BT_INBUS,
 		BT_OUTBUS,
@@ -25,31 +26,46 @@
 		BT_AMP_OUTBUS
 	};
 
+	///rodzaj zdarzenia(kliknięcia) myszy
 	enum MouseEvent{
 		ME_PRESS,
 		ME_REPEAT,
 		ME_RELEASE
 	};
 
+	///rysuje połączenia pomiędzy busami
 	void drawConnections();
 	
+	///ustawia optymalną ilość miejść po przecinku dla wartości i dla danego strumienia 
 	void setOptimalPrecision(float value, std::stringstream& ss);
 
+	///Klasa bazowa dla obiektu rysowalnego
 	class Drawable{
 		public:
+		///rysowanie obiektu 
 		virtual void draw() = 0;
+		///ustawianie pozycji
 		virtual void setPos(int X, int Y) = 0;
+		///przesuwanie obiektu o zadaną współżędną
 		virtual void move(int X, int Y) = 0;
+		///zwraca wymiar X pozycji okna
 		virtual int getPosX() = 0;
+		///zwraca wymiar Y pozycji okna
 		virtual int getPosY() = 0;
+		//zwraca szerokość okna
 		virtual int getWidth() = 0;
+		//zwraca wysokość okna
 		virtual int getHeight() = 0;
+		//odbiera pierwszy klawisz myszy
 		virtual bool receiveClick(int X, int Y, MouseEvent me) = 0;
+		//odbiera drugi klawisz myszy
 		virtual bool receiveSecondClick(int X, int Y, MouseEvent me) {return false;}
+		//odbiera trzeci klawisz myszy
 		virtual bool receiveKeyboardEvent(SDL_Scancode scancode) {return false;}
 		virtual ~Drawable() {}
 	};
 
+	///Obiekt rysowalny: punkt materialny - nie robi praktycznie nic
 	class Point : public Drawable{
 		int posX, posY;
 		
@@ -79,18 +95,20 @@
 		Point(int X, int Y): posX(X), posY(Y) {}
 	};
 
+	///Obiekt rysowalny: przycisk - pauzuje efekt/kontroler, klasa bazowa dla SwitchButton
 	class Button : public Drawable{
-		int posX, posY;
+		int posX, posY; ///pozycja obiektu
 		
 		protected:
 		
-		int symbol;
+		int symbol; ///identyfikator symbolu który jest wyświetlany na przycisku
 		
 		public:
-		static constexpr int size=15;
+		static constexpr int size=15; ///wysokość/szerokość przycisku
 		
 		Button(int X, int Y, int s): posX(X), posY(Y), symbol(s) {}
 		
+		///ustawia dany symbol
 		void setSymbol(int s) {symbol=s;}
 		
 		void draw()
@@ -164,6 +182,7 @@
 		int getHeight() {return size;}
 	};
 	
+	///Obiekt rysowalny: przełącznik - ustawia jedną z dwóch wartości reprezentowanych przez 2 symbole
 	class SwitchButton : public Button
 	{
 		float value1;
@@ -172,19 +191,21 @@
 		int symbol1;
 		int symbol2;
 		
-		bool isTrigger;
+		bool isTrigger; ///flaga która jeżeli jest ustawina powoduje, że przycisk sam odskakuje
 		
-		Effect* effect;
-		int argument;
+		Effect* effect; ///kontrolowany efekt
+		int argument;  ///kontrolowany argument w efekcie
 		
-		bool status=false;
+		bool status=false; ///stan przycisku
 	
 		public:
 		SwitchButton(int X, int Y, float v1, float v2, int s1, int s2, bool iT, Effect* e, int a): 
 		Button(X, Y, s1), value1(v1), value2(v2), symbol1(s1), symbol2(s2), isTrigger(iT), effect(e), argument(a) {}
 		
+		///zwraca status
 		bool getStatus() {return status;}
 		
+		///ustawia status
 		void setStatus(bool s);
 		
 		bool receiveClick(int X, int Y, MouseEvent me);

@@ -1,7 +1,6 @@
 #include "effectsdef.h"
 
 
-
 #define REGISTER_EFFECT(a, b) registerEffect(a::name, a::fullName, b);
 #define REGISTER_EFFECT_EX(a, b, c) registerEffect(a::name, a::fullName, b, c);
 
