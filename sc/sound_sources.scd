@@ -468,8 +468,9 @@ SynthDef.new(\eff_concat_sinus,{
 }).add;
 
 SynthDef.new(\eff_concat_sinus_from_bus,{
-	arg outbus, freq_bus, amp=1, source_bus, storesize=20, seektime=10, seekdur=10, matchlength=0.03, freezestore=0, zcr=0, lms=1, sc=1, st=1, mul=1;
+	arg outbus, freq_bus, amp_bus, source_bus, storesize=20, seektime=10, seekdur=10, matchlength=0.03, freezestore=0, zcr=0, lms=1, sc=1, st=1, mul=1;
 	var freq = In.kr(freq_bus);
+	var amp = In.kr(amp_bus);
 	var control = SinOsc.ar(freq,0,amp);
 	var source = In.ar(source_bus);
     Out.ar(outbus,Concat2.ar(control,source,storesize,seektime,seekdur,matchlength,freezestore,zcr,lms,sc,st, mul:mul));
