@@ -41,12 +41,22 @@ void registerEffects()
 	REGISTER_EFFECT(BBandPass, "Filters");
 	REGISTER_EFFECT(BPeakEQ, "Filters");
 	REGISTER_EFFECT(BAllPass, "Filters");
+	REGISTER_EFFECT(ButterworthLPF, "Filters");
+	REGISTER_EFFECT(ButterworthHPF, "Filters");
+	REGISTER_EFFECT(ButterworthBRF, "Filters");
+	REGISTER_EFFECT(ButterworthBPF, "Filters");
 	
 	REGISTER_EFFECT(Amplitude, "Analysis");
 	REGISTER_EFFECT(Pitch, "Analysis");
 	REGISTER_EFFECT(TartiniPitch, "Analysis");
 	REGISTER_EFFECT(QitchPitch, "Analysis");
 	REGISTER_EFFECT(Goetzel, "Analysis");
+	REGISTER_EFFECT(ParamToFreqency, "Analysis");
+	REGISTER_EFFECT(ParamToAmplitude, "Analysis");
+	
+	REGISTER_EFFECT_EX(FreqBucketing, "Analysis", "FrequencyModifiers");
+	REGISTER_EFFECT_EX(FreqHalfToneBucketing, "Analysis", "FrequencyModifiers");
+	REGISTER_EFFECT_EX(FreqQuaterToneBucketing, "Analysis", "FrequencyModifiers");
 	
 	REGISTER_EFFECT_EX(Harmonizer4, "Generators", "Harmonic");
 	REGISTER_EFFECT_EX(Harmonizer5, "Generators", "Harmonic");
@@ -58,6 +68,8 @@ void registerEffects()
 	REGISTER_EFFECT_EX(ShepardCycleTone, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(AYSimple, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(YMSimple, "Generators", "Synthesizers");
+	
+	REGISTER_EFFECT_EX(Sinus, "Generators", "Oscillators");
 	
 	REGISTER_EFFECT_EX(Playbuf, "Basics", "Buffers");
 	
@@ -197,6 +209,16 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(FBamFX);
 	EFFECT_BY_NAME(FBamFXVD);
 	EFFECT_BY_NAME(WarmChorus);
+	EFFECT_BY_NAME(ParamToFreqency);
+	EFFECT_BY_NAME(ParamToAmplitude);
+	EFFECT_BY_NAME(Sinus);
+	EFFECT_BY_NAME(FreqBucketing);
+	EFFECT_BY_NAME(FreqQuaterToneBucketing);
+	EFFECT_BY_NAME(FreqHalfToneBucketing);
+	EFFECT_BY_NAME(ButterworthLPF);
+	EFFECT_BY_NAME(ButterworthHPF);
+	EFFECT_BY_NAME(ButterworthBRF);
+	EFFECT_BY_NAME(ButterworthBPF);
 	return NULL;
 }
 

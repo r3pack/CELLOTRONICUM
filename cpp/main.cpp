@@ -315,19 +315,21 @@ bool getSCPath()
 
 int main (int argc, char** argv)
 {
-	if(getSCPath() && launchSuperCollider());
-	else
-	{
-		fprintf(stderr, "Cant get sclang patch - exiting\n");
-		exit(0);
-	}
-	
 	if(argc>1)
 	{
 		OSCConn::setServer(argv[1]);
 		if(argc>2)
 		{
 			OSCConn::setPort(atoi(argv[2])); 
+		}
+	}
+	else
+	{
+		if(getSCPath() && launchSuperCollider());
+		else
+		{
+			fprintf(stderr, "Cant get sclang patch - exiting\n");
+			exit(0);
 		}
 	}
 	

@@ -1026,6 +1026,8 @@
 		friend class Controller;
 		friend class Effect;
 		
+		static const int too_much_graduals_threshold=10; ///od jakiej liczby zmienić sposób wyświetlania suwaka na taki który jest przystosowany do większej ilości stopni
+		
 		int gradualCount; ///ilość stopni suwaka
 		float* graduals; ///tablica z wartościami
 		
@@ -1158,21 +1160,21 @@
 			setColor(COLOR_SLIDER2);
 			SDL_RenderFillRect(render, &rect1);
 			
-			SDL_Color color;
-			
-			if(controlledBy!=NULL)
-			color=COLOR_SLIDER_CONTROLLED;
-			else
-			color=COLOR_SLIDER1;
-			
-			if(clicked)
-			color=getDarkerColor(color);
-			
-			setColor(color);
-			
-			SDL_RenderFillRect(render, &rect2);
-			setColor(COLOR_SLIDER_BORDER);
-			SDL_RenderDrawRect(render, &rect1);
+			if(gradualCount>too_much_graduals_threshold)
+			{
+				SDL_Color color;
+				
+				if(controlledBy!=NULL)
+				color=COLOR_SLIDER_CONTROLLED;
+				else
+				color=COLOR_SLIDER1;
+				
+				if(clicked)
+				color=getDarkerColor(color);
+				setColor(color);
+				
+				SDL_RenderFillRect(render, &rect2);
+			}
 			
 			SDL_Rect controllRect;
 			controllRect.x = posX;
@@ -1182,8 +1184,45 @@
 			
 			setColor((clicked?getDarkerColor(COLOR_CONTROLL_BUS):COLOR_CONTROLL_BUS));
 			SDL_RenderFillRect(render, &controllRect);
+			
+			setColor(COLOR_SLIDER_BORDER);
+			
+			if(gradualCount<=too_much_graduals_threshold)
+			{
+				for(int i=0;i<gradualCount;++i)
+				{
+					int lineHeight=int((float(i)/float(gradualCount))*float(height));
+					if(gradualCount-i-1==value)
+					{
+						SDL_Rect rect;
+						rect.x = posX;
+						rect.y = posY+lineHeight;
+						rect.w = width;
+						rect.h = int((float(i+1)/float(gradualCount))*float(height))-lineHeight;
+						SDL_Color color;
+			
+						if(controlledBy!=NULL)
+						color=COLOR_SLIDER_CONTROLLED;
+						else
+						color=COLOR_SLIDER1;
+						
+						if(clicked)
+						color=getDarkerColor(color);
+						setColor(color);
+						SDL_RenderFillRect(render, &rect);
+						setColor(COLOR_SLIDER_BORDER);
+					}
+
+					SDL_RenderDrawLine(render, posX,       posY+lineHeight,
+											   posX+width-1, posY+lineHeight);
+				}
+			}
+			
 			setColor(COLOR_SLIDER_BORDER);
 			SDL_RenderDrawRect(render, &controllRect);
+			
+			setColor(COLOR_SLIDER_BORDER);
+			SDL_RenderDrawRect(render, &rect1);
 			
 			int w, h;
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);
