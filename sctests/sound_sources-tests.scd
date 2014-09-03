@@ -104,6 +104,9 @@ x = Synth.new(\eff_concat, [\outbus, 0, \control_bus, 17, \source_bus, 18]);
 y = Synth.new(\eff_playbuf, [\outbus, 18, \bufnum, 1]); //control
 z = Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 2]); //source
 
-// 0-zbrody 4
-// 1-sarabanda g
+x = Synth.new(\eff_concat_sinus, [\outbus, 0, \freq, 220, \source_bus, 18]);
+y = Synth.new(\eff_playbuf, [\outbus, 18, \bufnum, 0]); //control
+
+// 0-sarabanda
+// 1-zbrody 1
 // 2 - d

@@ -12,7 +12,6 @@ SynthDef.new(\eff_hadamard_last, {
 	Out.ar(outbus,res);
 }).add;
 
-/*
 SynthDef.new(\eff_warm_chorus, {
 	//Pierwsza próba - na razie na gotowych pitch shifterach
 	//http://quod.lib.umich.edu/i/icmc/bbp2372.2012.014/--warm-chorus-re-thinking-the-chorus-effect-using/4?view=pdf
@@ -24,11 +23,10 @@ SynthDef.new(\eff_warm_chorus, {
 	var semitones = [0, 0.02, 0.03, 0.05, 0.07, 0.11, 0.13];
 	var delays = [ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay)];
 	var sig = semitones.collect({|e, i| PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12)));}); //optymalizacja na później - multiple-tap delay line
-	var res = WalshHadamard.ar(Mix.ar(sig)/8, hadamard_cut);
-	delays.poll;
+	var all = Mix.ar(sig)/8;
+	var res = all - WalshHadamard.ar(all, hadamard_cut);
     Out.ar(outbus,res);
 }).add;
-*/
 
 /* TESTS
 
