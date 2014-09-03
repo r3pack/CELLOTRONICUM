@@ -1048,7 +1048,7 @@
 		EFFECT_BODY(3, "Hadamard2", "eff_hadamard_last");
 		
 		Hadamard2(int X, int Y): 
-		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 0.0f)}),
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 64.0f)}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 0, 64)})
 		{sendInstance(); initGUI(X, Y);}
 		~Hadamard2() {quitGUI();}
