@@ -215,9 +215,12 @@
 	class Bus : public Drawable{
 		friend class Effect;
 		
+		///ostatnio przyznany identyfikator dla Busów
 		static int lastId;
+		///identyfikator busa
 		int id;
 		
+		///wewnętrzna informacja czy bus
 		bool clicked=false;
 	   
 		int posX, posY;
