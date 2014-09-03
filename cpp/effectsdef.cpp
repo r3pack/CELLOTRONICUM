@@ -24,6 +24,8 @@ void registerEffects()
 	REGISTER_EFFECT_EX(BrassageOSC, "Time-based", "Brassage");
 	REGISTER_EFFECT_EX(BrassagePlus, "Time-based", "Brassage");
 	
+	REGISTER_EFFECT_EX(WarmChorus, "Time-based", "Choruses");
+	
 	REGISTER_EFFECT_EX(RMChorus, "Time-based", "RM-based");
 	REGISTER_EFFECT_EX(RMChorus2, "Time-based", "RM-based");
 	REGISTER_EFFECT_EX(RMDelay, "Time-based", "RM-based");
@@ -192,6 +194,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(Compander);
 	EFFECT_BY_NAME(FBamFX);
 	EFFECT_BY_NAME(FBamFXVD);
+	EFFECT_BY_NAME(WarmChorus);
 	return NULL;
 }
 

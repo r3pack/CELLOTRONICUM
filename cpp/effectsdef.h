@@ -1134,6 +1134,18 @@
 		~Compander() {quitGUI();}
 	};
 	
+	class WarmChorus : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "WarmChorus", "eff_warm_chorus");
+		
+		WarmChorus(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("amp_attack", 0.02f), 
+		EffectArgument("amp_release", 0.5f), EffectArgument("max_delay", 0.2f), EffectArgument("hadamard_cut", 0.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.01f, 0.5f), ArgVis(VT_GRADUALSLIDER, 0, 25)})
+		{sendInstance(); initGUI(X, Y);}
+		~WarmChorus() {quitGUI();}
+	};
+	
 
 	
 	void registerEffects();
