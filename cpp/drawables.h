@@ -626,6 +626,7 @@
 					updateValue();
 				return true;
 				case SDL_SCANCODE_RETURN:
+				case SDL_SCANCODE_KP_ENTER:
 				case SDL_SCANCODE_RETURN2:
 					lastClicked=-1;
 					if(checkValue()) sendValue();
@@ -891,7 +892,7 @@
 		{
 			if(entryBox.receiveKeyboardEvent(scancode))
 			{
-				setValue(entryBox.getValue(), false);
+				setValue(entryBox.getValue(), true);
 				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 				return true;
 			}

@@ -49,6 +49,17 @@
 		~ShiftEcho() {quitGUI();}
 	};
 	
+	class GenEcho : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "GenEcho", "eff_genecho");
+		
+		GenEcho(int X, int Y): 
+		args({EffectArgument("feedback_input", OSCConn::getFreeBus()), EffectArgument("feedback_output", OSCConn::getFreeBus()), EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 0.1f), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 40, 45);}
+		~GenEcho() {quitGUI();}
+	};
+	
 	
 	class FBamFX : public EffectAutoGUI
 	{		

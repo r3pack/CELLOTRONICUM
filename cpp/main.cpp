@@ -311,6 +311,14 @@ bool getSCPath()
 	}
 }
 
+SDL_Texture* recordingInfoTex;
+
+void drawRecordingInfo()
+{
+	if((SDL_GetTicks()/800)%2 && OSCConn::isRecording())
+	drawTexture(recordingInfoTex, 5, 0);
+}
+
 #undef main //hack żeby działało na windowsie
 
 int main (int argc, char** argv)
@@ -348,6 +356,8 @@ int main (int argc, char** argv)
 	
 	effectCreator.init();
 	
+	recordingInfoTex=generateText("Recording", COLOR_SELECTED_TEXT);
+	
 	auto effectInstanceList=getEffectInstanceList();
 	
 	auto controllerInstanceList=getControllerInstanceList();
@@ -362,6 +372,7 @@ int main (int argc, char** argv)
 		
 		setColor(COLOR_CLEARCOLOR);
 		SDL_RenderClear(render);
+		drawRecordingInfo();
 		
 		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 		{

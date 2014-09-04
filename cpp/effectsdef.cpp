@@ -18,6 +18,7 @@ void registerEffects()
 	
 	REGISTER_EFFECT_EX(DistEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(ShiftEcho, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(GenEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(FBamFX, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(FBamFXVD, "Time-based", "Echo");
 	
@@ -219,6 +220,7 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(ButterworthHPF);
 	EFFECT_BY_NAME(ButterworthBRF);
 	EFFECT_BY_NAME(ButterworthBPF);
+	EFFECT_BY_NAME(GenEcho);
 	return NULL;
 }
 

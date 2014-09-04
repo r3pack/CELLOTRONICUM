@@ -84,6 +84,9 @@
 			///Kończy nagrywanie
 			static void stopRecord();
 			
+			///Informuje czy dźwięk jest nagrywany
+			static bool isRecording() {return recordIsStarted;}
+			
 			///Ustawia plik do nagrania (trzeba wykonać PRZED rozpoczęciem nagrywania)
 			static void recordToFile();
 	};
