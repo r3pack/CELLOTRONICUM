@@ -297,7 +297,9 @@ OSCdef.new(
 	\alloc_buffer,
 	{
 		arg msg, time, addr, recvPort;
-		Buffer.alloc(s,s.sampleRate*msg[1]);
+		buf = Buffer.alloc(s,s.sampleRate*msg[1]);
+		~b.add( buf.bufnum -> buf);
+		~app_netaddr.sendMsg('\new_buffer', buf.bufnum);
 	},
 	'/alloc_buffer'
 );
