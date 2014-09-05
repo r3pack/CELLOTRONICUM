@@ -69,6 +69,9 @@
 			///Ładuje bufor do SC i zwara jego id
 			static int loadBuffer(const char* filename);
 			
+			///Alokuje bufor o zadanym rozmiarze (w sekundach)
+			static int allocBuffer(float seconds);
+			
 			///zwraca nazwę pliku z próbką po id bufora
 			static std::string getBufferFileById(int id);
 			
