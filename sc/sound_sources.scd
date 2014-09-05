@@ -165,6 +165,14 @@ SynthDef.new(\eff_octave_down, {
 	Out.ar(outbus, res);
 }).add;
 
+SynthDef.new(\eff_formant_filter, {
+	arg inbus=8, outbus=0, mul=0.7, freq_mul=0.5;
+	var in = In.ar(inbus,1);
+	var freq, hasFreq;
+	# freq, hasFreq = Qitch.kr(in,~qitch_buffer.bufnum, ampThreshold,1,minfreq:minfreq, maxfreq:maxfreq);
+	Out.ar(outbus, (in*SinOsc.ar(freq*freq_mul))*mul);
+}).add;
+
 //Działa - dorobić zawijanie.
 SynthDef.new(\eff_shepard_tone_from_input, {
 	arg inbus=8, outbus=0; //, amp=0.5;
