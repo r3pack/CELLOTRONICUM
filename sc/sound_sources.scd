@@ -169,7 +169,7 @@ SynthDef.new(\eff_formant_filter, {
 	arg inbus=8, outbus=0, mul=0.7, freq_mul=0.5;
 	var in = In.ar(inbus,1);
 	var freq, hasFreq;
-	# freq, hasFreq = Qitch.kr(in,~qitch_buffer.bufnum, ampThreshold,1,minfreq:minfreq, maxfreq:maxfreq);
+	# freq, hasFreq = Qitch.kr(in,~qitch_buffer.bufnum,0.01,1,minfreq:0, maxfreq:2500);
 	Out.ar(outbus, (in*SinOsc.ar(freq*freq_mul))*mul);
 }).add;
 
