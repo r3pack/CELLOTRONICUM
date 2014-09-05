@@ -335,6 +335,7 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		s.plotTree;
+		"plotTree".postln;
 	},
 	'/plot_tree'
 );
@@ -344,6 +345,7 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		s.meter;
+		"meter".postln;
 	},
 	'/meter'
 );
@@ -353,6 +355,7 @@ OSCdef.new(
 	{
 		arg msg, time, addr, recvPort;
 		s.freqscope;
+		"freqscope".postln;
 	},
 	'/freqscope'
 );
