@@ -68,7 +68,7 @@ SynthDef.new(\eff_playbuf2, {
 }).add;
 
 SynthDef.new(\eff_sinus, {
-	arg inbus=8, freq=440, amp=1, outbus;
+	arg freq=440, amp=1, outbus;
 	Out.ar(outbus, SinOsc.ar(freq,0,amp));
 }).add;
 

@@ -328,6 +328,36 @@ OSCdef.new(
 	'/delete_buffer'
 );
 
+// SUPER COLLIDER BUILD-IN INFO:
+
+OSCdef.new(
+	\plotTree,
+	{
+		arg msg, time, addr, recvPort;
+		s.plotTree;
+	},
+	'/plotTree'
+);
+
+OSCdef.new(
+	\meter,
+	{
+		arg msg, time, addr, recvPort;
+		s.meter;
+	},
+	'/meter'
+);
+
+OSCdef.new(
+	\freqscope,
+	{
+		arg msg, time, addr, recvPort;
+		s.freqscope;
+	},
+	'/freqscope'
+);
+
+
 
 //TODO: /app_all_working_effects //Do debugu
 /*

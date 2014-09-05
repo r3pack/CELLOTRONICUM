@@ -8,25 +8,17 @@
 ~qitch_buffer = Buffer.read(s, ~qitch_filename); // może nie zadziałać bez włączonego servera - poprawki jutro!
 ~b.add( ~qitch_buffer.bufnum -> ~qitch_buffer);
 
-
-s.options.numAudioBusChannels=512;
+(~p +/+"soundcard_configuration.scd").loadPaths;
 (~p +/+"server_boot.scd").loadPaths;
 
 /*
-s.plotTree;
-s.meter;
-s.freqscope;
+s.plotTree; //plot_tree
+s.meter; //meter
+s.freqscope; //freqscope
 
 s.options.numChannels;
 
-
 SynthDef.all;
-
-Zrobić pitch shift ze zmianą szybkosci odtwarzania
-
-WAŻNE: nagrywanie do buffora
-
-czy da się z poziomu sc-lang robić sprawdzanie, czy działa server super collidera? Jakis ping-pong?
 
 Quarks.gui
 
@@ -39,7 +31,6 @@ IFWT - hadamard w jedną stronę
 TODO: http://chrisjeffs.com/blog/?p=750
 http://permalink.gmane.org/gmane.comp.audio.supercollider.user/87244
 http://danielnouri.org/docs/SuperColliderHelp/Collections/Wavetable.html
-
 */
 
 
