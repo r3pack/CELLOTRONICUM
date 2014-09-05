@@ -211,37 +211,32 @@
 		bool receiveClick(int X, int Y, MouseEvent me);
 	};
 
-
+	///Obiekt rysowalny: bus - łączy wyjścia jednego efektu z wyściamy innego efektu. Możliwe wyjścia to strumień dźwięku, częstotliwości lub amplitudy
 	class Bus : public Drawable{
 		friend class Effect;
 		
-		///ostatnio przyznany identyfikator dla Busów
-		static int lastId;
-		///identyfikator busa
-		int id;
-		
-		///wewnętrzna informacja czy bus
-		bool clicked=false;
-	   
-		int posX, posY;
-		
-		BusType type;
-		
-		Effect* effect;
-		int argument;
-		
-		bool used=false;
+		static int lastId; ///ostatnio przyznany identyfikator dla Busów +1
+		int id; ///identyfikator busa
+		bool clicked=false; ///wewnętrzna informacja czy bus jest kliknięty
+		int posX, posY; ///pozycja busa
+		BusType type; ///typ busa - wejściowy/wyjściowy i typ danych
+		Effect* effect; ///efekt w którym jest ten bus 
+		int argument; ///numer argumentu odpowiadającego busowi
+		bool used=false; ///czy bus jest aktualnie używany (podpięty do czegoś)
 		
 		public:
-		static int lastClicked;
 		
-		static constexpr int size=15;
+		static int lastClicked; ///ostatnio kliknięty bus (jego identyfikator)
 		
+		static constexpr int size=15; ///szerokość/wysokość busa
+		
+		///zwraca identyfikator
 		int getId() {return id;}
+		///zwraca efekt
 		Effect* getEffect() {return effect;}
-		
+		///zwraca argument
 		int getArg() {return argument;}
-		
+		///zwraca typ busa
 		int getType() {return type;}
 		
 		Bus(int X, int Y, BusType t, Effect* e, int a)
@@ -256,9 +251,14 @@
 			busList.insert(std::pair<int, Bus*>(id, this));
 		}
 		
+		///usuwa wszystkie połączenia wychodzące/wchodzące do/z busa 
 		void removeConnections();
 		
+		///usuwa busa z listy połączeń (lista connections)
 		void removeBus();
+		
+		///wykonuje zdarzenie po poprawnym kliknięciu (wykonanie tej metody kolejno na dwóch busach połączy je, o ile typy się zgadzają)
+		bool setClicked();
 		
 		~Bus()
 		{
@@ -293,8 +293,6 @@
 		
 		bool receiveClick(int X, int Y, MouseEvent me);
 		
-		bool setClicked();
-		
 		bool receiveSecondClick(int X, int Y, MouseEvent me);
 		
 		void setPos(int X, int Y)
@@ -317,49 +315,44 @@
 		
 	};
 
-
+	///Obiekt rysowalny: bus kontrolujący - łączy wyjście kontrolera z dawcami wartości (ValueGifter) (aktualnie tylko suwak (Slider) i suwak stopniowy (GradualSlider))
 	class ControllBus : public Drawable{
 		friend class Slider;
 		friend class Effect;
 		
-		static int lastId;
-		
-		int id;
-		
-		bool clicked=false;
-	   
-		int posX, posY;
-		
-		BusType type;
-		
-		Controller* controller;
-		
-		bool used=false;
+		static int lastId; ///ostatnio przyznany identyfikator dla Busów kontrolujących +1
+		int id; ///identyfikator busa kontrolującego
+		bool clicked=false; ///wewnętrzna informacja czy bus jest kliknięty
+		int posX, posY; ///pozycja busa
+		Controller* controller; ///kontroler do którego należy ten bus
+		bool used=false; ///czy bus jest aktualnie używany (podpięty do czegoś)
 		
 		public:
-		static int lastClicked;
+		static int lastClicked; ///ostatnio kliknięty bus (jego identyfikator)
 		
-		static constexpr int size=15;
+		static constexpr int size=15; ///szerokość/wysokość busa
 		
+		///zwraca kontroler
 		Controller* getController() {return controller;}
 		
-		int getType() {return type;}
-		
-		ControllBus(int X, int Y, BusType t, Controller* c)
+		ControllBus(int X, int Y, Controller* c)
 		{
 			controller=c;
 			posX=X;
 			posY=Y;
-			type=t;
 			id=lastId;
 			++lastId;
 			controllBusList.insert(std::pair<int, ControllBus*>(id, this));
 		}
 		
+		///usuwa bus z listy busów (controllBusList)
 		void removeBus()
 		{
 			controllBusList.erase(id);
 		}
+		
+		///wykonuje zdarzenie po poprawnym kliknięciu (wykonanie tej metody na busie kontrolującym i suwaku połączy je)
+		bool setClicked();
 		
 		~ControllBus()
 		{
@@ -397,8 +390,6 @@
 			return false;
 		}
 		
-		bool setClicked();
-		
 		bool receiveSecondClick(int X, int Y, MouseEvent me);
 		
 		static bool connectControllBusWithValueGifter();
@@ -423,6 +414,7 @@
 		
 	};
 
+	///Klasa pochodna od drawable: dawca wartości (coś w tym stylu) jest to klasa która przekazuje wartości do parametrów i może być kontrolowana przez kontroler.  
 	class ValueGifter : public Drawable
 	{
 		friend class ControllBus;
@@ -430,56 +422,53 @@
 		friend class Effect;
 		
 		protected:
-		static int lastId;
-		int id;
-		
-		bool clicked=false;
-		
-		Effect* effect;
-		int argument;
-		
-		Controller* controlledBy=NULL;
+	
+		static int lastId; 	///ostatnio przyznany numer identyfikacyjny +1
+		int id; ///numer identyfikacyjny
+		bool clicked=false; ///czy podłączenie do kontrolera jest aktualnie kliknięte
+		Effect* effect; ///kontrolowany efekt
+		int argument; ///argument do którego przekazywane są wartości
+		Controller* controlledBy=NULL; ///wskaźnik na kontroler który kontroluje ten obiekt
 		
 		public:
 		
-		static int lastClicked;
+		static int lastClicked; ///identyfikator ostatnio klikniętego dawcy wartości
 		
 		ValueGifter()
 		{
 			id=lastId++;
 		}
 		
+		///usuwa połączenie z kontrolera do tego obiektu
 		void removeConnections();
 		
+		///wykonuje zdarzenie po poprawnym kliknięciu (wykonanie tej metody na busie kontrolującym i suwaku połączy je)
 		void setClicked();
 		
+		///ustawia wartość na podstawie znormalizowanej wartości (od 0 do 1) - ułamek odpowiada zapełnieniu dla suwaka
 		virtual void setNormalizedValue(float nv)=0;
-		
 	};
 	
+	///Obiekt rysowalny: pole do wpisywania. Używany jako osobny element do zmiany wartości. Zawiera go także suwak. 
 	class EntryBox : public Drawable{
 		friend class Slider;
-		int width;
-		const int height;
-		int posX;
-		int posY;
+
+		int width; ///szerokośc pola
+		const int height; ///wysokość pola (jest stała)
+		int posX, posY; ///pozycja pola
+		SDL_Texture* valueTex=NULL; ///tekstura z tekstem w polu
+		std::string data; ///string z tekstem w polu
+		float value; ///wartość odpowiadająca tekstu
+		static int lastId; ///ostatnio przypisany identyfikator +1
+		int id; ///identyfikator pola
+		static int lastClicked; ///ostatnio kliknięte pole
 		
-		SDL_Texture* valueTex=NULL;
+		Effect* effect; ///efekt w którym jest ten bus 
+		int argument; ///numer argumentu odpowiadającego busowi
 		
-		std::string data;
+		bool clicked=false; ///czy jest kliknięty (tekst jest wprowadzany)
 		
-		float value;
-		
-		static int lastId;
-		int id;
-		static int lastClicked;
-		
-		Effect* effect;
-		int argument;
-		
-		bool clicked=false;
-		
-		bool textToRemove=true;
+		bool textToRemove=true; ///czy tekst ma być usunięty przed wprowadzeniem następnego znaku (po kliknięciu)
 		
 		public:
 		
@@ -637,6 +626,7 @@
 					updateValue();
 				return true;
 				case SDL_SCANCODE_RETURN:
+				case SDL_SCANCODE_KP_ENTER:
 				case SDL_SCANCODE_RETURN2:
 					lastClicked=-1;
 					if(checkValue()) sendValue();
@@ -647,8 +637,10 @@
 			return false;
 		}
 		
+		///ustawia wartość argumentu w SC
 		void sendValue();
 		
+		///ustawia wartość 
 		void setValue(float v)
 		{
 			value=v;
@@ -679,6 +671,7 @@
 		int getPosX(){return posX;}
 		int getPosY(){return posY;}
 		
+		///sprawdza czy wpisana wartośc jest liczbą - jeżeli tak to ustawia ją, wpp. przywraca poprzednią
 		bool checkValue()
 		{
 			int periodCount=0;
@@ -705,6 +698,7 @@
 			}
 		}
 		
+		///aktualizuje taksture z tekstem
 		void updateValue()
 		{
 			SDL_DestroyTexture(valueTex);
@@ -758,30 +752,30 @@
 		
 	};
 	
+	///Obiekt rysowalny: duwak - płynnie ustawia wartości z danego przedziału
 	class Slider : public ValueGifter{
 		friend class ControllBus;
 		friend class Controller;
 		friend class Effect;
 
-		float rangeBegin;
-		float rangeEnd;
-		int width;
-		int height;
-		int posX;
-		int posY;
+		float rangeBegin; ///początek przedziału suwaka
+		float rangeEnd; ///koniec przedziału suwaka
+		int width; ///szerokość suwaka
+		int height; ///wysokośc suwaka
+		int posX, posY; ///pozycja suwaka (lewy górny róg)
 		
-		int level;
+		int level; ///odległość między górną krawędzią suwaka, a górną częścią zapełnionej części suwaka
 		
-		EntryBox entryBox;
+		EntryBox entryBox; ///pole do wpisania wartości argumentu
+		EntryBox rangeBeginBox; ///pole do wpisania początku przedziału
+		EntryBox rangeEndBox; ///pole do wpisania końca przedziału
 		
-		EntryBox rangeBeginBox;
-		EntryBox rangeEndBox;
+		bool editRange=false; ///czy przedział jest edytowany (czy pola mają być widoczne)
 		
-		bool editRange=false;
+		float lastValue; ///ostatnia wartość przed aktualizowaniem pola
+		float value; ///aktualna wartość
 		
-		float lastValue;
-		float value;
-		
+		///ustawia przedział z pól do wpisywania
 		void setRangeFromEntryBoxes()
 		{
 			rangeBegin=rangeBeginBox.getValue();
@@ -801,8 +795,8 @@
 		
 		public:
 		
-		static const int slider_bus_height=8;
-		static const int entry_box_width=30;
+		static const int slider_bus_height=8; ///wysokość busa do podpięcia kontrolera (szerokość jest taka sama jak szerokość całego suwaka)
+		static const int entry_box_width=30; ///minimalna szerokość pola do wpisywania
 		
 		Slider(int pX, int pY, int w, int h, float rB, float rE, float l, Effect* e, int a):
 		rangeBegin(rB), rangeEnd(rE), width(w), height(h), posX(pX), posY(pY), level(int((1.0f-(l-rB)/(rE-rB)) * float(height))), value(l), lastValue(l),
@@ -898,7 +892,7 @@
 		{
 			if(entryBox.receiveKeyboardEvent(scancode))
 			{
-				setValue(entryBox.getValue(), false);
+				setValue(entryBox.getValue(), true);
 				entryBox.setPos(posX+width/2-entryBox.getWidth()/2, posY+height);
 				return true;
 			}
@@ -1027,27 +1021,29 @@
 		
 	};
 	
+	///Obiekt rysowalny: suwak stopniowy - przełącza pomiędzy wartościamy z podanej tablicy
 	class GradualSlider : public ValueGifter{
 		friend class ControllBus;
 		friend class Controller;
 		friend class Effect;
 		
-		static const int slider_bus_height=8;
-
-		int gradualCount;
-		float* graduals;
+		static const int too_much_graduals_threshold=10; ///od jakiej liczby zmienić sposób wyświetlania suwaka na taki który jest przystosowany do większej ilości stopni
 		
-		int width;
-		int height;
-		int posX;
-		int posY;
+		int gradualCount; ///ilość stopni suwaka
+		float* graduals; ///tablica z wartościami
 		
-		SDL_Texture* valueTex=NULL;
+		int width; ///szerokość suwaka
+		int height; ///wysokośc suwaka
+		int posX, posY; ///pozycja suwaka (lewy górny róg)
 		
-		int lastValue;
-		int value;
+		SDL_Texture* valueTex=NULL; ///tekstura z wyrenderowaną wartością
+		
+		int lastValue; ///ostatnia wartość przed aktualizowaniem pola (numer w tablicy graduals)
+		int value; ///aktualna wartość (numer w tablicy graduals)
 		
 		public:
+		
+		static const int slider_bus_height=8; ///wysokość busa do podpięcia kontrolera (szerokość jest taka sama jak szerokość całego suwaka)
 		
 		GradualSlider(int pX, int pY, int w, int h, int gC, float* g, float l, Effect* e, int a):
 		width(w), height(h), posX(pX), posY(pY), gradualCount(gC), graduals(g)
@@ -1165,21 +1161,21 @@
 			setColor(COLOR_SLIDER2);
 			SDL_RenderFillRect(render, &rect1);
 			
-			SDL_Color color;
-			
-			if(controlledBy!=NULL)
-			color=COLOR_SLIDER_CONTROLLED;
-			else
-			color=COLOR_SLIDER1;
-			
-			if(clicked)
-			color=getDarkerColor(color);
-			
-			setColor(color);
-			
-			SDL_RenderFillRect(render, &rect2);
-			setColor(COLOR_SLIDER_BORDER);
-			SDL_RenderDrawRect(render, &rect1);
+			if(gradualCount>too_much_graduals_threshold)
+			{
+				SDL_Color color;
+				
+				if(controlledBy!=NULL)
+				color=COLOR_SLIDER_CONTROLLED;
+				else
+				color=COLOR_SLIDER1;
+				
+				if(clicked)
+				color=getDarkerColor(color);
+				setColor(color);
+				
+				SDL_RenderFillRect(render, &rect2);
+			}
 			
 			SDL_Rect controllRect;
 			controllRect.x = posX;
@@ -1189,8 +1185,45 @@
 			
 			setColor((clicked?getDarkerColor(COLOR_CONTROLL_BUS):COLOR_CONTROLL_BUS));
 			SDL_RenderFillRect(render, &controllRect);
+			
+			setColor(COLOR_SLIDER_BORDER);
+			
+			if(gradualCount<=too_much_graduals_threshold)
+			{
+				for(int i=0;i<gradualCount;++i)
+				{
+					int lineHeight=int((float(i)/float(gradualCount))*float(height));
+					if(gradualCount-i-1==value)
+					{
+						SDL_Rect rect;
+						rect.x = posX;
+						rect.y = posY+lineHeight;
+						rect.w = width;
+						rect.h = int((float(i+1)/float(gradualCount))*float(height))-lineHeight;
+						SDL_Color color;
+			
+						if(controlledBy!=NULL)
+						color=COLOR_SLIDER_CONTROLLED;
+						else
+						color=COLOR_SLIDER1;
+						
+						if(clicked)
+						color=getDarkerColor(color);
+						setColor(color);
+						SDL_RenderFillRect(render, &rect);
+						setColor(COLOR_SLIDER_BORDER);
+					}
+
+					SDL_RenderDrawLine(render, posX,       posY+lineHeight,
+											   posX+width-1, posY+lineHeight);
+				}
+			}
+			
 			setColor(COLOR_SLIDER_BORDER);
 			SDL_RenderDrawRect(render, &controllRect);
+			
+			setColor(COLOR_SLIDER_BORDER);
+			SDL_RenderDrawRect(render, &rect1);
 			
 			int w, h;
 			SDL_QueryTexture(valueTex, NULL, NULL, &w, &h);

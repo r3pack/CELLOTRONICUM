@@ -4,7 +4,11 @@
 #include "effectgui.h"
 #include "graphics.h"
 
-
+///Definicje efektów
+///Zeby efekt działał wystarczy zrobić 3 rzeczy:
+///1. Napisać klase z definicją efektów bazując na EffectGUI (tu patrz PlayBuf) lub EffectAutoGUI. Zalecane jest użycie makra EFFECT_BODY (patrz poniższe implementacje)
+///2. dodać linijkę 'REGISTER_EFFECT(<tu nazwa efektu>, <nazwa grupy>);' lub 'REGISTER_EFFECT_EX(<tu nazwa efektu>, <nazwa grupy>, <nazwa podgrupy>);' (w przypadku podgrupy) do funkcji registerEffects()
+///3. dodać linijkę 'EFFECT_BY_NAME(<tu nazwa efektu>);' do funkcji getEffect()
 
 	
 #define EFFECT_BODY(ARGS_COUNT, FULL_NAME, SC_NAME) \
@@ -43,6 +47,17 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, -100.0f, 100.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~ShiftEcho() {quitGUI();}
+	};
+	
+	class GenEcho : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "GenEcho", "eff_genecho");
+		
+		GenEcho(int X, int Y): 
+		args({EffectArgument("feedback_input", OSCConn::getFreeBus()), EffectArgument("feedback_output", OSCConn::getFreeBus()), EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 0.1f), EffectArgument("delay", 0.15f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 40, 45);}
+		~GenEcho() {quitGUI();}
 	};
 	
 	
@@ -484,6 +499,50 @@
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~BBandPass() {quitGUI();}
+	};
+	
+	class ButterworthLPF : public EffectAutoGUI
+	{		
+		EFFECT_BODY(3, "ButterworthLPF", "eff_LPF");
+		
+		ButterworthLPF(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~ButterworthLPF() {quitGUI();}
+	};
+	
+	class ButterworthHPF : public EffectAutoGUI
+	{		
+		EFFECT_BODY(3, "ButterworthHPF", "eff_HPF");
+		
+		ButterworthHPF(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~ButterworthHPF() {quitGUI();}
+	};
+	
+	class ButterworthBRF : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "ButterworthBRF", "eff_BRF");
+		
+		ButterworthBRF(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~ButterworthBRF() {quitGUI();}
+	};
+	
+	class ButterworthBPF : public EffectAutoGUI
+	{		
+		EFFECT_BODY(4, "ButterworthBPF", "eff_BPF");
+		
+		ButterworthBPF(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 100.0f), EffectArgument("rq", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 22000.0f), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~ButterworthBPF() {quitGUI();}
 	};
 	
 	class OctaveUp : public EffectAutoGUI
@@ -1048,7 +1107,7 @@
 		EFFECT_BODY(3, "Hadamard2", "eff_hadamard_last");
 		
 		Hadamard2(int X, int Y): 
-		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 0.0f)}),
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("hadamard_cut", 64.0f)}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, 0, 64)})
 		{sendInstance(); initGUI(X, Y);}
 		~Hadamard2() {quitGUI();}
@@ -1146,7 +1205,71 @@
 		~WarmChorus() {quitGUI();}
 	};
 	
-
+	class ParamToFreqency : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "ParamToFreqency", "eff_param_to_bus");
+		
+		ParamToFreqency(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("param", 440.0f)}),
+		argsVis({ArgVis(VT_FREQ_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 20000.0f)})
+		{sendInstance(); initGUI(X, Y, EffectAutoGUI::left_padding, 25);}
+		~ParamToFreqency() {quitGUI();}
+	};
+	
+	class ParamToAmplitude : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "ParamToAmplitude", "eff_param_to_bus");
+		
+		ParamToAmplitude(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("param", 1.0f)}),
+		argsVis({ArgVis(VT_AMP_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, EffectAutoGUI::left_padding, 25);}
+		~ParamToAmplitude() {quitGUI();}
+	};
+	
+	class Sinus : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "Sinus", "eff_sinus");
+		
+		Sinus(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq", 440.0f), EffectArgument("amp", 1.0f)}),
+		argsVis({ArgVis(VT_OUTBUS),  ArgVis(VT_SLIDER, 0.0f, 20000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~Sinus() {quitGUI();}
+	};
+	
+	class FreqHalfToneBucketing : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "FreqHalfToneBucketing", "eff_freq_bucketing_halftone");
+		
+		FreqHalfToneBucketing(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_AMP_OUTBUS), ArgVis(VT_AMP_INBUS)})
+		{sendInstance(); initGUI(X, Y, 35, 35);}
+		~FreqHalfToneBucketing() {quitGUI();}
+	};
+	
+	class FreqQuaterToneBucketing : public EffectAutoGUI
+	{
+		EFFECT_BODY(2, "FreqQuaterToneBucketing", "eff_freq_bucketing_quater_tone");
+		
+		FreqQuaterToneBucketing(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus())}),
+		argsVis({ArgVis(VT_AMP_OUTBUS), ArgVis(VT_AMP_INBUS)})
+		{sendInstance(); initGUI(X, Y, 40, 40);}
+		~FreqQuaterToneBucketing() {quitGUI();}
+	};
+	
+	class FreqBucketing : public EffectAutoGUI
+	{
+		EFFECT_BODY(3, "FreqBucketing", "eff_freq_bucketing");
+		
+		FreqBucketing(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("halftones", 1.0f)}),
+		argsVis({ArgVis(VT_AMP_OUTBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 20, 20);}
+		~FreqBucketing() {quitGUI();}
+	};
 	
 	void registerEffects();
 	

@@ -10,14 +10,17 @@
 
 EffectCreator effectCreator;
 
-void waitFor(int ms)
+///czeka podaną liczbę milisekund
+void waitFor(int ms) 
 {
 	std::chrono::milliseconds dura(ms);
 	std::this_thread::sleep_for(dura);
 }
 
+///bufor do przechowania stringu z nazwą pliku
 char fileStr[MAX_PATH];
 
+///sprawdza sygnały z myszy i klawiatury i wykonuje odpowiednie rzeczy
 bool checkInputs()
 {
 	bool quit = false;
@@ -221,6 +224,7 @@ bool checkInputs()
 	return quit;
 }
 
+///sprawdza czy plik intnieje
 inline bool existsTest(const char* name) 
 {
     if(FILE *file = fopen(name, "r")) 
@@ -232,12 +236,13 @@ inline bool existsTest(const char* name)
     return false;
 }
 
-const char* SC_PATH_FILE="scpath.txt";
+const char* SC_PATH_FILE="scpath.txt"; ///Nazwa pliku ze ścieżką do sclang
 
-const char* SC_MAIN_FILE="sc\\main.scd";
+const char* SC_MAIN_FILE="sc/main.scd"; ///nazwa pliku z głównym plikiem SC
 
-char sclangPath[MAX_PATH];
+char sclangPath[MAX_PATH]; ///ścieżka do sclang
 
+///Uruchamia interpreter (NIE server) SuperCollidera
 bool launchSuperCollider()
 {
 	char currentDir[MAX_PATH];
@@ -268,6 +273,7 @@ bool launchSuperCollider()
 	return true;
 }
 
+///zapisuje ścieżkę do sclang do pliku
 void saveSCPath()
 {
 	FILE* pathFile=fopen(SC_PATH_FILE, "w");
@@ -275,6 +281,7 @@ void saveSCPath()
 	fclose(pathFile);
 }
 
+///Daje użytkownikowi możliwość wprowadzenia ścieżki do sclang
 bool getSCPath()
 {
 	FILE* pathFile=fopen(SC_PATH_FILE, "r");
@@ -304,22 +311,33 @@ bool getSCPath()
 	}
 }
 
-#undef main
+SDL_Texture* recordingInfoTex;
+
+void drawRecordingInfo()
+{
+	if((SDL_GetTicks()/800)%2 && OSCConn::isRecording())
+	drawTexture(recordingInfoTex, 5, 0);
+}
+
+#undef main //hack żeby działało na windowsie
+
 int main (int argc, char** argv)
 {
-	if(getSCPath() && launchSuperCollider());
-	else
-	{
-		fprintf(stderr, "Cant get sclang patch - exiting\n");
-		exit(0);
-	}
-	
 	if(argc>1)
 	{
 		OSCConn::setServer(argv[1]);
 		if(argc>2)
 		{
 			OSCConn::setPort(atoi(argv[2])); 
+		}
+	}
+	else
+	{
+		if(getSCPath() && launchSuperCollider());
+		else
+		{
+			fprintf(stderr, "Cant get sclang patch - exiting\n");
+			exit(0);
 		}
 	}
 	
@@ -338,6 +356,8 @@ int main (int argc, char** argv)
 	
 	effectCreator.init();
 	
+	recordingInfoTex=generateText("Recording", COLOR_SELECTED_TEXT);
+	
 	auto effectInstanceList=getEffectInstanceList();
 	
 	auto controllerInstanceList=getControllerInstanceList();
@@ -352,6 +372,7 @@ int main (int argc, char** argv)
 		
 		setColor(COLOR_CLEARCOLOR);
 		SDL_RenderClear(render);
+		drawRecordingInfo();
 		
 		for(auto it=effectInstanceList->begin();it!=effectInstanceList->end();++it)
 		{

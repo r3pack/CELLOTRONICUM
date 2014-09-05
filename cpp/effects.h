@@ -76,7 +76,7 @@
 	class Effect{
 	
 		private:
-			static int lastId; ///ostatnio przyznany indentyfikator dla efektu
+			static int lastId; ///ostatnio przyznany indentyfikator dla efektu +1
 		
 		protected:
 			static std::set <std::pair<int, int> > effectTree; ///drzewo połączeń efektów - budowane w metodzie updateTopologicalSequence()

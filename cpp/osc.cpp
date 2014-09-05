@@ -2,8 +2,6 @@
 #include <chrono>
 #include "graphics.h"
 
-OSCConn conn;
-
 int OSCConn::serverPortNumber=57120;
 
 const char* OSCConn::serverAddress="localhost";
@@ -33,13 +31,13 @@ bool checkIfTimeout(double seconds)
 bool OSCConn::connect() 
 {
 	sock.connectTo(serverAddress, serverPortNumber);
-	if(!conn.isOk()) 
+	if(!OSCConn::isOk()) 
 	{
-		fprintf(stderr, "Error connection to %s:%d : %s\n", conn.getServer(), conn.getPort(), conn.getError());
+		fprintf(stderr, "Error connection to %s:%d : %s\n", OSCConn::getServer(), OSCConn::getPort(), OSCConn::getError());
 		return false;
 	}
 	
-	fprintf(stderr, "Client started, will send packets to %s:%d\n", conn.getServer(), conn.getPort());
+	fprintf(stderr, "Client started, will send packets to %s:%d\n", OSCConn::getServer(), OSCConn::getPort());
 	return true;
 }
 
