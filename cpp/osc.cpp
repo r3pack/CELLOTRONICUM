@@ -27,7 +27,6 @@ bool checkIfTimeout(double seconds)
 	else return false;
 }
 
-
 bool OSCConn::connect() 
 {
 	sock.connectTo(serverAddress, serverPortNumber);
@@ -280,6 +279,51 @@ int OSCConn::loadBuffer(const char* filename)
 		if(checkIfTimeout(3.0f))
 		{
 			printf("Fail to load buffer (Timeout)\n");
+			return -1;
+		}
+	}
+}
+
+int OSCConn::allocBuffer(float seconds)
+{
+	PacketWriter pw;
+	Message msg("/alloc_buffer"); 
+	msg.pushFloat(seconds);
+	pw.init();
+	pw.startBundle().addMessage(msg).endBundle();
+	
+	if(!sock.sendPacket(pw.packetData(), pw.packetSize()))
+	{
+		fprintf(stderr, "Error sending /alloc_buffer message\n");
+		return -1;
+	}
+	
+	setOperationStart();
+	while (sock.isOk())
+	{
+		if (sock.receiveNextPacket(30)) 
+		{
+			PacketReader pr(sock.packetData(), sock.packetSize());
+			Message *incomingMsg;
+			while (pr.isOk() && (incomingMsg = pr.popMessage()) != NULL) 
+			{
+				if(strcmp(incomingMsg->addressPattern().c_str(), "/new_buffer")==0)
+				{
+					int bufnum=-1;
+					incomingMsg->arg().popInt32(bufnum);
+					
+					std::stringstream ss;
+					ss<<"Allocated Buffer ("<<bufnum<<")";
+					
+					bufferFileById.insert(std::pair<int, std::string>(bufnum, ss.str()));
+					fprintf(stderr, "Allocated buffer which number: %d\n", bufnum);
+					return bufnum;
+				}
+			}
+		}
+		if(checkIfTimeout(3.0f))
+		{
+			printf("Fail to allocate buffer (Timeout)\n");
 			return -1;
 		}
 	}

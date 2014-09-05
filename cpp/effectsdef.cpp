@@ -19,6 +19,7 @@ void registerEffects()
 	REGISTER_EFFECT_EX(DistEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(ShiftEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(GenEcho, "Time-based", "Echo");
+	REGISTER_EFFECT_EX(DubEcho, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(FBamFX, "Time-based", "Echo");
 	REGISTER_EFFECT_EX(FBamFXVD, "Time-based", "Echo");
 	
@@ -42,6 +43,7 @@ void registerEffects()
 	REGISTER_EFFECT(BBandPass, "Filters");
 	REGISTER_EFFECT(BPeakEQ, "Filters");
 	REGISTER_EFFECT(BAllPass, "Filters");
+	REGISTER_EFFECT(RLPFD, "Filters");
 	REGISTER_EFFECT(ButterworthLPF, "Filters");
 	REGISTER_EFFECT(ButterworthHPF, "Filters");
 	REGISTER_EFFECT(ButterworthBRF, "Filters");
@@ -73,6 +75,7 @@ void registerEffects()
 	REGISTER_EFFECT_EX(Sinus, "Generators", "Oscillators");
 	
 	REGISTER_EFFECT_EX(Playbuf, "Basics", "Buffers");
+	REGISTER_EFFECT_EX(Recordbuf, "Basics", "Buffers");
 	
 	REGISTER_EFFECT_EX(Gain, "Basics", "Loudness");
 	REGISTER_EFFECT_EX(Normalizer, "Basics", "Loudness");
@@ -104,6 +107,7 @@ void registerEffects()
 	REGISTER_EFFECT_EX(SoftClipper4, "Distortions", "Clippers");
 	REGISTER_EFFECT_EX(SoftClipper8, "Distortions", "Clippers");
 	REGISTER_EFFECT_EX(WSDistortion, "Distortions", "Waveshapers");
+	REGISTER_EFFECT_EX(WSDistortionWetDry, "Distortions", "Waveshapers");
 	REGISTER_EFFECT_EX(SampleDecrease, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(BitCrush, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(MixWithSquare, "Distortions", "Sound Damage");
@@ -221,6 +225,10 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(ButterworthBRF);
 	EFFECT_BY_NAME(ButterworthBPF);
 	EFFECT_BY_NAME(GenEcho);
+	EFFECT_BY_NAME(DubEcho);
+	EFFECT_BY_NAME(WSDistortionWetDry);
+	EFFECT_BY_NAME(RLPFD);
+	EFFECT_BY_NAME(Recordbuf);
 	return NULL;
 }
 

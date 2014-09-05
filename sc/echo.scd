@@ -173,9 +173,9 @@ x = Synth.new(\eff_rmchorus2, [\inbus, 8, \outbus, 0, \delay, 0.5]);
 
 //ECHO WITH CUSTOMIZED FEEDBACK?
 SynthDef.new(\eff_genecho, {
-	arg inbus=8, outbus=0, feedback_input=99, feedback_output=99, delay=0, decay=0; //.zobaczyć, czy ten feedback output jest potrzebny!
+	arg inbus=8, outbus=0, feedback_input=99, feedback_output=99, delay=0, feedback=0; //.zobaczyć, czy ten feedback output jest potrzebny!
 	var input = In.ar(inbus,1)+InFeedback.ar(feedback_input);
-	OffsetOut.ar(feedback_output, DelayC.ar(decay*input, asFloat(delay), asFloat(delay) - ControlRate.ir.reciprocal)); // subtract block size
+	OffsetOut.ar(feedback_output, DelayC.ar(feedback*input, asFloat(delay), asFloat(delay) - ControlRate.ir.reciprocal)); // subtract block size
 	Out.ar(outbus,input);
 }).add;
 
