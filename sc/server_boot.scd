@@ -298,10 +298,17 @@ OSCdef.new(
 	\alloc_buffer,
 	{
 		arg msg, time, addr, recvPort;
-		var buf = Buffer.alloc(s,s.sampleRate*msg[1],completionMessage: {
-			~b.add( buf.bufnum -> buf);
-			~app_netaddr.sendMsg('\new_buffer', buf.bufnum);
+		var buf = Buffer.alloc(s,s.sampleRate*msg[1],completionMessage: { |bu|
+			~b.add( bu.bufnum -> bu);
+			~app_netaddr.sendMsg('\new_buffer', bu.bufnum);
 		});
+		/*
+		~temp = Buffer.alloc(s,s.sampleRate*msg[1]);
+		3.wait;
+		~b.add( ~temp.bufnum -> ~temp);
+		~app_netaddr.sendMsg('\new_buffer', ~temp.bufnum);
+		*/
+
 	},
 	'/alloc_buffer'
 );

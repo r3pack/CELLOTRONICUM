@@ -581,13 +581,24 @@
 	
 	class FormantFilter : public EffectAutoGUI
 	{		
-		EFFECT_BODY(5, "FormantFilter", "eff_octave_down");
+		EFFECT_BODY(4, "FormantFilter", "eff_formant_filter");
 		
 		FormantFilter(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_mul", 0.5f), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(21, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f)), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FormantFilter() {quitGUI();}
+	};
+	
+	class FormantFilterFreq : public EffectAutoGUI
+	{		
+		EFFECT_BODY(5, "FormantFilterFreq", "eff_octave_down");
+		
+		FormantFilterFreq(int X, int Y): 
 		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("freq_mul", 0.5f), EffectArgument("mul", 1.0f)}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_FREQ_INBUS), ArgVis(VT_GRADUALSLIDER, FloatArray(21, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f, 17.0f, 18.0f, 19.0f, 20.0f)), ArgVis(VT_SLIDER, 0.0f, 5.0f)})
 		{sendInstance(); initGUI(X, Y, 20);}
-		~FormantFilter() {quitGUI();}
+		~FormantFilterFreq() {quitGUI();}
 	};
 	
 	class Amplitude : public EffectAutoGUI
@@ -955,10 +966,9 @@
 					}
 					
 					(*(std::string*)(argsVis[0].data)).erase(0, lastSlash+1);
-					sendInstance(true); 
 				}
-				else
-				sendInstance(); 
+				
+				sendInstance(true); 
 				
 				initGUI(X, Y);
 				
@@ -1055,7 +1065,7 @@
 				args[0].set(bufnum);
 				*(std::string*)(argsVis[0].data)=OSCConn::getBufferFileById(bufnum);
 				
-				sendInstance(); 
+				sendInstance(true); 
 				
 				initGUI(X, Y);
 				
@@ -1412,18 +1422,90 @@
 		~FBam() {quitGUI();}
 	};
 	
-	class FBamEnv : public EffectAutoGUI //Do zrobienia
+	class FBamEnv : public EffectAutoGUI 
 	{
 		EFFECT_BODY(7, "FBamEnv", "eff_fbam_env");
 		
 		FBamEnv(int X, int Y): 
 		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()),
-		EffectArgument("freq", 250.0f), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
+		EffectArgument("freq", 440.0f), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
 		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), 
-		ArgVis(VT_SLIDER, 0.0f, 2000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		ArgVis(VT_SLIDER, 20.0f, 2000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
 		{sendInstance(); initGUI(X, Y);}
 		~FBamEnv() {quitGUI();}
 	};
+	
+	class FBamEnvFreq : public EffectAutoGUI
+	{
+		EFFECT_BODY(7, "FBamEnvFreq", "eff_fbam_env1");
+		
+		FBamEnvFreq(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()),
+		EffectArgument("freq_bus", 440.0f), EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), 
+		ArgVis(VT_FREQ_INBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FBamEnvFreq() {quitGUI();}
+	};
+	
+	class FBamFiddle : public EffectAutoGUI
+	{
+		EFFECT_BODY(6, "FBamFiddle", "eff_fbam_fiddle");
+		
+		FBamFiddle(int X, int Y): 
+		args({EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()),
+		EffectArgument("feedback", 0.1f), EffectArgument("amp", 1.0f), EffectArgument("amp_attackTime", 0.01f), EffectArgument("amp_releaseTime", 0.01f)}),
+		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), 
+		ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 2.5f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y);}
+		~FBamFiddle() {quitGUI();}
+	};
+	
+	class Concat : public EffectAutoGUI
+	{
+		EFFECT_BODY(12, "Concat", "eff_concat");
+		
+		Concat(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("control_bus", OSCConn::getFreeBus()), EffectArgument("source_bus", OSCConn::getFreeBus()), 
+		EffectArgument("seektime", 10.0f), EffectArgument("seekdur", 10.0f), EffectArgument("matchlength", 0.05f),
+		EffectArgument("freezestore", 0.0f), EffectArgument("zcr", 0.5f), EffectArgument("lms", 0.1f), EffectArgument("sc", 1.0f), EffectArgument("st", 1.0f), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), ArgVis(VT_INBUS), 
+		ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f),
+		ArgVis(VT_GRADUALSLIDER, 0, 1), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y, 35);}
+		~Concat() {quitGUI();}
+	};
+	
+	class ConcatSinus : public EffectAutoGUI
+	{
+		EFFECT_BODY(13, "ConcatSinus", "eff_concat_sinus");
+		
+		ConcatSinus(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("source_bus", OSCConn::getFreeBus()), 
+		EffectArgument("freq", 440.0f), EffectArgument("amp", 1.0f), EffectArgument("seektime", 10.0f), EffectArgument("seekdur", 10.0f), EffectArgument("matchlength", 0.05f),
+		EffectArgument("freezestore", 0.0f), EffectArgument("zcr", 0.5f), EffectArgument("lms", 0.1f), EffectArgument("sc", 1.0f), EffectArgument("st", 1.0f), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), 
+		ArgVis(VT_SLIDER, 20.0f, 2000.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f),
+		ArgVis(VT_GRADUALSLIDER, 0, 1), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y, 35);}
+		~ConcatSinus() {quitGUI();}
+	};
+	
+	class ConcatSinusBus : public EffectAutoGUI
+	{
+		EFFECT_BODY(13, "ConcatSinusBus", "eff_concat_sinus_from_bus");
+		
+		ConcatSinusBus(int X, int Y): 
+		args({EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("source_bus", OSCConn::getFreeBus()), 
+		EffectArgument("freq_bus", OSCConn::getFreeBus()), EffectArgument("amp_bus", OSCConn::getFreeBus()), EffectArgument("seektime", 10.0f), EffectArgument("seekdur", 10.0f), EffectArgument("matchlength", 0.05f),
+		EffectArgument("freezestore", 0.0f), EffectArgument("zcr", 0.5f), EffectArgument("lms", 0.1f), EffectArgument("sc", 1.0f), EffectArgument("st", 1.0f), EffectArgument("mul", 1.0f)}),
+		argsVis({ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), 
+		ArgVis(VT_FREQ_INBUS), ArgVis(VT_AMP_INBUS), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 20.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f),
+		ArgVis(VT_GRADUALSLIDER, 0, 1), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 2.0f), ArgVis(VT_SLIDER, 0.0f, 10.0f)})
+		{sendInstance(); initGUI(X, Y, 35);}
+		~ConcatSinusBus() {quitGUI();}
+	};
+	
 	
 	void registerEffects();
 	

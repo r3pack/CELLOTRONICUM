@@ -13,6 +13,7 @@ void registerEffects()
 	REGISTER_EFFECT(OctaveUp, "Spectral");
 	REGISTER_EFFECT(OctaveDown, "Spectral");
 	REGISTER_EFFECT(FormantFilter, "Spectral");
+	REGISTER_EFFECT(FormantFilterFreq, "Spectral");
 	REGISTER_EFFECT(Hadamard, "Spectral");
 	REGISTER_EFFECT(Hadamard2, "Spectral");
 	
@@ -54,8 +55,8 @@ void registerEffects()
 	REGISTER_EFFECT(TartiniPitch, "Analysis");
 	REGISTER_EFFECT(QitchPitch, "Analysis");
 	REGISTER_EFFECT(Goetzel, "Analysis");
-	REGISTER_EFFECT(ParamToFreqency, "Analysis");
-	REGISTER_EFFECT(ParamToAmplitude, "Analysis");
+	//REGISTER_EFFECT(ParamToFreqency, "Analysis"); //zakomentowane bo nie działa
+	//REGISTER_EFFECT(ParamToAmplitude, "Analysis");
 	
 	REGISTER_EFFECT_EX(FreqBucketing, "Analysis", "FrequencyModifiers");
 	REGISTER_EFFECT_EX(FreqHalfToneBucketing, "Analysis", "FrequencyModifiers");
@@ -71,6 +72,10 @@ void registerEffects()
 	REGISTER_EFFECT_EX(ShepardCycleTone, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(AYSimple, "Generators", "Synthesizers");
 	REGISTER_EFFECT_EX(YMSimple, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(FBam, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(FBamEnv, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(FBamEnvFreq, "Generators", "Synthesizers");
+	REGISTER_EFFECT_EX(FBamFiddle, "Generators", "Synthesizers");
 	
 	REGISTER_EFFECT_EX(Sinus, "Generators", "Oscillators");
 	
@@ -116,6 +121,10 @@ void registerEffects()
 	REGISTER_EFFECT_EX(MobilePhoneLag3, "Distortions", "Sound Damage");
 	REGISTER_EFFECT_EX(Gramophone, "Distortions", "Sound Damage");
 	
+	
+	REGISTER_EFFECT_EX(Concat, "Granular-Synthetic", "Concatenation Cross Synthesis");
+	REGISTER_EFFECT_EX(ConcatSinus, "Granular-Synthetic", "Concatenation Cross Synthesis");
+	REGISTER_EFFECT_EX(ConcatSinusBus, "Granular-Synthetic", "Concatenation Cross Synthesis");
 	
 	REGISTER_EFFECT(AFM1, "Natural-Synthetic");
 	REGISTER_EFFECT(AFM1Env, "Natural-Synthetic");
@@ -229,6 +238,14 @@ Effect* getEffect(const char* name, int X, int Y)
 	EFFECT_BY_NAME(WSDistortionWetDry);
 	EFFECT_BY_NAME(RLPFD);
 	EFFECT_BY_NAME(Recordbuf);
+	EFFECT_BY_NAME(FormantFilterFreq);
+	EFFECT_BY_NAME(FBam);
+	EFFECT_BY_NAME(FBamEnv);
+	EFFECT_BY_NAME(FBamEnvFreq);
+	EFFECT_BY_NAME(FBamFiddle);
+	EFFECT_BY_NAME(Concat);
+	EFFECT_BY_NAME(ConcatSinus);
+	EFFECT_BY_NAME(ConcatSinusBus);
 	return NULL;
 }
 

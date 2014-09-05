@@ -95,7 +95,7 @@ SynthDef.new(\eff_amplitude, {
 
 SynthDef.new(\eff_param_to_bus, {
 	arg param, bus;
-	Out.kr(bus, param);
+	Out.kr(bus, DC.kr(1)*param);
 }).add;
 
 // PITCH DETECTION.
