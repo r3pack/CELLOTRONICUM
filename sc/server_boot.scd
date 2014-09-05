@@ -334,7 +334,7 @@ OSCdef.new(
 	\plot_tree,
 	{
 		arg msg, time, addr, recvPort;
-		s.plotTree;
+		{s.plotTree;}.defer;
 		"plotTree".postln;
 	},
 	'/plot_tree'
@@ -344,7 +344,7 @@ OSCdef.new(
 	\meter,
 	{
 		arg msg, time, addr, recvPort;
-		s.meter;
+		{s.meter}.defer;
 		"meter".postln;
 	},
 	'/meter'
@@ -354,7 +354,7 @@ OSCdef.new(
 	\freqscope,
 	{
 		arg msg, time, addr, recvPort;
-		s.freqscope;
+		{s.freqscope}.defer;
 		"freqscope".postln;
 	},
 	'/freqscope'
