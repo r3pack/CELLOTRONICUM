@@ -6,43 +6,56 @@ SynthDef.new(\eff_hadamard_first, {
 }).add;
 
 SynthDef.new(\eff_hadamard_last, {
-	arg inbus=8, outbus=0, hadamard_cut=10;
+	arg inbus=8, outbus=0, hadamard_cut=64;
 	var in = In.ar(inbus,1);
 	var res = in - WalshHadamard.ar(in, hadamard_cut);
 	Out.ar(outbus,res);
 }).add;
 
+
 SynthDef.new(\eff_warm_chorus, {
 	//Pierwsza próba - na razie na gotowych pitch shifterach
 	//http://quod.lib.umich.edu/i/icmc/bbp2372.2012.014/--warm-chorus-re-thinking-the-chorus-effect-using/4?view=pdf
 	arg inbus=8, outbus=0,
-        amp_attack=0.02, amp_release=0.5, max_delay=0.2, hadamard_cut=1;
+        amp_attack=0.02, amp_release=0.5, max_delay=0.2, hadamard_cut=60;
     var in = In.ar(inbus,1);
 	var amp = Amplitude.ar(in, amp_attack,amp_release);
 	var min_delay = SampleDur.ir*4;
 	var semitones = [0, 0.02, 0.03, 0.05, 0.07, 0.11, 0.13];
 	var delays = [ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay)];
-	var sig = semitones.collect({|e, i| PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12)));}); //optymalizacja na później - multiple-tap delay line
+	var sig = semitones.collect({|e, i| LPZ2.ar(PitchShift.ar(DelayC.ar(in, max_delay, delays[i]), 0.2, (pow(2,e/12))));}); //optymalizacja na później - multiple-tap delay line
+	//var sig_diff = sig.collect({ |item, i| item - WalshHadamard.ar(all,hadamard_cut);});
+	//var sig_harm = sig_diff.collect( {|item, i| ;};
 	var all = Mix.ar(sig)/8;
-	var res = all - WalshHadamard.ar(all, hadamard_cut);
+	var diffusion = all - WalshHadamard.ar(all, hadamard_cut);
+	var delays2 = [ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay), ExpRand.new(min_delay,max_delay)];
+	var delayed_and_shifted = semitones.collect({|e, i| LPZ2.ar(PitchShift.ar(DelayC.ar(diffusion, max_delay, delays2[i]), 0.2, (pow(2,e/12))));});
+	var res = Mix.ar(delayed_and_shifted);
     Out.ar(outbus,res);
 }).add;
+
 
 /* TESTS
 
 b = Buffer.read(s, ~p +/+ "D-DUR.aiff");
 b = Buffer.read(s, ~p +/+ "zBrody1.wav");
-
+// 0 - D-DUR
+// 1 - zBrody1
 
 s.prepareForRecord(~p +/+ "d-dur-harmonizer.aiff");
 s.record;
 
-x = Synth.new(\eff_hadamard_first,
-	[\inbus, 16, \outbus, 0]);
-Synth.new(\eff_playbuf, [\outbus, 0, \bufnum, 0]);
+x = Synth.new(\eff_hadamard_last,
+	[\inbus, 17, \outbus, 0]);
+Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
 
-x.set(\hadamard_cut, 0);
+x.set(\hadamard_cut, 50);
 
+x = Synth.new(\eff_warm_chorus2,
+	[\inbus, 17, \outbus, 0]);
+Synth.new(\eff_playbuf, [\outbus, 17, \bufnum, 0]);
+
+x.set(\hadamard_cut, 60);
 
 s.stopRecording;
 
