@@ -87,6 +87,7 @@ OSCdef.new(
 		s.reboot;
 		~e = Dictionary.new(0); //synths on server
 		~bus = Dictionary.new(0); //busses
+		~b = Dictionary.new(0); //buffers
 		s.waitForBoot(func_start, inf, func_onFailure);
 	},
 	'/app_reboot'
