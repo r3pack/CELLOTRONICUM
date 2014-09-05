@@ -331,12 +331,12 @@ OSCdef.new(
 // SUPER COLLIDER BUILD-IN INFO:
 
 OSCdef.new(
-	\plotTree,
+	\plot_tree,
 	{
 		arg msg, time, addr, recvPort;
 		s.plotTree;
 	},
-	'/plotTree'
+	'/plot_tree'
 );
 
 OSCdef.new(
