@@ -31,6 +31,7 @@ bool checkInputs()
 
 	while (SDL_PollEvent(&event))
 	{
+		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		switch(event.type)
 		{
 			case SDL_QUIT:
@@ -40,7 +41,7 @@ bool checkInputs()
 				{
 					int x=event.button.x;
 					int y=event.button.y;
-					if(event.button.button==SDL_BUTTON_LEFT)
+					if(event.button.button==SDL_BUTTON_LEFT && !(state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT]) && !(state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -53,7 +54,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(event.button.button==SDL_BUTTON_RIGHT)
+					if(event.button.button==SDL_BUTTON_RIGHT || (event.button.button==SDL_BUTTON_LEFT && (state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -66,7 +67,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(event.button.button==SDL_BUTTON_MIDDLE)
+					if(event.button.button==SDL_BUTTON_MIDDLE || (event.button.button==SDL_BUTTON_LEFT && (state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
 						{
@@ -88,7 +89,7 @@ bool checkInputs()
 				{
 					int x=event.button.x;
 					int y=event.button.y;
-					if(event.button.button==SDL_BUTTON_LEFT)
+					if(event.button.button==SDL_BUTTON_LEFT && !(state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT]) && !(state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -100,7 +101,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(event.button.button==SDL_BUTTON_RIGHT)
+					if(event.button.button==SDL_BUTTON_RIGHT || (event.button.button==SDL_BUTTON_LEFT && (state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -112,7 +113,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(event.button.button==SDL_BUTTON_MIDDLE)
+					if(event.button.button==SDL_BUTTON_MIDDLE || (event.button.button==SDL_BUTTON_LEFT && (state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
 						{
@@ -133,7 +134,7 @@ bool checkInputs()
 				{
 					int x=event.button.x;
 					int y=event.button.y;
-					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && !(state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT]) && !(state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -145,7 +146,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT) || (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();++it)
 						{
@@ -157,7 +158,7 @@ bool checkInputs()
 						}
 					}
 					else
-					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE))
+					if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE) || (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT) && (state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL])))
 					{
 						for(auto it=effectInstanceList->rbegin();it!=effectInstanceList->rend();)
 						{
@@ -184,35 +185,33 @@ bool checkInputs()
 				
 				if(it==effectInstanceList->end())
 				effectCreator.receiveKeyboardEvent(event.key.keysym.scancode);
-				
-				const Uint8 *state = SDL_GetKeyboardState(NULL);
 			
-				if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
+				if((state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]) && state[SDL_SCANCODE_S])
 				{
 					getSaveFile(fileStr, MAX_PATH);
 					Effect::saveToFile(fileStr);
 				}
-				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_L])
+				else if((state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]) && state[SDL_SCANCODE_L])
 				{
 					Effect::saveToFile("session_before_load.cello");
 					Effect::clearAll();
 					getOpenFile(fileStr, MAX_PATH);
 					Effect::loadFromFile(fileStr);
 				}
-				else if(state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_E])
+				else if((state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]) && (state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT]) && state[SDL_SCANCODE_E])
 				{
 					Effect::saveToFile("session_before_erase.cello");
 					Effect::clearAll();
 				}
-				else if(state[SDL_SCANCODE_LALT] && state[SDL_SCANCODE_R])
+				else if((state[SDL_SCANCODE_LALT] || state[SDL_SCANCODE_RALT]) && state[SDL_SCANCODE_R])
 				{
 					OSCConn::recordToFile();
 				}
-				else if(!state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				else if(!(state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && (state[SDL_SCANCODE_LCTRL] || state[SDL_SCANCODE_RCTRL]) && state[SDL_SCANCODE_R])
 				{
 					OSCConn::startRecord();
 				}
-				else if(state[SDL_SCANCODE_LSHIFT] && state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_R])
+				else if((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && state[SDL_SCANCODE_R])
 				{
 					OSCConn::stopRecord();
 				}

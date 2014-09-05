@@ -55,8 +55,8 @@
 		
 		GenEcho(int X, int Y): 
 		args({EffectArgument("feedback_input", OSCConn::getFreeBus()), EffectArgument("feedback_output", OSCConn::getFreeBus()), EffectArgument("inbus", OSCConn::getFreeBus()), EffectArgument("outbus", OSCConn::getFreeBus()), EffectArgument("decay", 0.1f), EffectArgument("delay", 0.15f)}),
-		argsVis({ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
-		{sendInstance(); initGUI(X, Y, 40, 45);}
+		argsVis({ArgVis(VT_FEEDBACK_INBUS), ArgVis(VT_FEEDBACK_OUTBUS), ArgVis(VT_INBUS), ArgVis(VT_OUTBUS), ArgVis(VT_SLIDER, 0.0f, 1.0f), ArgVis(VT_SLIDER, 0.0f, 1.0f)})
+		{sendInstance(); initGUI(X, Y, 45, 40);}
 		~GenEcho() {quitGUI();}
 	};
 	

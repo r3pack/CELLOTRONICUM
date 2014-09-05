@@ -60,6 +60,8 @@
 			VT_FREQ_OUTBUS,
 			VT_AMP_INBUS,
 			VT_AMP_OUTBUS,
+			VT_FEEDBACK_INBUS,
+			VT_FEEDBACK_OUTBUS,
             VT_SLIDER,
 			VT_GRADUALSLIDER,
 			VT_ENTRYBOX,
@@ -243,6 +245,12 @@
 					break;
 					case VT_OUTBUS:
 					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_OUTBUS, this, i), args[i].getName()));
+					break;
+					case VT_FEEDBACK_INBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_FEEDBACK_INBUS, this, i), args[i].getName()));
+					break;
+					case VT_FEEDBACK_OUTBUS:
+					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_FEEDBACK_OUTBUS, this, i), args[i].getName()));
 					break;
 					case VT_FREQ_INBUS:
 					drawables.push_back(ParamDrawable(new Bus(posX+argpos[i].first, posY+argpos[i].second, BT_FREQ_INBUS, this, i), args[i].getName()));
@@ -579,12 +587,14 @@
 					case VT_INBUS:
 					case VT_FREQ_INBUS:
 					case VT_AMP_INBUS:
+					case VT_FEEDBACK_OUTBUS:
 						visualPositions[i]=int_pair(0+left_padding, bus_y);
 						bus_y+=bus_period;
 					break;
 					case VT_OUTBUS:
 					case VT_FREQ_OUTBUS:
 					case VT_AMP_OUTBUS:
+					case VT_FEEDBACK_INBUS:
 						visualPositions[i]=int_pair(0, bus_y2);
 						bus_y2+=bus_period;
 					break;
@@ -618,7 +628,7 @@
 			
 			for(int i=0;i<argsCount;++i)
 			{
-				if(argvis[i].visType==VT_OUTBUS || argvis[i].visType==VT_FREQ_OUTBUS || argvis[i].visType==VT_AMP_OUTBUS)
+				if(argvis[i].visType==VT_OUTBUS || argvis[i].visType==VT_FREQ_OUTBUS || argvis[i].visType==VT_AMP_OUTBUS || argvis[i].visType==VT_FEEDBACK_INBUS)
 				{
 					visualPositions[i].first=x;
 				}

@@ -323,58 +323,10 @@ void Effect::updateTopologicalSequence()
 	effectTree.clear();
 	
 	for(auto it=getConnections()->begin();it!=getConnections()->end();++it)
-	effectTree.insert(std::pair<int, int>((*it).first->getEffect()->getId(), (*it).second->getEffect()->getId()));
-
-
-	//odcyklanie grafu (trza usunąć cykle żeby sortowanie topologiczne działało)
-	
-	/*std::set <int> visitedVerticles;
-	
-	for(auto it=effectTree.begin();it!=effectTree.end();++it)
 	{
-		int id=(*it).second;
-		auto itlow=tmp.lower_bound(std::pair<int, int>(id, -1)); 
-		if(itlow==tmp.end() || (*itlow).first!=id)
-		{
-			tmp.insert(std::pair<int,int>(id,1));
-		}
+		if((*it).first->getType()!=BT_FEEDBACK_OUTBUS && (*it).second->getType()!=BT_FEEDBACK_OUTBUS)
+		effectTree.insert(std::pair<int, int>((*it).first->getEffect()->getId(), (*it).second->getEffect()->getId()));
 	}
-	
-	for(auto it=effectTree.begin();it!=effectTree.end();++it)
-	{
-		int id=(*it).first;
-		auto itlow=tmp.lower_bound(std::pair<int, int>(id, -1)); 
-		if(itlow==tmp.end() || (*itlow).first!=id)
-		{
-			Q.push(id);
-		}
-	}
-	tmp.clear();
-	
-	while(!Q.empty())
-	{
-		int u=Q.front();
-		Q.pop();
-		
-		visitedVerticles.insert(u);
-		
-		auto itlow=effectTree.lower_bound(std::pair<int, int>(u, -1)); 
-		auto itup=effectTree.upper_bound(std::pair<int, int>(u+1, -1));
-		
-		for(auto it=itlow;it!=itup;)
-		{
-			if(visitedVerticles.find(it->second)==visitedVerticles.end())
-			{
-				Q.push(it->second);
-				++it;
-			}
-			else
-			{
-				it=effectTree.erase(it);
-			}
-		}
-	}*/
-	//koniec odcyklania grafu
 	
 	for(auto it=effectTree.begin();it!=effectTree.end();++it)
 	{
@@ -734,7 +686,16 @@ void EffectCreator::enter()
 		{
 			if(getController(chosenEffect->name, x, y)==NULL)
 			{
-				fprintf(stderr, "Error: No Effect or Controller called '%s'\n", chosenEffect->name);
+				if(strcmp(chosenEffect->name, "PlotTree")==0)
+				OSCConn::sendSimpleMessage("/plot_tree");
+				else
+				if(strcmp(chosenEffect->name, "Meter")==0)
+				OSCConn::sendSimpleMessage("/meter");
+				else
+				if(strcmp(chosenEffect->name, "FreqScope")==0)
+				OSCConn::sendSimpleMessage("/freqscope");
+				else
+				fprintf(stderr, "Error: No Effect, Controller or anything else called '%s'\n", chosenEffect->name);
 			}
 		}
 	}
@@ -787,6 +748,13 @@ void EffectCreator::init()
 		const char* name=(*it);
 		(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry(name, (*mapIt), true));
 	}
+	
+	chosenEffect->submenuEntries->push_back(new EffectCreatorMenuEntry("SCDebug", chosenEffect, false));
+	mapIt=--chosenEffect->submenuEntries->end();
+	
+	(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry("PlotTree", (*mapIt), true));
+	(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry("Meter", (*mapIt), true));
+	(*mapIt)->submenuEntries->push_back(new EffectCreatorMenuEntry("FreqScope", (*mapIt), true));
 	
 	chosenEffect->calculateWidth();
 	

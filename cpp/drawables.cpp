@@ -151,7 +151,9 @@ bool Bus::setClicked()
 		
 		if(!((bus1->getType()==BT_OUTBUS && bus2->getType()==BT_INBUS) ||
 		     (bus1->getType()==BT_FREQ_OUTBUS && bus2->getType()==BT_FREQ_INBUS) ||
-		     (bus1->getType()==BT_AMP_OUTBUS && bus2->getType()==BT_AMP_INBUS)))
+		     (bus1->getType()==BT_AMP_OUTBUS && bus2->getType()==BT_AMP_INBUS) ||
+			 (bus1->getType()==BT_FEEDBACK_OUTBUS && bus2->getType()==BT_INBUS) ||
+			 (bus1->getType()==BT_OUTBUS && bus2->getType()==BT_FEEDBACK_INBUS )))
 		{
 			fprintf(stderr, "Error: bad buses type\n");
 			Bus::lastClicked=-1;

@@ -23,7 +23,9 @@
 		BT_FREQ_INBUS,
 		BT_FREQ_OUTBUS,
 		BT_AMP_INBUS,
-		BT_AMP_OUTBUS
+		BT_AMP_OUTBUS,
+		BT_FEEDBACK_INBUS,
+		BT_FEEDBACK_OUTBUS
 	};
 
 	///rodzaj zdarzenia(kliknięcia) myszy
@@ -270,7 +272,7 @@
 			if(lastClicked!=id) clicked=false;
 			
 			SDL_Color color;
-			if(type==BT_INBUS || type==BT_OUTBUS)
+			if(type==BT_INBUS || type==BT_OUTBUS || type==BT_FEEDBACK_INBUS || type==BT_FEEDBACK_OUTBUS)
 			color=COLOR_AUDIO_BUS;
 			else if(type==BT_FREQ_INBUS || type==BT_FREQ_OUTBUS)
 			color=COLOR_FREQ_BUS;
