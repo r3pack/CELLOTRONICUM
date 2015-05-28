@@ -2,6 +2,9 @@
 #include <cstring>
 #include <chrono>
 #include <thread>
+#ifdef  __LINUX__
+	#include <unistd.h>
+#endif
 #include "osc.h"
 #include "effects.h"
 #include "effectsdef.h"
@@ -267,7 +270,14 @@ bool launchSuperCollider()
 	
 	printf("Executing: %s %s...\n", sclangPath, tab);
 	
-	ShellExecute(NULL, "open", sclangPath, tab, NULL, SW_SHOWDEFAULT);
+	#ifdef __LINUX__
+		if(fork()){
+			execlp(sclangPath,tab);
+		}
+
+	#else
+		ShellExecute(NULL, "open", sclangPath, tab, NULL, SW_SHOWDEFAULT);
+	#endif
 	
 	return true;
 }

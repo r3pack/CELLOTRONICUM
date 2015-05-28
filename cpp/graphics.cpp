@@ -1,3 +1,6 @@
+#ifdef  __LINUX__
+	#include <unistd.h>
+#endif
 #include "graphics.h"
 #include "effects.h"
 #include "controllers.h"
@@ -63,12 +66,23 @@ void quitSDL()
 
 void ShowAlert(const wchar_t* title, const wchar_t* text)
 {
-	 MessageBoxW(NULL, text, title, MB_OK);
+#ifdef __linux__
+	char title2[100], text2[500];
+	wcstombs(title2,title,100);
+	wcstombs(text2,text,500);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title2, text2, window);
+#else
+  MessageBoxW(NULL, text, title, MB_OK);
+#endif
 }
 
 void getCurrentDir(char* filename, int size)
 {
+#ifdef  __LINUX__
+	getcwd(filename, size);
+#else
 	GetCurrentDirectory(size, filename);
+#endif
 }
 
 void getOpenFile(char* filename, int size)
@@ -271,4 +285,3 @@ SDL_Color getDarkerColor(SDL_Color color)
 	color.b=(color.b+127)/2;
 	return color;
 }
-
