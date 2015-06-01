@@ -2,6 +2,9 @@
 #include <cstring>
 #include <chrono>
 #include <thread>
+#ifdef  __LINUX__
+	#include <unistd.h>
+#endif
 #include "osc.h"
 #include "effects.h"
 #include "effectsdef.h"
@@ -260,15 +263,34 @@ bool launchSuperCollider()
 		if(i==1) return false;
 	}
 	
-	char tab[MAX_PATH*2+10];
-	sprintf(tab, "-d \"%s\" \"%s\\%s\"", sclangPathDirectory, currentDir, SC_MAIN_FILE);
+	char main_scd_path[MAX_PATH+10];
+	#ifdef __LINUX__
+		char dir_sep_char = '/';
+	#else
+		char dir_sep_char = '\\';
+	#endif
+	sprintf(main_scd_path, "%s%c%s", currentDir, dir_sep_char, SC_MAIN_FILE);
 	
-	//przykładowe polecenie: "C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
 	
-	printf("Executing: %s %s...\n", sclangPath, tab);
 	
-	ShellExecute(NULL, "open", sclangPath, tab, NULL, SW_SHOWDEFAULT);
+	#ifdef __LINUX__
+		if(!fork()){
+			printf("Executing: %s %s...\n", sclangPath, main_scd_path);
+			//execlp(sclangPath,sclangPath,"-d","/usr/share/SuperCollider",main_scd_path,NULL);
+			execlp(sclangPath,sclangPath,main_scd_path,NULL);
+			// execlp never returns
+		}
+
+	#else
+		char tab[MAX_PATH*2+10];
+		sprintf(tab, "-d \"%s\" \"%s\"", sclangPathDirectory, main_scd_path);
+
+		//przykładowe polecenie: "C:\Program Files (x86)\SuperCollider-3.6.6\sclang.exe" -d "C:\Program Files (x86)\SuperCollider-3.6.6" "C:\Users\praktykant\CELLOTRONICUM\main.scd"
+		printf("Executing: %s %s...\n", sclangPath, tab);
+		ShellExecute(NULL, "open", sclangPath, tab, NULL, SW_SHOWDEFAULT);
+	#endif
 	
+
 	return true;
 }
 
@@ -289,10 +311,17 @@ bool getSCPath()
 		fgets(sclangPath, MAX_PATH, pathFile);
 		if(existsTest(sclangPath))
 		{
+			fclose(pathFile);
 			return true;
 		}
 	}
-	fclose(pathFile);
+
+#ifdef __LINUX__
+	if(existsTest("/usr/bin/sclang")){
+		strcpy(sclangPath,"/usr/bin/sclang");
+		return true;
+	}
+#endif
 	
 	ShowAlert(L"SuperCollider Path", L"To launch program you must provide path to sclang in SuperCollider folder.");
 	getOpenFile(sclangPath, MAX_PATH);
